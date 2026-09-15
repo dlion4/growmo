@@ -1,0 +1,55 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+:root {
+  --bg-base: #e7f3ec;
+  --sea-ink: #173a40;
+  --sea-ink-soft: #416166;
+  --lagoon: #4fb8b2;
+  --lagoon-deep: #328f97;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--sea-ink);
+  min-height: 100vh;
+}
+
+.navbar {
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  color: var(--lagoon-deep);
+}
+
+.nav-link {
+  color: var(--sea-ink-soft);
+  font-weight: 500;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--lagoon-deep);
+}
+
+.btn-primary {
+  background-color: var(--lagoon);
+  border-color: var(--lagoon);
+}
+
+.btn-primary:hover {
+  background-color: var(--lagoon-deep);
+  border-color: var(--lagoon-deep);
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.form-control:focus {
+  border-color: var(--lagoon);
+  box-shadow: 0 0 0 0.25rem rgba(79, 184, 178, 0.25);
+}
