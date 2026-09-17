@@ -143,7 +143,16 @@ see prompt) mounted the same way for `/app/*`.
 
 Blueprint source: `growmo.md` (pages 1–17) + `growmo-p2.md` (pages 17–25+).
 
-## 11. Hard DON'Ts
+## 11. Dashboard shell (AppShell)
+
+- `src/components/app/AppShell.tsx` + `src/data/app/nav.ts` (25 modules, 7 groups, `ready` flags) + `src/styles.css` §18.
+- Dark gradient sidebar (`#0b1a0d → #12300f`), collapsible to 78px icons-only on desktop, off-canvas + scrim under 1024px.
+- Sticky blur topbar: hamburger, breadcrumbs, ⌘K command palette trigger, notifications dropdown, tools dropdown, avatar dropdown, wallet pill, cloud-sync.
+- Right drawers: alerts, weather, notes (localStorage), help. Global FAB (+ New task / note / photo). All controls real — no dead buttons.
+- `__root.tsx` renders `<AppShell><Outlet /></AppShell>` chromeless for `/app` and `/app/*`. Pages render inside `.gm-app-inner` (max 1200px).
+- Shared app components in §18: `.gm-modal`, `.gm-drawer`, `.gm-menu`, `.gm-table`, `.gm-steps`, `.gm-tabs`, `.gm-ring`, `.gm-otp`, `.gm-pinpad`, `.gm-checkcard`, `.gm-module-grid`.
+
+## 12. Hard DON'Ts
 No new colors/fonts outside tokens · no hex/rgb literals in `.tsx` (use `var(--gm-*)`) ·
 no Tailwind/MUI/new libs · no dead buttons or links (unbuilt routes stay disabled with
 "Soon", never 404) · no lorem ipsum · no `console.log`/TODOs · no other git branches ·

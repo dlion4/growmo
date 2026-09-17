@@ -38,15 +38,8 @@ section table. Do not summarize; the AI must implement every listed section.>
 2. DATA_FILE with realistic Kenyan demo data (KES, 07XX phones, real counties/
    crops/varieties, Kiswahili microcopy). No lorem ipsum, ever.
 3. Reusable widgets → src/components/app/ (check dir first; no duplicates).
-4. If CREATE_SHELL=true, also create:
-   - src/components/app/AppShell.tsx — sidebar (grouped nav of ALL 25 routes
-     from the MASTER_THEME map, unbuilt ones disabled with "Soon" badge) +
-     topbar (farm name, weather chip, wallet chip → /app/wallet, bell with
-     badge, avatar, EN|SW toggle) + mobile drawer + <Outlet/> content area,
-     styled ONLY with master-theme classes.
-   - src/data/app/nav.ts — the 25-route nav config with ready flags.
-   - __root.tsx: add isApp (pathname startsWith "/app") rendering
-     <AppShell/> + <ToastHost/>, same pattern as the auth chrome.
+4. (Retired — the AppShell, nav config, and __root isApp chrome already
+   exist. Never rebuild them; only flip your route to ready:true.)
 
 ## DESIGN CONSTRAINTS (anti-hallucination — zero exceptions)
 - Style ONLY with master-theme classes/tokens; no hex/rgb in .tsx (use

@@ -4,6 +4,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import { AuthMiniFooter, AuthTopbar } from '../components/auth/shell'
 import Footer from '../components/home/layout/Footer'
 import Header from '../components/home/layout/Header'
+import { AppShell } from '../components/app/AppShell'
 import { CartProvider } from '../store/cart'
 import { ToastHost, ToastProvider } from '../store/toast'
 
@@ -24,7 +25,7 @@ export const Route = createRootRoute({
     ],
     links: [
       // ?v= busts preview/proxy CSS caches — bump it whenever styles.css changes
-      { rel: 'stylesheet', href: `${appCss}?v=3` },
+      { rel: 'stylesheet', href: `${appCss}?v=4` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],
@@ -36,6 +37,16 @@ export const Route = createRootRoute({
 function Chrome({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation()
   const isAuth = pathname.startsWith('/auth')
+  const isApp = pathname === '/app' || pathname.startsWith('/app/')
+
+  if (isApp) {
+    return (
+      <>
+        <AppShell>{children}</AppShell>
+        <ToastHost />
+      </>
+    )
+  }
 
   if (isAuth) {
     return (

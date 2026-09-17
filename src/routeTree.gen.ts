@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AppIndexRouteImport } from './routes/app/index'
+import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthAccountStatusRouteImport } from './routes/auth/account-status'
 import { Route as AuthHubRouteImport } from './routes/auth/hub'
@@ -40,6 +42,16 @@ const AboutRoute = AboutRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppOnboardingRoute = AppOnboardingRouteImport.update({
+  id: '/app/onboarding',
+  path: '/app/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
@@ -117,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/app/onboarding': typeof AppOnboardingRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -128,6 +141,7 @@ export interface FileRoutesByFullPath {
   '/auth/security': typeof AuthSecurityRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/app/': typeof AppIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -136,6 +150,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/app/onboarding': typeof AppOnboardingRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -147,6 +162,7 @@ export interface FileRoutesByTo {
   '/auth/security': typeof AuthSecurityRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/app': typeof AppIndexRoute
   '/auth': typeof AuthIndexRoute
   '/services': typeof ServicesIndexRoute
   '/shop': typeof ShopIndexRoute
@@ -156,6 +172,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/app/onboarding': typeof AppOnboardingRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -167,6 +184,7 @@ export interface FileRoutesById {
   '/auth/security': typeof AuthSecurityRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/app/': typeof AppIndexRoute
   '/auth/': typeof AuthIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -177,6 +195,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/app/onboarding'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -188,6 +207,7 @@ export interface FileRouteTypes {
     | '/auth/security'
     | '/services/$slug'
     | '/shop/$slug'
+    | '/app/'
     | '/auth/'
     | '/services/'
     | '/shop/'
@@ -196,6 +216,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/app/onboarding'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -207,6 +228,7 @@ export interface FileRouteTypes {
     | '/auth/security'
     | '/services/$slug'
     | '/shop/$slug'
+    | '/app'
     | '/auth'
     | '/services'
     | '/shop'
@@ -215,6 +237,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/app/onboarding'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -226,6 +249,7 @@ export interface FileRouteTypes {
     | '/auth/security'
     | '/services/$slug'
     | '/shop/$slug'
+    | '/app/'
     | '/auth/'
     | '/services/'
     | '/shop/'
@@ -235,6 +259,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  AppOnboardingRoute: typeof AppOnboardingRoute
   AuthAccountStatusRoute: typeof AuthAccountStatusRoute
   AuthHubRoute: typeof AuthHubRoute
   AuthIdentityRoute: typeof AuthIdentityRoute
@@ -246,6 +271,7 @@ export interface RootRouteChildren {
   AuthSecurityRoute: typeof AuthSecurityRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
+  AppIndexRoute: typeof AppIndexRoute
   AuthIndexRoute: typeof AuthIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -272,6 +298,20 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/': {
+      id: '/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/onboarding': {
+      id: '/app/onboarding'
+      path: '/app/onboarding'
+      fullPath: '/app/onboarding'
+      preLoaderRoute: typeof AppOnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/': {
@@ -379,6 +419,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  AppOnboardingRoute: AppOnboardingRoute,
   AuthAccountStatusRoute: AuthAccountStatusRoute,
   AuthHubRoute: AuthHubRoute,
   AuthIdentityRoute: AuthIdentityRoute,
@@ -390,6 +431,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthSecurityRoute: AuthSecurityRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
+  AppIndexRoute: AppIndexRoute,
   AuthIndexRoute: AuthIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
