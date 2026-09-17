@@ -39,7 +39,7 @@ import {
   STATS,
   TESTIMONIALS,
 } from "../data/site";
-import { useCart } from "../store/cart";
+import { useToast } from "../store/toast";
 
 export const Route = createFileRoute("/")({ component: HomePage });
 
@@ -575,7 +575,7 @@ function HomePage() {
                     </div>
                   </div>
                   <div className="d-flex flex-wrap gap-2 mt-4">
-                    <button className="gm-btn gm-btn-ghost" onClick={() => cart.notify("Android app — coming to Play Store soon")}>
+                    <button className="gm-btn gm-btn-ghost" onClick={() => toast.notify("Android app — coming to Play Store soon", "info")}>
                       <Smartphone /> Android app
                     </button>
                     <a className="gm-btn gm-btn-ghost" href="tel:0800221000">

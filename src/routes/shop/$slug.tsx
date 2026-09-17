@@ -12,6 +12,7 @@ export const Route = createFileRoute("/shop/$slug")({ component: ProductDetailPa
 function ProductDetailPage() {
   const { slug } = Route.useParams();
   const cart = useCart();
+  const toast = useToast();
   const [qty, setQty] = useState(1);
   const product = PRODUCTS.find((p) => p.slug === slug);
 

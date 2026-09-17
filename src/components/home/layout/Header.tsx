@@ -26,6 +26,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { PRODUCTS, SERVICES, kes } from "../../../data/site";
 import { useCart } from "../../../store/cart";
+import { useToast } from "../../../store/toast";
 
 /* ================= Shared logo (also used by Footer) ================= */
 export function Logo({ dark = false }: { dark?: boolean }) {
@@ -145,6 +146,7 @@ const MENUS: MegaMenu[] = [
 export default function Header() {
   const { pathname } = useLocation();
   const cart = useCart();
+  const toast = useToast();
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -528,7 +530,7 @@ export default function Header() {
             <button
               className="gm-btn gm-btn-mpesa gm-btn-block"
               onClick={() => {
-                cart.notify("M-Pesa push sent — enter PIN to complete");
+                toast.notify("M-Pesa push sent — enter PIN to complete");
                 cart.closeCart();
               }}
             >
