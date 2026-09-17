@@ -296,7 +296,7 @@ export default function Header() {
             <a href="/#pricing" className="gm-btn gm-btn-soft gm-btn-sm gm-signin">
               Pricing
             </a>
-            <Link to="/contact" className="gm-btn gm-btn-sm gm-btn-keep">
+            <Link to="/auth/login" className="gm-btn gm-btn-sm gm-btn-keep">
               Start free <ArrowRight />
             </Link>
             <button
@@ -386,7 +386,7 @@ export default function Header() {
           ))}
         </div>
         <div className="gm-drawer-foot">
-          <Link to="/contact" className="gm-btn gm-btn-block">
+          <Link to="/auth/login" className="gm-btn gm-btn-block">
             Start farming free <ArrowRight />
           </Link>
           <a href="tel:0800221000" className="gm-btn gm-btn-outline gm-btn-block gm-btn-sm">
