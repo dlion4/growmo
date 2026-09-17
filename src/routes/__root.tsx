@@ -1,9 +1,11 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, useLocation } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { AuthMiniFooter, AuthTopbar } from '../components/auth/shell'
 import Footer from '../components/home/layout/Footer'
 import Header from '../components/home/layout/Header'
 import { CartProvider } from '../store/cart'
+import { ToastHost, ToastProvider } from '../store/toast'
 
 import appCss from '../styles.css?url'
 
@@ -29,6 +31,31 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
+/* Marketing chrome on site pages, minimal secure chrome on /auth/* — same master theme */
+function Chrome({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation()
+  const isAuth = pathname.startsWith('/auth')
+
+  if (isAuth) {
+    return (
+      <>
+        <AuthTopbar />
+        {children}
+        <AuthMiniFooter />
+        <ToastHost />
+      </>
+    )
+  }
+  return (
+    <>
+      <Header />
+      {children}
+      <Footer />
+      <ToastHost />
+    </>
+  )
+}
+
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -36,11 +63,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <CartProvider>
-          <Header />
-          {children}
-          <Footer />
-        </CartProvider>
+        <ToastProvider>
+          <CartProvider>
+            <Chrome>{children}</Chrome>
+          </CartProvider>
+        </ToastProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

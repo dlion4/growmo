@@ -5,6 +5,7 @@ import { ProductCard } from "../../components/ui/cards";
 import { Reveal, Stars } from "../../components/ui/primitives";
 import { PRODUCTS, kes } from "../../data/site";
 import { useCart } from "../../store/cart";
+import { useToast } from "../../store/toast";
 
 export const Route = createFileRoute("/shop/$slug")({ component: ProductDetailPage });
 
@@ -95,7 +96,7 @@ function ProductDetailPage() {
                   className="gm-btn gm-btn-mpesa gm-btn-block mt-2"
                   onClick={() => {
                     cart.add(product.slug, qty);
-                    cart.notify("M-Pesa push sent — enter PIN to complete");
+                    toast.notify("M-Pesa push sent — enter PIN to complete");
                   }}
                 >
                   Buy now with M-Pesa <ArrowRight />

@@ -12,6 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthIndexRouteImport } from './routes/auth/index'
+import { Route as AuthAccountStatusRouteImport } from './routes/auth/account-status'
+import { Route as AuthHubRouteImport } from './routes/auth/hub'
+import { Route as AuthIdentityRouteImport } from './routes/auth/identity'
+import { Route as AuthLoginRouteImport } from './routes/auth/login'
+import { Route as AuthMfaRouteImport } from './routes/auth/mfa'
+import { Route as AuthPasskeysRouteImport } from './routes/auth/passkeys'
+import { Route as AuthRecoveryRouteImport } from './routes/auth/recovery'
+import { Route as AuthRegisterRouteImport } from './routes/auth/register'
+import { Route as AuthSecurityRouteImport } from './routes/auth/security'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as ServicesSlugRouteImport } from './routes/services/$slug'
 import { Route as ShopIndexRouteImport } from './routes/shop/index'
@@ -30,6 +40,56 @@ const AboutRoute = AboutRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthIndexRoute = AuthIndexRouteImport.update({
+  id: '/auth/',
+  path: '/auth/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthAccountStatusRoute = AuthAccountStatusRouteImport.update({
+  id: '/auth/account-status',
+  path: '/auth/account-status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthHubRoute = AuthHubRouteImport.update({
+  id: '/auth/hub',
+  path: '/auth/hub',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthIdentityRoute = AuthIdentityRouteImport.update({
+  id: '/auth/identity',
+  path: '/auth/identity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/auth/login',
+  path: '/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthMfaRoute = AuthMfaRouteImport.update({
+  id: '/auth/mfa',
+  path: '/auth/mfa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthPasskeysRoute = AuthPasskeysRouteImport.update({
+  id: '/auth/passkeys',
+  path: '/auth/passkeys',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRecoveryRoute = AuthRecoveryRouteImport.update({
+  id: '/auth/recovery',
+  path: '/auth/recovery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/auth/register',
+  path: '/auth/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthSecurityRoute = AuthSecurityRouteImport.update({
+  id: '/auth/security',
+  path: '/auth/security',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
@@ -57,8 +117,18 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/auth/account-status': typeof AuthAccountStatusRoute
+  '/auth/hub': typeof AuthHubRoute
+  '/auth/identity': typeof AuthIdentityRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/mfa': typeof AuthMfaRoute
+  '/auth/passkeys': typeof AuthPasskeysRoute
+  '/auth/recovery': typeof AuthRecoveryRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/auth/security': typeof AuthSecurityRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/auth/': typeof AuthIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
 }
@@ -66,8 +136,18 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/auth/account-status': typeof AuthAccountStatusRoute
+  '/auth/hub': typeof AuthHubRoute
+  '/auth/identity': typeof AuthIdentityRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/mfa': typeof AuthMfaRoute
+  '/auth/passkeys': typeof AuthPasskeysRoute
+  '/auth/recovery': typeof AuthRecoveryRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/auth/security': typeof AuthSecurityRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/auth': typeof AuthIndexRoute
   '/services': typeof ServicesIndexRoute
   '/shop': typeof ShopIndexRoute
 }
@@ -76,8 +156,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/auth/account-status': typeof AuthAccountStatusRoute
+  '/auth/hub': typeof AuthHubRoute
+  '/auth/identity': typeof AuthIdentityRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/mfa': typeof AuthMfaRoute
+  '/auth/passkeys': typeof AuthPasskeysRoute
+  '/auth/recovery': typeof AuthRecoveryRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/auth/security': typeof AuthSecurityRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
+  '/auth/': typeof AuthIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
 }
@@ -87,8 +177,18 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/auth/account-status'
+    | '/auth/hub'
+    | '/auth/identity'
+    | '/auth/login'
+    | '/auth/mfa'
+    | '/auth/passkeys'
+    | '/auth/recovery'
+    | '/auth/register'
+    | '/auth/security'
     | '/services/$slug'
     | '/shop/$slug'
+    | '/auth/'
     | '/services/'
     | '/shop/'
   fileRoutesByTo: FileRoutesByTo
@@ -96,8 +196,18 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/auth/account-status'
+    | '/auth/hub'
+    | '/auth/identity'
+    | '/auth/login'
+    | '/auth/mfa'
+    | '/auth/passkeys'
+    | '/auth/recovery'
+    | '/auth/register'
+    | '/auth/security'
     | '/services/$slug'
     | '/shop/$slug'
+    | '/auth'
     | '/services'
     | '/shop'
   id:
@@ -105,8 +215,18 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/auth/account-status'
+    | '/auth/hub'
+    | '/auth/identity'
+    | '/auth/login'
+    | '/auth/mfa'
+    | '/auth/passkeys'
+    | '/auth/recovery'
+    | '/auth/register'
+    | '/auth/security'
     | '/services/$slug'
     | '/shop/$slug'
+    | '/auth/'
     | '/services/'
     | '/shop/'
   fileRoutesById: FileRoutesById
@@ -115,8 +235,18 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  AuthAccountStatusRoute: typeof AuthAccountStatusRoute
+  AuthHubRoute: typeof AuthHubRoute
+  AuthIdentityRoute: typeof AuthIdentityRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthMfaRoute: typeof AuthMfaRoute
+  AuthPasskeysRoute: typeof AuthPasskeysRoute
+  AuthRecoveryRoute: typeof AuthRecoveryRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthSecurityRoute: typeof AuthSecurityRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
+  AuthIndexRoute: typeof AuthIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
 }
@@ -142,6 +272,76 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/': {
+      id: '/auth/'
+      path: '/auth'
+      fullPath: '/auth/'
+      preLoaderRoute: typeof AuthIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/account-status': {
+      id: '/auth/account-status'
+      path: '/auth/account-status'
+      fullPath: '/auth/account-status'
+      preLoaderRoute: typeof AuthAccountStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/hub': {
+      id: '/auth/hub'
+      path: '/auth/hub'
+      fullPath: '/auth/hub'
+      preLoaderRoute: typeof AuthHubRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/identity': {
+      id: '/auth/identity'
+      path: '/auth/identity'
+      fullPath: '/auth/identity'
+      preLoaderRoute: typeof AuthIdentityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/mfa': {
+      id: '/auth/mfa'
+      path: '/auth/mfa'
+      fullPath: '/auth/mfa'
+      preLoaderRoute: typeof AuthMfaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/passkeys': {
+      id: '/auth/passkeys'
+      path: '/auth/passkeys'
+      fullPath: '/auth/passkeys'
+      preLoaderRoute: typeof AuthPasskeysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/recovery': {
+      id: '/auth/recovery'
+      path: '/auth/recovery'
+      fullPath: '/auth/recovery'
+      preLoaderRoute: typeof AuthRecoveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/security': {
+      id: '/auth/security'
+      path: '/auth/security'
+      fullPath: '/auth/security'
+      preLoaderRoute: typeof AuthSecurityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services/': {
@@ -179,8 +379,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  AuthAccountStatusRoute: AuthAccountStatusRoute,
+  AuthHubRoute: AuthHubRoute,
+  AuthIdentityRoute: AuthIdentityRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthMfaRoute: AuthMfaRoute,
+  AuthPasskeysRoute: AuthPasskeysRoute,
+  AuthRecoveryRoute: AuthRecoveryRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+  AuthSecurityRoute: AuthSecurityRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
+  AuthIndexRoute: AuthIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
 }

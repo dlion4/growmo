@@ -541,10 +541,6 @@ export default function Header() {
         )}
       </aside>
 
-      {/* ---------- toast ---------- */}
-      <div className={`gm-toast ${cart.toast ? "is-visible" : ""}`} role="status">
-        <ShoppingBasket /> {cart.toast}
-      </div>
     </>
   );
 }

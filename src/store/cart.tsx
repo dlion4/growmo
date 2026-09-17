@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { PRODUCTS } from "../data/site";
+import { useToast } from "./toast";
 
 export interface CartLine {
   slug: string;
@@ -12,8 +13,6 @@ interface CartContextValue {
   count: number;
   subtotal: number;
   isOpen: boolean;
-  toast: string | null;
-  notify: (msg: string) => void;
   openCart: () => void;
   closeCart: () => void;
   add: (slug: string, qty?: number) => void;
@@ -41,9 +40,9 @@ function load(): CartLine[] {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const toast = useToast();
   const [lines, setLines] = useState<CartLine[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -60,21 +59,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [lines, hydrated]);
 
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 2600);
-    return () => clearTimeout(t);
-  }, [toast]);
-
-  const add = useCallback((slug: string, qty = 1) => {
-    setLines((prev) => {
-      const found = prev.find((l) => l.slug === slug);
-      if (found) return prev.map((l) => (l.slug === slug ? { ...l, qty: l.qty + qty } : l));
-      return [...prev, { slug, qty }];
-    });
-    const p = PRODUCTS.find((x) => x.slug === slug);
-    setToast(p ? `${p.name} added to basket` : "Added to basket");
-  }, []);
+  const add = useCallback(
+    (slug: string, qty = 1) => {
+      setLines((prev) => {
+        const found = prev.find((l) => l.slug === slug);
+        if (found) return prev.map((l) => (l.slug === slug ? { ...l, qty: l.qty + qty } : l));
+        return [...prev, { slug, qty }];
+      });
+      const p = PRODUCTS.find((x) => x.slug === slug);
+      toast.notify(p ? `${p.name} added to basket` : "Added to basket");
+    },
+    [toast],
+  );
 
   const remove = useCallback((slug: string) => {
     setLines((prev) => prev.filter((l) => l.slug !== slug));
@@ -87,7 +83,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clear = useCallback(() => setLines([]), []);
-  const notify = useCallback((msg: string) => setToast(msg), []);
   const openCart = useCallback(() => setIsOpen(true), []);
   const closeCart = useCallback(() => setIsOpen(false), []);
 
@@ -103,8 +98,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [lines]);
 
   const value = useMemo(
-    () => ({ lines, count, subtotal, isOpen, toast, notify, openCart, closeCart, add, remove, setQty, clear }),
-    [lines, count, subtotal, isOpen, toast, notify, openCart, closeCart, add, remove, setQty, clear],
+    () => ({ lines, count, subtotal, isOpen, openCart, closeCart, add, remove, setQty, clear }),
+    [lines, count, subtotal, isOpen, openCart, closeCart, add, remove, setQty, clear],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

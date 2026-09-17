@@ -52,7 +52,7 @@ const AVATARS = [
 ];
 
 function HomePage() {
-  const cart = useCart();
+  const toast = useToast();
   const [tab, setTab] = useState(PLATFORM_TABS[0]);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
   const quoteRef = useRef<HTMLDivElement>(null);
