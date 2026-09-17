@@ -1,37 +1,72 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import { HeadContent, Scripts, createRootRoute, useLocation } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { AuthMiniFooter, AuthTopbar } from '../components/auth/shell'
 import Footer from '../components/home/layout/Footer'
 import Header from '../components/home/layout/Header'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import { AppShell } from '../components/app/AppShell'
+import { CartProvider } from '../store/cart'
+import { ToastHost, ToastProvider } from '../store/toast'
 
 import appCss from '../styles.css?url'
-
-
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
+      { charSet: 'utf-8' },
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      { title: 'GrowMO — Smart Farming for Kenya | Plan, Predict, Profit' },
       {
-        charSet: 'utf-8',
+        name: 'description',
+        content:
+          'GrowMO plans your season, predicts pests, tracks every shilling on M-Pesa and connects you straight to buyers. 128K+ Kenyan farmers grow with us.',
       },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'TanStack Start Starter',
-      },
+      { name: 'theme-color', content: '#0c2317' },
     ],
     links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
+      // ?v= busts preview/proxy CSS caches — bump it whenever styles.css changes
+      { rel: 'stylesheet', href: `${appCss}?v=4` },
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],
   }),
   shellComponent: RootDocument,
 })
+
+/* Marketing chrome on site pages, minimal secure chrome on /auth/* — same master theme */
+function Chrome({ children }: { children: React.ReactNode }) {
+  const { pathname } = useLocation()
+  const isAuth = pathname.startsWith('/auth')
+  const isApp = pathname === '/app' || pathname.startsWith('/app/')
+
+  if (isApp) {
+    return (
+      <>
+        <AppShell>{children}</AppShell>
+        <ToastHost />
+      </>
+    )
+  }
+
+  if (isAuth) {
+    return (
+      <>
+        <AuthTopbar />
+        {children}
+        <AuthMiniFooter />
+        <ToastHost />
+      </>
+    )
+  }
+  return (
+    <>
+      <Header />
+      {children}
+      <Footer />
+      <ToastHost />
+    </>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -40,9 +75,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <Header />
-        {children}
-        <Footer />
+        <ToastProvider>
+          <CartProvider>
+            <Chrome>{children}</Chrome>
+          </CartProvider>
+        </ToastProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
