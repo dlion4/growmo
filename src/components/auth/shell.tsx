@@ -82,6 +82,11 @@ export function AuthSplit({
                 </li>
               ))}
             </ul>
+            <div className="gm-auth-stats">
+              <div><strong>128K+</strong><small>farmers</small></div>
+              <div><strong>4.9★</strong><small>rating</small></div>
+              <div><strong>47</strong><small>counties</small></div>
+            </div>
             <figure className="gm-auth-quote">
               <blockquote>“{quote.text}”</blockquote>
               <figcaption>— {quote.who}</figcaption>

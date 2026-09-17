@@ -23,7 +23,8 @@ export const Route = createRootRoute({
       { name: 'theme-color', content: '#0c2317' },
     ],
     links: [
-      { rel: 'stylesheet', href: appCss },
+      // ?v= busts preview/proxy CSS caches — bump it whenever styles.css changes
+      { rel: 'stylesheet', href: `${appCss}?v=3` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],
