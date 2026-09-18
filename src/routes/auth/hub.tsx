@@ -2,20 +2,24 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Bell,
+  Bot,
   Check,
   ChevronRight,
   CircleDollarSign,
   ClipboardList,
   Command,
   LayoutDashboard,
+  Rocket,
   Search,
   TriangleAlert,
+  UserPlus,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, Toggle } from "../../components/auth/controls";
 import { AuthConsole } from "../../components/auth/shell";
 import { AUTH_NAV, HUB_NOTIFICATIONS, HUB_WIDGETS, WORKSPACES, type HubNote } from "../../data/auth";
+import { APP_NAV } from "../../data/app/nav";
 import { useToast } from "../../store/toast";
 
 export const Route = createFileRoute("/auth/hub")({ component: HubPage });
@@ -67,8 +71,19 @@ function HubPage() {
       icon: n.icon, label: `Go to ${n.label}`, hint: n.desc,
       run: () => navigate({ to: n.to }),
     }));
+
+    const appNav = APP_NAV.flatMap((group) =>
+      group.items.filter((item) => item.ready).map((item) => ({
+        icon: item.icon,
+        label: item.label,
+        hint: item.desc,
+        run: () => navigate({ to: item.to }),
+      }))
+    );
+
     return [
       ...nav,
+      ...appNav,
       {
         icon: Search, label: "Copy USSD code *384*66#", hint: "Share with kabambe users",
         run: () => {
@@ -139,7 +154,7 @@ function HubPage() {
                 <button
                   className="gm-btn gm-btn-sm"
                   style={{ flex: 1 }}
-                  onClick={() => { setActiveId(w.id); toast.notify(`${w.name} is now active`); }}
+                  onClick={() => { navigate({ to: "/app/onboarding" }); }}
                 >
                   Enter <ChevronRight width={14} height={14} />
                 </button>
@@ -171,7 +186,7 @@ function HubPage() {
                     ))}
                   </div>
                 </div>
-                <button className="gm-btn gm-btn-block" onClick={() => { setActiveId(preview.id); toast.notify(`Entered ${preview.name} — dashboard coming right up`); }}>
+                <button className="gm-btn gm-btn-block" onClick={() => { navigate({ to: "/app/onboarding" }); }}>
                   Enter {preview.name} <ArrowRight />
                 </button>
               </>

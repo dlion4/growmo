@@ -90,7 +90,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+    };
   }, []);
 
   useEffect(() => {
@@ -158,7 +160,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className={`gm-scrim ${mobileOpen ? "is-visible" : ""}`} onClick={() => setMobileOpen(false)} />
 
       {/* ================= SIDEBAR ================= */}
-      <aside className={`gm-app-side ${mobileOpen ? "is-open" : ""}`} aria-label="Dashboard navigation">
+      <aside className={`gm-app-side ${collapsed ? "collapsed" : ""} ${mobileOpen ? "is-open" : ""}`} aria-label="Dashboard navigation">
         <div className="gm-app-brand">
           <Link to="/app" className="gm-app-logo" aria-label="GrowMO Farm OS home">
             <span className="gm-logo-mark">
@@ -250,7 +252,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="gm-app-collapse gm-only-desktop"
             onClick={() => {
               setCollapsed(!collapsed);
-              toast.notify(collapsed ? "Sidebar expanded" : "Sidebar collapsed — icons only", "info");
+              toast.notify(collapsed ? "Expanded" : "Collapsed", "info");
             }}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >

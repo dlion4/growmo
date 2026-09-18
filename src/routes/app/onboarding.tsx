@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft, BadgeCheck, Building2, Camera, Check, CheckCircle2,
@@ -69,6 +69,7 @@ function missingHint(i: number, p: FarmProfile): string {
 /* ================= page ================= */
 function OnboardingPage() {
   const toast = useToast();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState<FarmProfile>(() => {
     try {
       if (typeof window !== "undefined") {
@@ -84,6 +85,13 @@ function OnboardingPage() {
   const [menu, setMenu] = useState(false);
   const [modal, setModal] = useState<string | null>(null);
   const [confirm, setConfirm] = useState<{ title: string; body: string; onYes: () => void } | null>(null);
+
+  // Close AppShell drawers when opening any modal/drawer in onboarding
+  useEffect(() => {
+    if (modal || confirm || drawer) {
+      window.dispatchEvent(new CustomEvent('close-appshell-drawers'));
+    }
+  }, [modal, confirm, drawer]);
   const [editingPlot, setEditingPlot] = useState<Plot | null>(null);
   const [editingSeason, setEditingSeason] = useState<SeasonRow | null>(null);
   const [gpsTarget, setGpsTarget] = useState<{ kind: "farm" } | { kind: "plot"; id: string }>({ kind: "farm" });
@@ -131,9 +139,23 @@ function OnboardingPage() {
     },
   });
 
-  const openPlot = (pl: Plot | null) => { setEditingPlot(pl); setModal("plot"); };
-  const openSeason = (s: SeasonRow | null) => { setEditingSeason(s); setModal("season"); };
-  const askDelete = (title: string, body: string, onYes: () => void) => setConfirm({ title, body, onYes });
+  const openPlot = (pl: Plot | null) => {
+    setDrawer(false);
+    window.dispatchEvent(new CustomEvent('close-appshell-drawers'));
+    setEditingPlot(pl);
+    setModal("plot");
+  };
+  const openSeason = (s: SeasonRow | null) => {
+    setDrawer(false);
+    window.dispatchEvent(new CustomEvent('close-appshell-drawers'));
+    setEditingSeason(s);
+    setModal("season");
+  };
+  const askDelete = (title: string, body: string, onYes: () => void) => {
+    setDrawer(false);
+    window.dispatchEvent(new CustomEvent('close-appshell-drawers'));
+    setConfirm({ title, body, onYes });
+  };
 
   /* ---------- success view ---------- */
   if (done) {
@@ -193,7 +215,7 @@ function OnboardingPage() {
         </div>
         <Reveal>
           <div className="gm-card p-3 mt-3 d-flex flex-wrap gap-2 align-items-center">
-            <Link to="/app" className="gm-btn gm-btn-lime"><ArrowLeft /> Back to setup hub</Link>
+            <Link to="/app" className="gm-btn gm-btn-lime"><ArrowLeft /> Back to dashboard</Link>
             <button type="button" className="gm-btn gm-btn-outline" onClick={exportCSV}><Download /> Export CSV</button>
             <button type="button" className="gm-btn gm-btn-outline" onClick={() => window.print()}><Printer /> Print summary</button>
             <button type="button" className="gm-btn" disabled title="Ships with Page 2 — Dashboard">Open dashboard <span className="gm-chip gm-chip-gold" style={{ marginLeft: 6 }}>Page 2</span></button>
@@ -294,7 +316,7 @@ function OnboardingPage() {
       </p>
 
       {/* review drawer */}
-      {drawer && (
+      {drawer && !modal && !confirm && (
         <>
           <div className="gm-scrim" onClick={() => setDrawer(false)} />
           <aside className="gm-drawer wide" role="dialog" aria-label="Profile review">
