@@ -1,8 +1,23 @@
 /* ============================================================================
    GrowMO AppShell — dashboard layout for ALL /app/* pages.
+
    Collapsible dark sidebar (icons-only ↔ icons+labels), dropdown/drawer
    topbar, command palette, notifications + help drawers. Pages render as
-   {children}. Styled ONLY with master-theme classes (§18).
+   {children}.
+
+   STYLING
+   - Base shell comes from the master theme (styles.css §18).
+   - All dashboard chrome + polish lives in dashboard.css, a separate
+     additive stylesheet scoped under .gm-app, so the master theme is
+     never touched and never clashes.
+
+   OVERLAY SAFETY (no more "stuck" drawers hiding the page)
+   - Drawers / scrims / palette are non-interactive while closed
+     (visibility + pointer-events, see dashboard.css §8).
+   - Scroll locking goes through a shared counter (store/scroll-lock), and
+     a stale lock is auto-cleared whenever no overlay is really open.
+   - `close-appshell-drawers` / `gm-app:close-overlays` events (dispatched
+     by /app/onboarding) force every overlay shut.
    ========================================================================== */
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import {
@@ -31,25 +46,39 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { APP_NAV, findNavItem } from "../../data/app/nav";
-import { APP_FORECAST, APP_NOTES, APP_WALLET, type AppNote } from "../../data/app/shell";
+import {
+  APP_FORECAST,
+  APP_NOTES,
+  APP_WALLET,
+  type AppNote,
+} from "../../data/app/shell";
 import { kes } from "../../data/site";
+import {
+  clearStaleScrollLock,
+  lockScroll,
+  unlockScroll,
+} from "../../store/scroll-lock";
 import { useToast } from "../../store/toast";
 
-const NOTE_ICON = { alert: TriangleAlert, money: CircleDollarSign, task: ClipboardList } as const;
+const NOTE_ICON = {
+  alert: TriangleAlert,
+  money: CircleDollarSign,
+  task: ClipboardList,
+} as const;
+const COLLAPSE_KEY = "gm-app-collapsed";
+
+/** Close-everything handlers — pages signal the shell through these. */
+export const CLOSE_SHELL_EVENT = "close-appshell-drawers";
+export const CLOSE_OVERLAYS_EVENT = "gm-app:close-overlays";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const toast = useToast();
 
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return localStorage.getItem("gm-app-collapsed") === "1";
-    } catch {
-      return false;
-    }
-  });
+  /* `collapsed` starts false on both server and client (no hydration
+     mismatch); the saved preference is applied after mount. */
+  const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [drop, setDrop] = useState<string | null>(null);
   const [drawer, setDrawer] = useState<"notes" | "help" | null>(null);
@@ -59,20 +88,62 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [lang, setLang] = useState("EN");
   const [notes, setNotes] = useState<AppNote[]>(APP_NOTES);
 
+  /* restore saved sidebar state (post-hydration, so SSR and client match) */
   useEffect(() => {
     try {
-      localStorage.setItem("gm-app-collapsed", collapsed ? "1" : "0");
+      if (localStorage.getItem(COLLAPSE_KEY) === "1") setCollapsed(true);
     } catch {
-      /* ignore */
+      /* storage unavailable — stay expanded */
     }
-  }, [collapsed]);
+  }, []);
 
+  const toggleCollapsed = () => {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(COLLAPSE_KEY, next ? "1" : "0");
+      } catch {
+        /* ignore */
+      }
+      return next;
+    });
+  };
+
+  /* any overlay open => lock the page behind it (stack-safe) */
+  useEffect(() => {
+    if (!(mobileOpen || drawer || palette)) return;
+    lockScroll();
+    return () => unlockScroll();
+  }, [mobileOpen, drawer, palette]);
+
+  /* self-healing: drop a leftover lock from a previous route / hot reload */
+  useEffect(() => {
+    clearStaleScrollLock();
+  }, [pathname]);
+
+  /* route change closes every overlay */
   useEffect(() => {
     setMobileOpen(false);
     setDrawer(null);
     setDrop(null);
     setPalette(false);
   }, [pathname]);
+
+  /* pages can ask the shell to shut its overlays */
+  useEffect(() => {
+    const closeAll = () => {
+      setMobileOpen(false);
+      setDrawer(null);
+      setDrop(null);
+      setPalette(false);
+    };
+    window.addEventListener(CLOSE_SHELL_EVENT, closeAll);
+    window.addEventListener(CLOSE_OVERLAYS_EVENT, closeAll);
+    return () => {
+      window.removeEventListener(CLOSE_SHELL_EVENT, closeAll);
+      window.removeEventListener(CLOSE_OVERLAYS_EVENT, closeAll);
+    };
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -95,17 +166,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen || drawer || palette ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen, drawer, palette]);
-
   const found = findNavItem(pathname);
   const unread = notes.filter((n) => n.unread).length;
   const toggleDrop = (id: string) => setDrop(drop === id ? null : id);
-  const soon = (label: string) => toast.notify(`${label} module is coming soon — hang tight`, "info");
+  const soon = (label: string) =>
+    toast.notify(`${label} module is coming soon`, "info");
   const markAllRead = () => {
     setNotes((ns) => ns.map((n) => ({ ...n, unread: false })));
     toast.notify("All caught up!");
@@ -151,18 +216,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate, unread]);
 
-  const filtered = paletteActions.filter((a) => a.label.toLowerCase().includes(query.toLowerCase()));
-  const currentAction = filtered[Math.min(hl, Math.max(filtered.length - 1, 0))];
+  const filtered = paletteActions.filter((a) =>
+    a.label.toLowerCase().includes(query.toLowerCase()),
+  );
+  const currentAction =
+    filtered[Math.min(hl, Math.max(filtered.length - 1, 0))];
 
   return (
     <div className={`gm-app ${collapsed ? "is-collapsed" : ""}`}>
       {/* mobile sidebar scrim */}
-      <div className={`gm-scrim ${mobileOpen ? "is-visible" : ""}`} onClick={() => setMobileOpen(false)} />
+      <div
+        className={`gm-scrim ${mobileOpen ? "is-visible" : ""}`}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
 
       {/* ================= SIDEBAR ================= */}
-      <aside className={`gm-app-side ${collapsed ? "collapsed" : ""} ${mobileOpen ? "is-open" : ""}`} aria-label="Dashboard navigation">
+      <aside
+        className={`gm-app-side ${collapsed ? "collapsed" : ""} ${mobileOpen ? "is-open" : ""}`}
+        aria-label="Dashboard navigation"
+      >
         <div className="gm-app-brand">
-          <Link to="/app" className="gm-app-logo" aria-label="GrowMO Farm OS home">
+          <Link
+            to="/app"
+            className="gm-app-logo"
+            aria-label="GrowMO Farm OS home"
+          >
             <span className="gm-logo-mark">
               <Sprout />
             </span>
@@ -173,7 +252,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <small>Farm OS</small>
             </span>
           </Link>
-          <button className="gm-icon-btn on-dark gm-only-mobile" onClick={() => setMobileOpen(false)} aria-label="Close menu">
+          <button
+            className="gm-icon-btn on-dark gm-only-mobile"
+            onClick={() => setMobileOpen(false)}
+            aria-label="Close menu"
+          >
             <X />
           </button>
         </div>
@@ -181,31 +264,36 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <nav className="gm-app-nav">
           {APP_NAV.map((g) => (
             <div key={g.id} className="gm-app-group">
-              <p className="gm-app-cap">{g.label}</p>
+              <p className="gm-app-cap" aria-hidden={collapsed}>
+                {g.label}
+              </p>
               {g.items.map((item) => {
                 const active = pathname === item.to;
+                const tip = item.ready
+                  ? item.label
+                  : `${item.label} — coming soon`;
                 const inner = (
                   <>
                     <span className="gm-app-link-icon">
                       <item.icon />
                     </span>
-                    <span className="gm-app-link-text">
-                      <strong>{item.label}</strong>
-                      <small>{item.desc}</small>
-                    </span>
-                    {item.count !== undefined ? (
+                    <span className="gm-app-link-text">{item.label}</span>
+                    {item.count ? (
                       <span className="gm-app-count">{item.count}</span>
-                    ) : item.badge ? (
+                    ) : null}
+                    {item.badge ? (
                       <span className="gm-app-badge">{item.badge}</span>
                     ) : null}
-                    {!item.ready && <span className="gm-app-soon">Soon</span>}
+                    {!item.ready && (
+                      <i className="gm-app-dot" aria-hidden="true" />
+                    )}
                   </>
                 );
                 return item.ready ? (
                   <Link
                     key={item.to}
                     to={item.to}
-                    title={item.label}
+                    title={tip}
                     className={`gm-app-link ${active ? "is-active" : ""}`}
                     aria-current={active ? "page" : undefined}
                   >
@@ -215,7 +303,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <button
                     key={item.to}
                     type="button"
-                    title={`${item.label} — coming soon`}
+                    title={tip}
                     className="gm-app-link is-soon-link"
                     onClick={() => {
                       setMobileOpen(false);
@@ -234,6 +322,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             className="gm-app-link gm-app-help"
+            title="Help & support — 0800 221 000"
             onClick={() => {
               setMobileOpen(false);
               setDrawer("help");
@@ -242,22 +331,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <span className="gm-app-link-icon">
               <LifeBuoy />
             </span>
-            <span className="gm-app-link-text">
-              <strong>Get help</strong>
-              <small>0800 221 000</small>
-            </span>
+            <span className="gm-app-link-text">Help</span>
           </button>
           <button
             type="button"
             className="gm-app-collapse gm-only-desktop"
-            onClick={() => {
-              setCollapsed(!collapsed);
-              toast.notify(collapsed ? "Expanded" : "Collapsed", "info");
-            }}
+            onClick={toggleCollapsed}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ChevronsRight /> : <ChevronsLeft />}
-            <span>{collapsed ? "Expand" : "Collapse"}</span>
+            <span>Collapse</span>
           </button>
         </div>
       </aside>
@@ -265,7 +349,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* ================= MAIN ================= */}
       <div className="gm-app-main">
         <header className="gm-app-top">
-          <button className="gm-icon-btn gm-only-mobile" onClick={() => setMobileOpen(true)} aria-label="Open menu">
+          <button
+            className="gm-icon-btn gm-only-mobile"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+          >
             <Menu />
           </button>
           <div className="gm-app-title">
@@ -273,7 +361,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <strong>{found ? found.item.label : "Getting started"}</strong>
           </div>
 
-          <button type="button" className="gm-app-search" onClick={() => { setPalette(true); setQuery(""); setHl(0); }}>
+          <button
+            type="button"
+            className="gm-app-search"
+            onClick={() => {
+              setPalette(true);
+              setQuery("");
+              setHl(0);
+            }}
+          >
             <Search />
             <span>Search modules…</span>
             <kbd>⌘K</kbd>
@@ -281,7 +377,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
           <div className="gm-app-actions">
             {/* weather dropdown */}
-            <div className={`gm-dropdown ${drop === "weather" ? "is-open" : ""}`}>
+            <div
+              className={`gm-dropdown ${drop === "weather" ? "is-open" : ""}`}
+            >
               <button
                 type="button"
                 className="gm-app-chip"
@@ -289,7 +387,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-expanded={drop === "weather"}
                 aria-label="Weather"
               >
-                <CloudSun /> <span className="hide-sm">{APP_FORECAST.temp} · {APP_FORECAST.rain}</span> <ChevronDown />
+                <CloudSun />{" "}
+                <span className="hide-sm">{APP_FORECAST.temp}</span>{" "}
+                <ChevronDown />
               </button>
               <div className="gm-dropdown-menu gm-app-menu">
                 <p className="gm-app-menu-cap">{APP_FORECAST.place}</p>
@@ -302,14 +402,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <small>{r.t}</small>
                   </div>
                 ))}
-                <button type="button" className="gm-btn gm-btn-soft gm-btn-sm gm-btn-block mt-2" onClick={() => soon("Weather")}>
+                <button
+                  type="button"
+                  className="gm-btn gm-btn-soft gm-btn-sm gm-btn-block mt-2"
+                  onClick={() => soon("Weather")}
+                >
                   Full forecast <ArrowRight width={14} height={14} />
                 </button>
               </div>
             </div>
 
             {/* wallet dropdown */}
-            <div className={`gm-dropdown ${drop === "wallet" ? "is-open" : ""}`}>
+            <div
+              className={`gm-dropdown ${drop === "wallet" ? "is-open" : ""}`}
+            >
               <button
                 type="button"
                 className="gm-app-chip gm-app-chip-money"
@@ -317,13 +423,23 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-expanded={drop === "wallet"}
                 aria-label="Wallet"
               >
-                <Wallet /> <span className="hide-sm">{kes(APP_WALLET.balance)}</span> <ChevronDown />
+                <Wallet />{" "}
+                <span className="hide-sm">{kes(APP_WALLET.balance)}</span>{" "}
+                <ChevronDown />
               </button>
               <div className="gm-dropdown-menu gm-app-menu">
-                <p className="gm-app-menu-cap">GrowMO Wallet · {APP_WALLET.phone}</p>
+                <p className="gm-app-menu-cap">
+                  GrowMO Wallet · {APP_WALLET.phone}
+                </p>
                 <p className="gm-wallet-balance">{kes(APP_WALLET.balance)}</p>
-                <small style={{ fontWeight: 700, color: "var(--gm-ink-400)" }}>
-                  +{kes(APP_WALLET.pending)} pending from buyers
+                <small
+                  style={{
+                    fontWeight: 700,
+                    color: "var(--gm-ink-400)",
+                    padding: "0 .6rem",
+                  }}
+                >
+                  +{kes(APP_WALLET.pending)} pending
                 </small>
                 <div className="d-flex gap-2 mt-2">
                   <button
@@ -357,13 +473,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Plus /> <span className="hide-sm">New</span>
               </button>
               <div className="gm-dropdown-menu">
-                <button type="button" className="gm-dropdown-item" onClick={() => soon("Crop Planner")}>
+                <button
+                  type="button"
+                  className="gm-dropdown-item"
+                  onClick={() => soon("Crop Planner")}
+                >
                   <Sprout width={16} height={16} /> New crop plan
                 </button>
-                <button type="button" className="gm-dropdown-item" onClick={() => soon("Finance")}>
+                <button
+                  type="button"
+                  className="gm-dropdown-item"
+                  onClick={() => soon("Finance")}
+                >
                   <Wallet width={16} height={16} /> Record expense
                 </button>
-                <button type="button" className="gm-dropdown-item" onClick={() => soon("Labour")}>
+                <button
+                  type="button"
+                  className="gm-dropdown-item"
+                  onClick={() => soon("Labour")}
+                >
                   <ClipboardList width={16} height={16} /> Schedule task
                 </button>
                 <Link to="/shop" className="gm-dropdown-item">
@@ -373,7 +501,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
 
             {/* notifications drawer */}
-            <button type="button" className="gm-icon-btn" onClick={() => setDrawer("notes")} aria-label={`Notifications, ${unread} unread`}>
+            <button
+              type="button"
+              className="gm-icon-btn"
+              onClick={() => setDrawer("notes")}
+              aria-label={`Notifications, ${unread} unread`}
+            >
               <Bell />
               {unread > 0 && <span className="gm-count">{unread}</span>}
             </button>
@@ -387,7 +520,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-expanded={drop === "lang"}
                 aria-label="Language"
               >
-                <span style={{ fontWeight: 900, fontSize: ".8rem" }}>{lang}</span> <ChevronDown />
+                <span style={{ fontWeight: 900, fontSize: ".78rem" }}>
+                  {lang}
+                </span>{" "}
+                <ChevronDown />
               </button>
               <div className="gm-dropdown-menu" style={{ minWidth: 150 }}>
                 {["EN", "SW"].map((l) => (
@@ -398,17 +534,25 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     onClick={() => {
                       setLang(l);
                       setDrop(null);
-                      toast.notify(l === "SW" ? "Lugha: Kiswahili (hivi punde)" : "Language: English", "info");
+                      toast.notify(
+                        l === "SW"
+                          ? "Lugha: Kiswahili (hivi punde)"
+                          : "Language: English",
+                        "info",
+                      );
                     }}
                   >
-                    {l === lang && <Check width={15} height={15} />} {l === "EN" ? "English" : "Kiswahili"}
+                    {l === lang && <Check width={15} height={15} />}{" "}
+                    {l === "EN" ? "English" : "Kiswahili"}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* avatar dropdown */}
-            <div className={`gm-dropdown ${drop === "avatar" ? "is-open" : ""}`}>
+            <div
+              className={`gm-dropdown ${drop === "avatar" ? "is-open" : ""}`}
+            >
               <button
                 type="button"
                 className="gm-app-avatar-btn"
@@ -416,25 +560,51 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 aria-expanded={drop === "avatar"}
                 aria-label="Account menu"
               >
-                <span className="gm-avatar" style={{ background: "var(--gm-grad-primary)", width: 40, height: 40 }}>
+                <span
+                  className="gm-avatar"
+                  style={{
+                    background: "var(--gm-grad-primary)",
+                    width: 38,
+                    height: 38,
+                  }}
+                >
                   MW
                 </span>
               </button>
               <div className="gm-dropdown-menu gm-app-menu">
                 <div className="d-flex align-items-center gap-2 mb-2">
-                  <span className="gm-avatar" style={{ background: "var(--gm-grad-primary)" }}>MW</span>
+                  <span
+                    className="gm-avatar"
+                    style={{ background: "var(--gm-grad-primary)" }}
+                  >
+                    MW
+                  </span>
                   <span>
-                    <strong style={{ display: "block", fontSize: ".88rem" }}>Mary Wanjiku</strong>
-                    <small style={{ color: "var(--gm-ink-400)", fontWeight: 700 }}>Owner · Mary's Farm</small>
+                    <strong style={{ display: "block", fontSize: ".86rem" }}>
+                      Mary Wanjiku
+                    </strong>
+                    <small
+                      style={{ color: "var(--gm-ink-400)", fontWeight: 700 }}
+                    >
+                      Owner · Mary's Farm
+                    </small>
                   </span>
                 </div>
-                <button type="button" className="gm-dropdown-item" onClick={() => soon("Farm Profile")}>
+                <button
+                  type="button"
+                  className="gm-dropdown-item"
+                  onClick={() => soon("Farm Profile")}
+                >
                   <Settings width={16} height={16} /> Farm profile
                 </button>
                 <Link to="/auth/hub" className="gm-dropdown-item">
                   <Repeat width={16} height={16} /> Switch workspace
                 </Link>
-                <Link to="/auth/login" className="gm-dropdown-item" style={{ color: "var(--gm-clay-500)" }}>
+                <Link
+                  to="/auth/login"
+                  className="gm-dropdown-item"
+                  style={{ color: "var(--gm-clay-500)" }}
+                >
                   <LogOut width={16} height={16} /> Sign out
                 </Link>
               </div>
@@ -446,39 +616,79 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="gm-app-inner">{children}</div>
           <footer className="gm-app-foot">
             <span>GrowMO Farm OS · v3.2</span>
-            <span className="hide-sm">USSD *384*66# · Helpline 0800 221 000</span>
+            <span className="hide-sm">
+              USSD *384*66# · Helpline 0800 221 000
+            </span>
             <Link to="/">View website</Link>
           </footer>
         </main>
       </div>
 
-      {/* transparent layer to close dropdowns */}
+      {/* transparent layer to close dropdowns (styled in dashboard.css §5) */}
       {drop && (
-        <button type="button" aria-hidden="true" tabIndex={-1} className="gm-drop-close" onClick={() => setDrop(null)} />
+        <button
+          type="button"
+          aria-hidden="true"
+          tabIndex={-1}
+          className="gm-drop-close"
+          onClick={() => setDrop(null)}
+        />
       )}
 
       {/* ================= RIGHT DRAWERS ================= */}
-      <div className={`gm-scrim ${drawer ? "is-visible" : ""}`} onClick={() => setDrawer(null)} />
-      <aside className={`gm-drawer ${drawer ? "is-visible" : ""}`} aria-label={drawer === "notes" ? "Notifications" : "Help"}>
+      <div
+        className={`gm-scrim ${drawer ? "is-visible" : ""}`}
+        onClick={() => setDrawer(null)}
+        aria-hidden="true"
+      />
+      <aside
+        className={`gm-drawer ${drawer ? "is-visible" : ""}`}
+        aria-label={drawer === "notes" ? "Notifications" : "Help"}
+        aria-hidden={!drawer}
+        {...(!drawer ? { inert: true } : {})}
+      >
         <div className="gm-drawer-head">
-          <strong style={{ display: "flex", alignItems: "center", gap: ".6rem" }}>
-            {drawer === "notes" ? <Bell width={20} height={20} /> : <LifeBuoy width={20} height={20} />}
-            {drawer === "notes" ? `Notifications (${unread} new)` : "Help & support"}
+          <strong
+            style={{ display: "flex", alignItems: "center", gap: ".6rem" }}
+          >
+            {drawer === "notes" ? (
+              <Bell width={18} height={18} />
+            ) : (
+              <LifeBuoy width={18} height={18} />
+            )}
+            {drawer === "notes" ? `Notifications (${unread} new)` : "Help"}
           </strong>
-          <button type="button" className="gm-icon-btn on-dark" onClick={() => setDrawer(null)} aria-label="Close panel">
+          <button
+            type="button"
+            className="gm-icon-btn on-dark"
+            onClick={() => setDrawer(null)}
+            aria-label="Close panel"
+          >
             <X />
           </button>
         </div>
         <div className="gm-drawer-body">
           {drawer === "notes" && (
             <>
-              <button type="button" className="gm-btn gm-btn-soft gm-btn-sm gm-btn-block mb-3" onClick={markAllRead}>
+              <button
+                type="button"
+                className="gm-btn gm-btn-soft gm-btn-sm gm-btn-block mb-3"
+                onClick={markAllRead}
+              >
                 <Check width={15} height={15} /> Mark all read
               </button>
               {notes.map((n) => {
                 const Icon = NOTE_ICON[n.kind];
                 return (
-                  <div key={n.id} className="gm-check-row" style={n.unread ? { borderColor: "var(--gm-leaf-500)" } : undefined}>
+                  <div
+                    key={n.id}
+                    className="gm-check-row"
+                    style={
+                      n.unread
+                        ? { borderColor: "var(--gm-leaf-500)" }
+                        : undefined
+                    }
+                  >
                     <span className="gm-mega-icon">
                       <Icon />
                     </span>
@@ -495,7 +705,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         setNotes((ns) => ns.filter((x) => x.id !== n.id));
                         toast.notify("Notification dismissed", "info");
                       }}
-                      style={{ border: "none", background: "none", color: "var(--gm-ink-400)", cursor: "pointer" }}
+                      style={{
+                        border: "none",
+                        background: "none",
+                        color: "var(--gm-ink-400)",
+                        cursor: "pointer",
+                      }}
                     >
                       <X width={16} height={16} />
                     </button>
@@ -517,8 +732,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <LifeBuoy />
                 </span>
                 <span style={{ flex: 1 }}>
-                  <strong style={{ display: "block", fontSize: ".9rem" }}>Talk to support</strong>
-                  <small style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}>Free call 0800 221 000 · Mon–Sat</small>
+                  <strong style={{ display: "block", fontSize: ".88rem" }}>
+                    Talk to support
+                  </strong>
+                  <small
+                    style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}
+                  >
+                    Free call · Mon–Sat
+                  </small>
                 </span>
                 <ArrowRight width={17} height={17} color="var(--gm-leaf-600)" />
               </Link>
@@ -527,8 +748,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Settings />
                 </span>
                 <span style={{ flex: 1 }}>
-                  <strong style={{ display: "block", fontSize: ".9rem" }}>Recover access</strong>
-                  <small style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}>Reset PIN or password</small>
+                  <strong style={{ display: "block", fontSize: ".88rem" }}>
+                    Recover access
+                  </strong>
+                  <small
+                    style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}
+                  >
+                    Reset PIN or password
+                  </small>
                 </span>
                 <ArrowRight width={17} height={17} color="var(--gm-leaf-600)" />
               </Link>
@@ -541,15 +768,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   } catch {
                     /* noop */
                   }
-                  toast.notify("USSD code copied — dial from any phone", "info");
+                  toast.notify(
+                    "USSD code copied — dial from any phone",
+                    "info",
+                  );
                 }}
               >
                 <span className="gm-mega-icon">
                   <Smartphone />
                 </span>
                 <span style={{ flex: 1 }}>
-                  <strong style={{ display: "block", fontSize: ".9rem" }}>Use *384*66# instead</strong>
-                  <small style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}>Works on kabambe, no internet</small>
+                  <strong style={{ display: "block", fontSize: ".88rem" }}>
+                    Use *384*66#
+                  </strong>
+                  <small
+                    style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}
+                  >
+                    Works on kabambe
+                  </small>
                 </span>
                 <Copy width={17} height={17} color="var(--gm-leaf-600)" />
               </button>
@@ -591,7 +827,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <div className="gm-palette-list">
               {filtered.length === 0 && (
-                <p style={{ padding: "1rem", color: "var(--gm-ink-400)", fontWeight: 600, margin: 0 }}>
+                <p
+                  style={{
+                    padding: "1rem",
+                    color: "var(--gm-ink-400)",
+                    fontWeight: 600,
+                    margin: 0,
+                  }}
+                >
                   No matches for “{query}”.
                 </p>
               )}

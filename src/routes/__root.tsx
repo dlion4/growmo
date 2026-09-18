@@ -9,6 +9,8 @@ import { CartProvider } from '../store/cart'
 import { ToastHost, ToastProvider } from '../store/toast'
 
 import appCss from '../styles.css?url'
+// Additive dashboard layer — loaded after the master theme, scoped to .gm-app
+import dashboardCss from '../dashboard.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -24,8 +26,9 @@ export const Route = createRootRoute({
       { name: 'theme-color', content: '#0c2317' },
     ],
     links: [
-      // ?v= busts preview/proxy CSS caches — bump it whenever styles.css changes
-      { rel: 'stylesheet', href: `${appCss}?v=4` },
+      // ?v= busts preview/proxy CSS caches — bump it whenever a stylesheet changes
+      { rel: 'stylesheet', href: `${appCss}?v=5` },
+      { rel: 'stylesheet', href: `${dashboardCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

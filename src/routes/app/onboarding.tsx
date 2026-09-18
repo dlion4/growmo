@@ -318,8 +318,8 @@ function OnboardingPage() {
       {/* review drawer */}
       {drawer && !modal && !confirm && (
         <>
-          <div className="gm-scrim" onClick={() => setDrawer(false)} />
-          <aside className="gm-drawer wide" role="dialog" aria-label="Profile review">
+          <div className="gm-scrim is-visible" onClick={() => setDrawer(false)} aria-hidden="true" />
+          <aside className="gm-drawer wide is-visible" role="dialog" aria-label="Profile review">
             <div className="gm-drawer-head">
               <h3>Profile review</h3>
               <button type="button" className="gm-iconbtn" onClick={() => setDrawer(false)} aria-label="Close review"><X /></button>
