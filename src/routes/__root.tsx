@@ -11,6 +11,8 @@ import { ToastHost, ToastProvider } from '../store/toast'
 import appCss from '../styles.css?url'
 // Additive dashboard layer — loaded after the master theme, scoped to .gm-app
 import dashboardCss from '../dashboard.css?url'
+// Page 3 crop-planner additions — token-only and .gm-app scoped
+import plannerCss from '../planner.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -29,6 +31,7 @@ export const Route = createRootRoute({
       // ?v= busts preview/proxy CSS caches — bump it whenever a stylesheet changes
       { rel: 'stylesheet', href: `${appCss}?v=5` },
       { rel: 'stylesheet', href: `${dashboardCss}?v=1` },
+      { rel: 'stylesheet', href: `${plannerCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

@@ -65,7 +65,7 @@ export const APP_NAV: AppNavGroup[] = [
     id: "grow",
     label: "Grow",
     items: [
-      { to: "/app/planner", label: "Crop Planner", desc: "Season plans", icon: Sprout, ready: false, page: 3 },
+      { to: "/app/planner", label: "Crop Planner", desc: "Season plans", icon: Sprout, ready: true, page: 3 },
       { to: "/app/crops", label: "Crops", desc: "Growth tracker", icon: Wheat, ready: false, page: 4 },
       { to: "/app/soil", label: "Soil Health", desc: "Tests & recipes", icon: FlaskConical, ready: false, page: 17 },
       { to: "/app/map", label: "Farm Map", desc: "Plots & GPS", icon: MapIcon, ready: false, page: 19 },

@@ -15,6 +15,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
+import { Route as AppPlannerRouteImport } from './routes/app/planner'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthAccountStatusRouteImport } from './routes/auth/account-status'
 import { Route as AuthHubRouteImport } from './routes/auth/hub'
@@ -58,6 +59,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppOnboardingRoute = AppOnboardingRouteImport.update({
   id: '/app/onboarding',
   path: '/app/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppPlannerRoute = AppPlannerRouteImport.update({
+  id: '/app/planner',
+  path: '/app/planner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/planner': typeof AppPlannerRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/planner': typeof AppPlannerRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -182,6 +190,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/planner': typeof AppPlannerRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/app/dashboard'
     | '/app/onboarding'
+    | '/app/planner'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/app/dashboard'
     | '/app/onboarding'
+    | '/app/planner'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/app/dashboard'
     | '/app/onboarding'
+    | '/app/planner'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -273,6 +285,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
+  AppPlannerRoute: typeof AppPlannerRoute
   AuthAccountStatusRoute: typeof AuthAccountStatusRoute
   AuthHubRoute: typeof AuthHubRoute
   AuthIdentityRoute: typeof AuthIdentityRoute
@@ -332,6 +345,13 @@ declare module '@tanstack/react-router' {
       path: '/app/onboarding'
       fullPath: '/app/onboarding'
       preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/planner': {
+      id: '/app/planner'
+      path: '/app/planner'
+      fullPath: '/app/planner'
+      preLoaderRoute: typeof AppPlannerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/': {
@@ -441,6 +461,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppOnboardingRoute: AppOnboardingRoute,
+  AppPlannerRoute: AppPlannerRoute,
   AuthAccountStatusRoute: AuthAccountStatusRoute,
   AuthHubRoute: AuthHubRoute,
   AuthIdentityRoute: AuthIdentityRoute,
