@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft, BadgeCheck, Building2, Camera, Check, CheckCircle2,
@@ -69,7 +69,6 @@ function missingHint(i: number, p: FarmProfile): string {
 /* ================= page ================= */
 function OnboardingPage() {
   const toast = useToast();
-  const navigate = useNavigate();
   const [profile, setProfile] = useState<FarmProfile>(() => {
     try {
       if (typeof window !== "undefined") {
@@ -218,7 +217,7 @@ function OnboardingPage() {
             <Link to="/app" className="gm-btn gm-btn-lime"><ArrowLeft /> Back to dashboard</Link>
             <button type="button" className="gm-btn gm-btn-outline" onClick={exportCSV}><Download /> Export CSV</button>
             <button type="button" className="gm-btn gm-btn-outline" onClick={() => window.print()}><Printer /> Print summary</button>
-            <button type="button" className="gm-btn" disabled title="Ships with Page 2 — Dashboard">Open dashboard <span className="gm-chip gm-chip-gold" style={{ marginLeft: 6 }}>Page 2</span></button>
+            <Link to="/app/dashboard" className="gm-btn gm-btn-dark">Open dashboard <span className="gm-chip gm-chip-gold" style={{ marginLeft: 6 }}>Page 2</span></Link>
           </div>
         </Reveal>
       </div>

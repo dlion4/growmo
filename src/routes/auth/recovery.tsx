@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Check, Headset, Mail, MapPin, MessageCircle, Smartphone, Video } from "lucide-react";
 import { useState } from "react";
 import { Dialog, OtpInput, PasswordField, Stepper, StrengthMeter, useCountdown, strengthOf } from "../../components/auth/controls";
@@ -11,7 +11,6 @@ const STEPS = ["Choose method", "Verify", "New password"];
 
 function RecoveryPage() {
   const toast = useToast();
-  const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [identifier, setIdentifier] = useState("");
   const [channel, setChannel] = useState("sms");
