@@ -1,0 +1,1477 @@
+/* ============================================================================
+   GrowMO DASHBOARD STYLESHEET  (dashboard.css)
+   ----------------------------------------------------------------------------
+   An ADDITIVE layer for the /app/* dashboard only.
+
+   • Loaded AFTER the master theme (styles.css) so it can refine the shell.
+   • EVERY selector is scoped under `.gm-app` (the AppShell root) or under
+     `.gm-modal-overlay` raised from inside the app, so it can never leak into
+     the marketing site, the shop, or the /auth/* screens.
+   • It never redefines a master token, never touches bare elements
+     (body/h1/p/a) and never overrides a global `.gm-*` component — only
+     dashboard chrome and dashboard page widgets.
+   • Dashboard-only tokens live in the `--gm-d-*` namespace.
+
+   Table of contents
+     1.  Dashboard tokens
+     2.  Shell grid
+     3.  Sidebar — brand, groups, links, collapsed (icons only), footer
+     4.  Topbar — title, search, chips, actions, menus
+     5.  Dropdown close layer
+     6.  Content area + page scaffolding
+     7.  Dashboard widgets (stats, setup list, module grid)
+     8.  Drawers + scrim  (can never cover the page while closed)
+     9.  Command palette
+     10. Reveal neutraliser + motion preferences
+     11. Responsive
+     12. Print
+   ========================================================================== */
+
+/* ==========================================================================
+   1. DASHBOARD TOKENS
+   ========================================================================== */
+.gm-app {
+  --gm-d-side: 248px;
+  --gm-d-side-collapsed: 68px;
+  --gm-d-rail: rgba(255, 255, 255, 0.09);
+  --gm-d-rail-soft: rgba(255, 255, 255, 0.055);
+  --gm-d-ink: #e7f2e4;
+  --gm-d-ink-dim: #9dc08f;
+  --gm-d-top: 64px;
+  --gm-d-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ==========================================================================
+   2. SHELL GRID
+   ========================================================================== */
+.gm-app {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--gm-mist, #f3f6f3);
+  isolation: isolate;
+}
+
+.gm-app > .gm-app-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-app .gm-app-content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-app .gm-app-inner {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: clamp(1.1rem, 2.4vw, 1.9rem) clamp(0.9rem, 2.6vw, 2rem) 2.5rem;
+}
+
+/* ==========================================================================
+   3. SIDEBAR
+   ========================================================================== */
+.gm-app .gm-app-side {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: var(--gm-d-side);
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: var(--gm-d-side);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: linear-gradient(180deg, #0b1a0d 0%, #0f2413 52%, #12300f 100%);
+  color: var(--gm-d-ink);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  transition:
+    width 0.26s var(--gm-d-ease),
+    flex-basis 0.26s var(--gm-d-ease),
+    transform 0.3s var(--gm-d-ease);
+  z-index: 1060;
+  overflow: hidden;
+}
+
+.gm-app.is-collapsed {
+  --gm-d-side: var(--gm-d-side-collapsed);
+}
+
+/* soft top glow behind the brand */
+.gm-app .gm-app-side::before {
+  content: "";
+  position: absolute;
+  inset: -30% 40% 55% -40%;
+  background: radial-gradient(
+    circle at 30% 0%,
+    rgba(76, 195, 138, 0.22),
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
+/* ---------- brand ---------- */
+.gm-app .gm-app-brand {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid var(--gm-d-rail);
+  min-height: var(--gm-d-top);
+}
+
+.gm-app .gm-app-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  flex: 1 1 auto;
+}
+
+.gm-app .gm-app-brand .gm-logo-mark {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--gm-grad-primary);
+  color: #fff;
+  box-shadow: 0 6px 16px -6px rgba(34, 163, 85, 0.8);
+}
+
+.gm-app .gm-app-brand .gm-logo-mark svg {
+  width: 19px;
+  height: 19px;
+}
+
+.gm-app .gm-app-logo-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.05;
+}
+
+.gm-app .gm-app-logo-text strong {
+  display: block;
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.gm-app .gm-app-logo-text strong em {
+  color: var(--gm-lime-400, #c4ef3c);
+  font-style: normal;
+}
+
+.gm-app .gm-app-logo-text small {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gm-d-ink-dim);
+  white-space: nowrap;
+}
+
+/* ---------- nav ---------- */
+.gm-app .gm-app-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.6rem 0.55rem 1rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.gm-app .gm-app-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gm-app .gm-app-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 99px;
+}
+
+.gm-app .gm-app-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.gm-app .gm-app-group {
+  margin-bottom: 0.55rem;
+}
+
+.gm-app .gm-app-cap {
+  margin: 0.55rem 0 0.3rem;
+  padding: 0 0.6rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: #7f9d76;
+  white-space: nowrap;
+}
+
+/* ---------- nav links: ONE line, icon + label, nothing else wordy ---------- */
+.gm-app .gm-app-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 38px;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #d5e7cd;
+  font-family: inherit;
+  font-size: 0.83rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s var(--gm-d-ease);
+}
+
+.gm-app .gm-app-link + .gm-app-link {
+  margin-top: 1px;
+}
+
+.gm-app .gm-app-link:hover {
+  background: var(--gm-d-rail-soft);
+  color: #fff;
+}
+
+.gm-app .gm-app-link:focus-visible {
+  outline: 2px solid var(--gm-lime-400, #c4ef3c);
+  outline-offset: 2px;
+}
+
+.gm-app .gm-app-link.is-active {
+  background: linear-gradient(
+    100deg,
+    rgba(22, 101, 52, 0.95) 0%,
+    rgba(34, 163, 85, 0.55) 100%
+  );
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
+}
+
+/* accent bar on the active item (survives collapse) */
+.gm-app .gm-app-link.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 99px;
+  background: var(--gm-lime-400, #c4ef3c);
+}
+
+.gm-app .gm-app-link-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  color: inherit;
+  opacity: 0.92;
+}
+
+.gm-app .gm-app-link-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-app-link.is-active .gm-app-link-icon {
+  color: var(--gm-lime-300, #d8f65f);
+  opacity: 1;
+}
+
+.gm-app .gm-app-link-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* unbuilt modules: muted, never a "Soon" paragraph */
+.gm-app .gm-app-link.is-soon-link {
+  color: #9fb59a;
+}
+
+.gm-app .gm-app-link.is-soon-link .gm-app-link-icon {
+  opacity: 0.65;
+}
+
+/* counters / badges: tiny, numeric, quiet */
+.gm-app .gm-app-count,
+.gm-app .gm-app-badge {
+  flex: 0 0 auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.34rem;
+  border-radius: 99px;
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.12);
+  color: #eaf6e6;
+}
+
+.gm-app .gm-app-badge {
+  background: rgba(196, 239, 60, 0.16);
+  color: var(--gm-lime-300, #d8f65f);
+  text-transform: uppercase;
+}
+
+/* unbuilt marker = a dot, not a word */
+.gm-app .gm-app-dot {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ---------- COLLAPSED: icons only, no text at all ---------- */
+.gm-app.is-collapsed .gm-app-side {
+  width: var(--gm-d-side-collapsed);
+  flex-basis: var(--gm-d-side-collapsed);
+}
+
+.gm-app.is-collapsed .gm-app-brand {
+  justify-content: center;
+  padding: 0.85rem 0.5rem;
+}
+
+.gm-app.is-collapsed .gm-app-logo {
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
+/* kill every text node in the rail */
+.gm-app.is-collapsed .gm-app-logo-text,
+.gm-app.is-collapsed .gm-app-cap,
+.gm-app.is-collapsed .gm-app-link-text,
+.gm-app.is-collapsed .gm-app-count,
+.gm-app.is-collapsed .gm-app-badge,
+.gm-app.is-collapsed .gm-app-dot,
+.gm-app.is-collapsed .gm-app-collapse span,
+.gm-app.is-collapsed .gm-app-side-foot .gm-app-help small,
+.gm-app.is-collapsed .gm-app-side-foot .gm-app-help strong {
+  display: none !important;
+}
+
+.gm-app.is-collapsed .gm-app-nav {
+  padding: 0.6rem 0.5rem 1rem;
+}
+
+.gm-app.is-collapsed .gm-app-group {
+  margin-bottom: 0.35rem;
+}
+
+/* hairline divider replaces the group caption */
+.gm-app.is-collapsed .gm-app-group + .gm-app-group::before {
+  content: "";
+  display: block;
+  height: 1px;
+  margin: 0.45rem 0.75rem 0.5rem;
+  background: var(--gm-d-rail);
+}
+
+.gm-app.is-collapsed .gm-app-link {
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  margin: 0 auto 2px;
+  border-radius: 12px;
+}
+
+.gm-app.is-collapsed .gm-app-link-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.gm-app.is-collapsed .gm-app-link.is-active::before {
+  left: -0.15rem;
+  height: 16px;
+}
+
+/* ---------- sidebar footer ---------- */
+.gm-app .gm-app-side-foot {
+  position: relative;
+  border-top: 1px solid var(--gm-d-rail);
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-app-side-foot .gm-app-help {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 38px;
+  padding: 0.4rem 0.6rem;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: #cfe3c8;
+  font: inherit;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+}
+
+.gm-app .gm-app-side-foot .gm-app-help:hover {
+  background: var(--gm-d-rail-soft);
+  color: #fff;
+}
+
+.gm-app .gm-app-side-foot .gm-app-help .gm-app-link-icon {
+  color: var(--gm-sprout-300, #86ddb0);
+}
+
+.gm-app .gm-app-collapse {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 36px;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--gm-d-rail);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #cfe3c8;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.gm-app .gm-app-collapse:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.gm-app .gm-app-collapse svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.gm-app.is-collapsed .gm-app-collapse {
+  width: 44px;
+  padding: 0;
+  margin: 0 auto;
+  min-height: 38px;
+}
+
+/* collapsed footer: two centred icon buttons, no labels */
+.gm-app.is-collapsed .gm-app-side-foot .gm-app-help {
+  width: 44px;
+  min-height: 40px;
+  margin: 0 auto;
+  padding: 0;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   4. TOPBAR
+   ========================================================================== */
+.gm-app .gm-app-top {
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: var(--gm-d-top);
+  padding: 0.5rem clamp(0.75rem, 2.2vw, 1.5rem);
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--gm-line, #dfe9e1);
+}
+
+.gm-app .gm-app-top > .gm-icon-btn {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+}
+
+.gm-app .gm-app-top > .gm-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- page title (one line, no wrapping paragraph) ---------- */
+.gm-app .gm-app-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-right: 0.4rem;
+  line-height: 1.15;
+}
+
+.gm-app .gm-app-title small {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400, #6b7d72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-app .gm-app-title strong {
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gm-forest-900, #0c2317);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- search ---------- */
+.gm-app .gm-app-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  max-width: 320px;
+  padding: 0.42rem 0.75rem;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: 99px;
+  background: var(--gm-mint-50, #f0faf3);
+  color: var(--gm-ink-400, #6b7d72);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.gm-app .gm-app-search:hover {
+  border-color: var(--gm-leaf-500, #22a355);
+  background: #fff;
+  box-shadow: var(--gm-shadow-xs, 0 1px 3px rgba(12, 35, 23, 0.1));
+}
+
+.gm-app .gm-app-search svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+}
+
+.gm-app .gm-app-search span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gm-app .gm-app-search kbd {
+  font-family: ui-monospace, monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--gm-ink-600, #3c4d43);
+}
+
+/* ---------- right-hand actions ---------- */
+.gm-app .gm-app-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: 0.25rem;
+}
+
+.gm-app .gm-app-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 36px;
+  padding: 0 0.7rem;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: 99px;
+  background: #fff;
+  color: var(--gm-ink-800, #1b261f);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background 0.18s ease,
+    transform 0.18s var(--gm-d-ease);
+}
+
+.gm-app .gm-app-chip:hover {
+  border-color: var(--gm-leaf-500, #22a355);
+  background: var(--gm-mint-50, #f0faf3);
+}
+
+.gm-app .gm-app-chip > svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  color: var(--gm-leaf-600, #1d8345);
+}
+
+.gm-app .gm-app-chip-money > svg:first-child {
+  color: var(--gm-gold-600, #c77f14);
+}
+
+.gm-app .gm-app-actions > .gm-icon-btn {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+}
+
+.gm-app .gm-app-actions > .gm-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-app-avatar-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.gm-app .gm-app-avatar-btn:focus-visible {
+  outline: 2px solid var(--gm-leaf-600, #1d8345);
+  outline-offset: 3px;
+}
+
+.gm-app .gm-app-avatar-btn .gm-avatar {
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 3px var(--gm-mint-200, #b9efcf);
+}
+
+.gm-app .gm-app-actions .gm-btn.gm-btn-sm {
+  height: 36px;
+  padding-inline: 0.8rem;
+}
+
+/* ---------- dropdown menus ---------- */
+.gm-app .gm-dropdown {
+  position: relative;
+}
+
+.gm-app .gm-dropdown-menu {
+  min-width: 220px;
+  padding: 0.35rem;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: var(--gm-shadow-lg, 0 28px 60px -18px rgba(12, 35, 23, 0.3));
+  z-index: 1070;
+}
+
+.gm-app .gm-dropdown-menu.gm-app-menu {
+  min-width: 250px;
+}
+
+.gm-app .gm-app-menu-cap {
+  margin: 0.15rem 0 0.3rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+.gm-app .gm-dropdown-menu .gm-dropdown-item {
+  font-size: 0.83rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+}
+
+.gm-app .gm-forecast-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 84px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--gm-ink-600, #3c4d43);
+}
+
+.gm-app .gm-forecast-bar {
+  height: 6px;
+  border-radius: 99px;
+  background: var(--gm-mint-100, #dcf5e5);
+  overflow: hidden;
+}
+
+.gm-app .gm-forecast-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gm-grad-primary);
+}
+
+.gm-app .gm-wallet-balance {
+  margin: 0.1rem 0 0.1rem;
+  padding: 0 0.6rem;
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--gm-forest-900, #0c2317);
+}
+
+/* ==========================================================================
+   5. DROPDOWN CLOSE LAYER
+   (a real full-screen catcher so a menu can never look "stuck" open)
+   ========================================================================== */
+.gm-app .gm-drop-close {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+  appearance: none;
+}
+
+/* ==========================================================================
+   6. CONTENT AREA + PAGE SCAFFOLDING
+   ========================================================================== */
+.gm-app .gm-app-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 1rem;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.9rem clamp(0.9rem, 2.6vw, 2rem) 1.4rem;
+  border-top: 1px solid var(--gm-line-soft, #ecf2ed);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+.gm-app .gm-app-foot a {
+  margin-left: auto;
+  color: var(--gm-leaf-700, #166534);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.gm-app .gm-app-foot a:hover {
+  text-decoration: underline;
+}
+
+/* dashboard page header block */
+.gm-app .gm-dash-head {
+  margin-bottom: 1.1rem;
+}
+
+.gm-app .gm-dash-head h1 {
+  margin: 0.35rem 0 0.3rem;
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--gm-forest-900, #0c2317);
+}
+
+.gm-app .gm-dash-head .gm-lead {
+  margin: 0;
+  max-width: 68ch;
+  font-size: 0.9rem;
+  color: var(--gm-ink-600, #3c4d43);
+}
+
+.gm-app .gm-dash-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.8rem 0 0.7rem;
+}
+
+.gm-app .gm-dash-section-title h2 {
+  margin: 0;
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--gm-forest-900, #0c2317);
+}
+
+.gm-app .gm-dash-card {
+  background: #fff;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: var(--gm-r-md, 18px);
+  padding: clamp(0.9rem, 2vw, 1.3rem);
+  box-shadow: var(--gm-shadow-xs, 0 1px 3px rgba(12, 35, 23, 0.1));
+}
+
+/* ==========================================================================
+   7. DASHBOARD WIDGETS
+   ========================================================================== */
+.gm-app .gm-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  background: #fff;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: var(--gm-r-md, 18px);
+  box-shadow: var(--gm-shadow-xs, 0 1px 3px rgba(12, 35, 23, 0.1));
+  transition:
+    transform 0.2s var(--gm-d-ease),
+    box-shadow 0.2s var(--gm-d-ease);
+}
+
+.gm-app .gm-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-md, 0 14px 34px -12px rgba(12, 35, 23, 0.22));
+}
+
+.gm-app .gm-stat .gm-mega-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  margin-bottom: 0.25rem;
+}
+
+.gm-app .gm-stat .gm-mega-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-stat .gm-stat-value {
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--gm-forest-900, #0c2317);
+}
+
+.gm-app .gm-stat .gm-stat-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--gm-leaf-700, #166534);
+}
+
+.gm-app .gm-stat .gm-stat-sub {
+  font-size: 0.71rem;
+  font-weight: 600;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+/* progress bar + grids used by the dashboard home page */
+.gm-app .gm-progress {
+  position: relative;
+  height: 8px;
+  margin: 0 0 0.9rem;
+  border-radius: 99px;
+  background: var(--gm-mint-100, #dcf5e5);
+  overflow: hidden;
+}
+
+.gm-app .gm-progress i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gm-grad-primary);
+  transition: width 0.6s var(--gm-d-ease);
+}
+
+.gm-app .gm-setup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 0.6rem;
+}
+
+.gm-app .gm-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.7rem;
+}
+
+/* setup checklist rows */
+.gm-app .gm-setup-row {
+  align-items: center;
+  margin-bottom: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--gm-r-sm, 12px);
+  text-decoration: none;
+}
+
+.gm-app .gm-setup-row .gm-mega-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+}
+
+.gm-app .gm-setup-row .gm-mega-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-setup-row strong {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--gm-ink-950, #0b120d);
+}
+
+.gm-app .gm-setup-row small {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+/* module grid */
+.gm-app .gm-module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 0.7rem;
+}
+
+.gm-app .gm-module-grid > * {
+  display: flex;
+  min-width: 0;
+}
+
+.gm-app .gm-module {
+  position: relative;
+  flex: 1 1 auto;
+  gap: 0.35rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 16px;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  background: #fff;
+  transition:
+    transform 0.2s var(--gm-d-ease),
+    box-shadow 0.2s var(--gm-d-ease),
+    border-color 0.2s ease;
+}
+
+.gm-app .gm-module:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-mint-200, #b9efcf);
+  box-shadow: var(--gm-shadow-md, 0 14px 34px -12px rgba(12, 35, 23, 0.22));
+}
+
+.gm-app .gm-module.is-soon {
+  background: var(--gm-mist, #f3f6f3);
+  border-style: dashed;
+}
+
+.gm-app .gm-module .gm-mega-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+
+.gm-app .gm-module .gm-mega-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.gm-app .gm-module strong {
+  font-size: 0.84rem;
+  color: var(--gm-ink-950, #0b120d);
+}
+
+.gm-app .gm-module small {
+  font-size: 0.71rem;
+  line-height: 1.3;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+/* ==========================================================================
+   8. DRAWERS + SCRIM
+   Hard rule: while closed these are invisible AND non-interactive
+   (visibility + pointer-events), so they can never cover the dashboard.
+   ========================================================================== */
+.gm-app .gm-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  background: rgba(8, 23, 13, 0.5);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
+  border: 0;
+  padding: 0;
+}
+
+.gm-app .gm-scrim.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: gm-dash-scrim-in 0.25s ease;
+}
+
+.gm-app .gm-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1060;
+  width: min(400px, 92vw);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 22px 0 0 22px;
+  box-shadow: -20px 0 60px -18px rgba(11, 26, 13, 0.35);
+  transform: translateX(102%);
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+  transition:
+    transform 0.3s var(--gm-d-ease),
+    visibility 0.3s ease;
+  overflow: hidden;
+}
+
+.gm-app .gm-drawer.is-visible {
+  transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.gm-app .gm-drawer.wide {
+  width: min(520px, 96vw);
+}
+
+.gm-app .gm-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--gm-grad-deep, #0c2317);
+  color: #fff;
+  border-bottom: 0;
+}
+
+.gm-app .gm-drawer-head strong {
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+}
+
+.gm-app .gm-drawer-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.9rem 1rem 1.5rem;
+}
+
+.gm-app .gm-drawer-foot {
+  padding: 0.85rem 1rem 1.1rem;
+  border-top: 1px solid var(--gm-line-soft, #ecf2ed);
+  background: var(--gm-mint-50, #f0faf3);
+  display: grid;
+  gap: 0.6rem;
+}
+
+/* tight rows inside drawers */
+.gm-app .gm-drawer .gm-check-row,
+.gm-app .gm-drawer .gm-option-row {
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--gm-r-sm, 12px);
+}
+
+.gm-app .gm-drawer .gm-check-row .gm-mega-icon,
+.gm-app .gm-drawer .gm-option-row .gm-mega-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+
+.gm-app .gm-drawer .gm-check-row strong,
+.gm-app .gm-drawer .gm-option-row strong {
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-drawer .gm-check-row small,
+.gm-app .gm-drawer .gm-option-row small {
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+/* modals raised from inside the dashboard keep their master look — these
+   rules only make tall modals scroll inside the viewport instead of
+   running off the screen (still scoped to the app shell) */
+.gm-app .gm-modal-overlay {
+  z-index: 1080;
+  align-items: flex-start;
+  padding: clamp(1rem, 6vh, 3rem) 1rem;
+}
+
+.gm-app .gm-modal-overlay .gm-modal {
+  max-height: min(88dvh, 780px);
+  display: flex;
+  flex-direction: column;
+  margin-inline: auto;
+}
+
+.gm-app .gm-modal-overlay .gm-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ==========================================================================
+   9. COMMAND PALETTE
+   ========================================================================== */
+.gm-app .gm-palette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1090;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(2rem, 12vh, 6rem) 1rem 2rem;
+  background: rgba(8, 23, 13, 0.6);
+  backdrop-filter: blur(8px);
+  animation: gm-dash-fade-in 0.2s ease;
+}
+
+.gm-app .gm-palette {
+  width: min(600px, 100%);
+  background: #fff;
+  border: 1px solid var(--gm-line, #dfe9e1);
+  border-radius: var(--gm-r-lg, 26px);
+  box-shadow: var(--gm-shadow-lg, 0 28px 60px -18px rgba(12, 35, 23, 0.3));
+  overflow: hidden;
+  animation: gm-dash-pop-in 0.24s var(--gm-d-ease);
+}
+
+.gm-app .gm-palette-input {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--gm-line-soft, #ecf2ed);
+}
+
+.gm-app .gm-palette-input svg {
+  width: 18px;
+  height: 18px;
+  color: var(--gm-leaf-600, #1d8345);
+  flex: 0 0 18px;
+}
+
+.gm-app .gm-palette-input input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gm-ink-950, #0b120d);
+  background: transparent;
+}
+
+.gm-app .gm-palette-input .gm-kbd {
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-palette-list {
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  padding: 0.4rem;
+}
+
+.gm-app .gm-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gm-ink-800, #1b261f);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-app .gm-palette-item svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gm-leaf-600, #1d8345);
+  flex: 0 0 16px;
+}
+
+.gm-app .gm-palette-item small {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+.gm-app .gm-palette-item.is-active,
+.gm-app .gm-palette-item:hover {
+  background: var(--gm-mint-50, #f0faf3);
+  color: var(--gm-leaf-800, #166534);
+}
+
+/* ==========================================================================
+   10. REVEAL NEUTRALISER + MOTION PREFERENCES
+   Marketing pages animate in on scroll — the dashboard must never hide
+   content behind a scroll observer, so reveals are always visible here.
+   ========================================================================== */
+.gm-app .gm-reveal,
+.gm-app .gm-reveal-l,
+.gm-app .gm-reveal-r,
+.gm-app .gm-reveal-zoom {
+  opacity: 1 !important;
+  transform: none !important;
+  animation: gm-dash-fade-in 0.4s var(--gm-d-ease) both;
+  animation-delay: var(--gm-d, 0s);
+}
+
+/* keep the module grid children stretchable even when wrapped in a Reveal */
+.gm-app .gm-module-grid > .gm-reveal {
+  display: flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-app *,
+  .gm-app *::before,
+  .gm-app *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}
+
+/* ==========================================================================
+   11. RESPONSIVE
+   Desktop-first shell: sidebar is a fixed off-canvas rail below 1024px.
+   ========================================================================== */
+.gm-app .gm-only-mobile {
+  display: none;
+}
+
+.gm-app .gm-only-desktop {
+  display: inline-flex;
+}
+
+@media (max-width: 1023px) {
+  .gm-app .gm-app-side {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 264px;
+    flex-basis: 264px !important;
+    transform: translateX(-102%);
+    box-shadow: 24px 0 60px -24px rgba(8, 23, 13, 0.6);
+  }
+
+  .gm-app .gm-app-side.is-open,
+  .gm-app .gm-app-side.open {
+    transform: translateX(0);
+  }
+
+  /* off-canvas is always the FULL sidebar — no collapsed rail on mobile */
+  .gm-app.is-collapsed .gm-app-side {
+    width: 264px;
+    flex-basis: 264px !important;
+  }
+
+  .gm-app.is-collapsed .gm-app-logo-text,
+  .gm-app.is-collapsed .gm-app-cap,
+  .gm-app.is-collapsed .gm-app-link-text,
+  .gm-app.is-collapsed .gm-app-count,
+  .gm-app.is-collapsed .gm-app-badge,
+  .gm-app.is-collapsed .gm-app-dot,
+  .gm-app.is-collapsed .gm-app-collapse span,
+  .gm-app.is-collapsed .gm-app-side-foot .gm-app-help small,
+  .gm-app.is-collapsed .gm-app-side-foot .gm-app-help strong {
+    display: revert !important;
+  }
+
+  .gm-app.is-collapsed .gm-app-link,
+  .gm-app .gm-app-link {
+    width: 100%;
+    height: auto;
+    min-height: 40px;
+    margin: 0;
+    padding: 0.45rem 0.6rem;
+    justify-content: flex-start;
+    border-radius: 11px;
+  }
+
+  .gm-app.is-collapsed .gm-app-group + .gm-app-group::before {
+    display: none;
+  }
+
+  .gm-app .gm-app-collapse {
+    display: none;
+  }
+
+  .gm-app .gm-only-desktop {
+    display: none;
+  }
+
+  .gm-app .gm-only-mobile {
+    display: inline-flex;
+  }
+
+  .gm-app .gm-app-title small {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .gm-app .gm-app-search {
+    display: none;
+  }
+
+  .gm-app .gm-app-title strong {
+    font-size: 0.92rem;
+  }
+
+  .gm-app .gm-app-inner {
+    padding-bottom: 2rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .gm-app .gm-app-chip.hide-sm,
+  .gm-app .gm-app-chip .hide-sm {
+    display: none;
+  }
+
+  .gm-app .gm-app-actions {
+    gap: 0.25rem;
+  }
+
+  .gm-app .gm-app-foot span.hide-sm {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   12. PRINT
+   ========================================================================== */
+@media print {
+  .gm-app .gm-app-side,
+  .gm-app .gm-app-top,
+  .gm-app .gm-drawer,
+  .gm-app .gm-scrim,
+  .gm-app .gm-palette-overlay,
+  .gm-app .gm-app-foot {
+    display: none !important;
+  }
+
+  .gm-app .gm-app-inner {
+    max-width: none;
+    padding: 0;
+  }
+}
+
+/* ==========================================================================
+   DASHBOARD KEYFRAMES (dashboard-only names — no clash with master @keyframes)
+   ========================================================================== */
+@keyframes gm-dash-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes gm-dash-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gm-dash-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

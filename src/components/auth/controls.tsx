@@ -2,6 +2,7 @@
 import { Check, Eye, EyeOff, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { lockScroll, unlockScroll } from "../../store/scroll-lock";
 
 /* ================= Dialog (modal) ================= */
 export function Dialog({
@@ -27,10 +28,12 @@ export function Dialog({
       if (e.key === "Escape" && dismissable) onClose();
     };
     window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
+    /* shared counter so a modal can never clear (or be cleared by) the
+       dashboard shell's own scroll lock */
+    lockScroll();
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
+      unlockScroll();
     };
   }, [open, onClose, dismissable]);
 

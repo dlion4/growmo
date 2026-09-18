@@ -2,21 +2,18 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   ArrowRight,
   Bell,
-  Bot,
   Check,
   ChevronRight,
   CircleDollarSign,
   ClipboardList,
   Command,
   LayoutDashboard,
-  Rocket,
   Search,
   TriangleAlert,
-  UserPlus,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { Dialog, Toggle } from "../../components/auth/controls";
+import { Toggle } from "../../components/auth/controls";
 import { AuthConsole } from "../../components/auth/shell";
 import { AUTH_NAV, HUB_NOTIFICATIONS, HUB_WIDGETS, WORKSPACES, type HubNote } from "../../data/auth";
 import { APP_NAV } from "../../data/app/nav";
@@ -39,7 +36,7 @@ const NOTE_ICON = { alert: TriangleAlert, money: CircleDollarSign, task: Clipboa
 function HubPage() {
   const toast = useToast();
   const navigate = useNavigate();
-  const [activeId, setActiveId] = useState(WORKSPACES[0].id);
+  const activeId = WORKSPACES[0].id;
   const [previewId, setPreviewId] = useState<string | null>(null);
   const [notes, setNotes] = useState<HubNote[]>(HUB_NOTIFICATIONS);
   const [notesOpen, setNotesOpen] = useState(false);
