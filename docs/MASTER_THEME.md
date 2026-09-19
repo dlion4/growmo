@@ -157,3 +157,46 @@ No new colors/fonts outside tokens · no hex/rgb literals in `.tsx` (use `var(--
 no Tailwind/MUI/new libs · no dead buttons or links (unbuilt routes stay disabled with
 "Soon", never 404) · no lorem ipsum · no `console.log`/TODOs · no other git branches ·
 no global-chrome rebuilds · mobile must stack cleanly at 1080/640.
+
+## 13. Weather & climate layer (page 8 — `/app/weather`)
+
+Page-scoped stylesheet `src/weather.css`, linked from `__root.tsx` after
+`planner.css` (`weatherCss` → `?url` + `?v=1`). Every selector is prefixed with
+`.gm-app` (or `.gm-modal-overlay`), so nothing leaks into the marketing or auth
+chrome. Token-only: no new colors, fonts, radii or shadows, and no global
+`.gm-*` component is redefined.
+
+**New `.gm-wx-*` classes (52, all additive):**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero / station strip | `.gm-wx-hero` (+`::after` rings), `.gm-wx-hero-weather` |
+| 8.1 live conditions | `.gm-wx-now`, `.gm-wx-now-top`, `.gm-wx-now-value`, `.gm-wx-now-change`, `.gm-wx-now-note`, `.gm-wx-now-grid`, `.gm-wx-now-list`, `.gm-wx-detail` |
+| 8.2 hourly + 7-day | `.gm-wx-strip`, `.gm-wx-temp`, `.gm-wx-hours`, `.gm-wx-hour`, `.gm-wx-hour-bar`, `.gm-wx-days`, `.gm-wx-day`(`.is-today`), `.gm-wx-day-top`, `.gm-wx-day-temp`, `.gm-wx-day-meta` |
+| 8.3 seasonal outlook | `.gm-wx-months`, `.gm-wx-month`, `.gm-wx-month-rain`, `.gm-wx-dekadal`, `.gm-wx-dek`, `.gm-wx-prob`, `.gm-wx-scenarios`, `.gm-wx-scenario` |
+| 8.4 prediction engine | `.gm-wx-engine-tabs`, `.gm-wx-crop-btn`(`.is-active`), `.gm-wx-stage-rail`, `.gm-wx-stage-item`(`.is-current`/`.is-done`), `.gm-wx-balance`, `.gm-wx-bar`, `.gm-wx-bar-track` |
+| 8.5 planting windows | `.gm-wx-window`, `.gm-wx-track`, `.gm-wx-months-mini`, `.gm-wx-legend` |
+| 8.6 extreme alerts | `.gm-wx-actions`, `.gm-wx-alert`(`.sev-critical`/`.sev-high`/`.sev-medium`/`.sev-low`), `.gm-wx-alert-head`, `.gm-wx-alert-msg`, `.gm-wx-alert-meta` |
+| 8.7 history | `.gm-wx-chart` (rainfall bar chart, month labels + values) |
+| Shared bits | `.gm-wx-note`, `.gm-wx-fact`, `.gm-wx-fact-grid`, `.gm-wx-summary`, `.gm-wx-receipt`, `.gm-wx-pop`, `.gm-wx-tools` |
+
+**Responsive:** grids collapse at **1080px** and **640px** (single column);
+a **380px** tier reflows the live-conditions grid to two columns and the
+planting-window row to one. `@media print` hides `.gm-wx-actions` /
+`.gm-wx-tools` so the tables print cleanly. Reveal transitions respect
+`prefers-reduced-motion` via `styles.css` §16.
+
+**Reusable widgets — `src/components/app/WeatherWidgets.tsx`:**
+`WxField`, `WxModalFooter`, `WxNote`, `WxFact`, `WxFactGrid`, `WxSummary`,
+`WxConditionTile`, `WxConditionDetail`, `WxHourlyStrip`, `WxDayCard`,
+`WxMonthCard`, `WxDekadalGrid`, `WxStageRail`, `WxBalanceBar`,
+`WxWindowTrack`, `WxWindowLegend`, `WxAlertCard`, `WxRainChart`,
+`WxObservationRow`, `WxContactRow`, plus the `CONDITION_ICONS` /
+`CURRENT_ICONS` icon maps and `severityTone()` (`low|medium|high` →
+`StatusChip` tone).
+
+**Page data:** `src/data/app/weather.ts` (live parameters, 7-day forecast,
+seasonal outlook + AI advisory, crop engine, planting windows, alerts,
+12-month history, stations, observations, scenarios, SMS bundle, spray
+products, mitigation presets, FAQs). Money goes through `kes()` from
+`data/site`.

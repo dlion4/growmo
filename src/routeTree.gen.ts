@@ -17,6 +17,7 @@ import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
+import { Route as AppWeatherRouteImport } from './routes/app/weather'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthAccountStatusRouteImport } from './routes/auth/account-status'
 import { Route as AuthHubRouteImport } from './routes/auth/hub'
@@ -70,6 +71,11 @@ const AppOnboardingRoute = AppOnboardingRouteImport.update({
 const AppPlannerRoute = AppPlannerRouteImport.update({
   id: '/app/planner',
   path: '/app/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppWeatherRoute = AppWeatherRouteImport.update({
+  id: '/app/weather',
+  path: '/app/weather',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
@@ -151,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
+  '/app/weather': typeof AppWeatherRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
+  '/app/weather': typeof AppWeatherRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/app/dashboard': typeof AppDashboardRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
+  '/app/weather': typeof AppWeatherRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/onboarding'
     | '/app/planner'
+    | '/app/weather'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/onboarding'
     | '/app/planner'
+    | '/app/weather'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -274,6 +285,7 @@ export interface FileRouteTypes {
     | '/app/dashboard'
     | '/app/onboarding'
     | '/app/planner'
+    | '/app/weather'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -299,6 +311,7 @@ export interface RootRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppPlannerRoute: typeof AppPlannerRoute
+  AppWeatherRoute: typeof AppWeatherRoute
   AuthAccountStatusRoute: typeof AuthAccountStatusRoute
   AuthHubRoute: typeof AuthHubRoute
   AuthIdentityRoute: typeof AuthIdentityRoute
@@ -372,6 +385,13 @@ declare module '@tanstack/react-router' {
       path: '/app/planner'
       fullPath: '/app/planner'
       preLoaderRoute: typeof AppPlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/weather': {
+      id: '/app/weather'
+      path: '/app/weather'
+      fullPath: '/app/weather'
+      preLoaderRoute: typeof AppWeatherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/': {
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppPlannerRoute: AppPlannerRoute,
+  AppWeatherRoute: AppWeatherRoute,
   AuthAccountStatusRoute: AuthAccountStatusRoute,
   AuthHubRoute: AuthHubRoute,
   AuthIdentityRoute: AuthIdentityRoute,

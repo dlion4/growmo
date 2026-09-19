@@ -71,7 +71,7 @@ export const APP_NAV: AppNavGroup[] = [
       { to: "/app/map", label: "Farm Map", desc: "Plots & GPS", icon: MapIcon, ready: false, page: 19 },
       { to: "/app/seasons", label: "Seasons", desc: "Rotation plans", icon: CalendarRange, ready: false, page: 23 },
       { to: "/app/nursery", label: "Nursery", desc: "Seeds & seedlings", icon: Leaf, ready: false, page: 25 },
-      { to: "/app/weather", label: "Weather", desc: "Forecasts & alerts", icon: CloudSun, ready: false, page: 8 },
+      { to: "/app/weather", label: "Weather", desc: "Forecasts & alerts", icon: CloudSun, badge: "Live", ready: true, page: 8 },
     ],
   },
   {
