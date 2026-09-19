@@ -359,3 +359,319 @@
     position: static;
   }
 }
+
+/* ---------- Labour management widgets (Page 6) ---------- */
+.gm-app .gm-table-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--gm-ink-800);
+  text-decoration: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-app .gm-table-link:hover {
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-table-link svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-inline-meta {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  line-height: 1.35;
+}
+
+.gm-app .gm-inline-meta + .gm-inline-meta {
+  margin-top: 0.28rem;
+}
+
+.gm-app .gm-inline-meta svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-ai-callout {
+  padding: 1rem;
+  border: 1px solid var(--gm-line);
+  border-left: 4px solid var(--gm-leaf-600);
+  border-radius: var(--gm-radius-md);
+  background: var(--gm-leaf-50);
+}
+
+.gm-app .gm-ai-callout > svg {
+  width: 21px;
+  height: 21px;
+  margin-top: 0.15rem;
+  color: var(--gm-leaf-600);
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-ai-callout > span {
+  display: block;
+}
+
+.gm-app .gm-ai-callout > span > small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--gm-muted);
+  line-height: 1.45;
+}
+
+.gm-app .gm-metric-card {
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.gm-app .gm-metric-card > strong {
+  font-size: clamp(1.25rem, 3vw, 1.8rem);
+  line-height: 1.05;
+}
+
+.gm-app .gm-metric-card > span:last-child {
+  color: var(--gm-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.gm-app .gm-metric-card.amber .gm-mega-icon {
+  color: var(--gm-gold-600);
+  background: var(--gm-lime-100);
+}
+
+.gm-app .gm-metric-card.sky .gm-mega-icon {
+  color: var(--gm-leaf-700);
+  background: var(--gm-mint-100);
+}
+
+.gm-app .gm-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.gm-app .gm-calendar-grid-head {
+  margin-bottom: 0.45rem;
+}
+
+.gm-app .gm-calendar-grid-head > span {
+  padding: 0.35rem 0.5rem;
+  color: var(--gm-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.gm-app .gm-calendar-day {
+  width: 100%;
+  min-height: 132px;
+  padding: 0.55rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-radius-md);
+  background: var(--gm-card);
+  color: var(--gm-ink-800);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--gm-ease),
+    box-shadow 0.2s var(--gm-ease),
+    transform 0.2s var(--gm-ease);
+}
+
+.gm-app .gm-calendar-day:hover,
+.gm-app .gm-calendar-day:focus-visible {
+  border-color: var(--gm-leaf-500);
+  box-shadow: var(--gm-shadow-xs);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.gm-app .gm-calendar-day.is-outside {
+  opacity: 0.45;
+  background: var(--gm-surface);
+}
+
+.gm-app .gm-calendar-day > div:first-child > :where(small) {
+  color: var(--gm-muted);
+  font-size: 0.65rem;
+}
+
+.gm-app .gm-calendar-day.has-tasks {
+  border-color: var(--gm-mint-200);
+}
+
+.gm-app .gm-calendar-task-list {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+}
+
+.gm-app .gm-calendar-task {
+  display: grid;
+  gap: 0.12rem;
+  width: 100%;
+  padding: 0.42rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-radius-sm);
+  background: var(--gm-surface);
+  color: var(--gm-ink-800);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.gm-app .gm-calendar-task:hover,
+.gm-app .gm-calendar-task:focus-visible {
+  border-color: var(--gm-leaf-500);
+  outline: none;
+}
+
+.gm-app .gm-calendar-task > span {
+  color: var(--gm-leaf-700);
+  font-size: 0.63rem;
+  font-weight: 800;
+}
+
+.gm-app .gm-icon-box svg {
+  width: 16px;
+  height: 16px;
+}
+
+.gm-app .gm-calendar-day .gm-calendar-task > span svg {
+  width: 11px;
+  height: 11px;
+}
+
+.gm-app .gm-calendar-day .gm-calendar-task > strong,
+.gm-app .gm-calendar-day .gm-calendar-task > small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gm-app .gm-calendar-day .gm-calendar-task > strong {
+  font-size: 0.7rem;
+}
+
+.gm-app .gm-calendar-day .gm-calendar-task > small {
+  color: var(--gm-muted);
+  font-size: 0.62rem;
+}
+
+.gm-app .gm-calendar-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gm-ink-400);
+  vertical-align: middle;
+}
+
+.gm-app .gm-calendar-dot.completed {
+  background: var(--gm-leaf-600);
+}
+
+.gm-app .gm-calendar-dot.today {
+  background: var(--gm-gold-600);
+}
+
+.gm-app .gm-calendar-dot.overdue {
+  background: var(--gm-risk-high, var(--gm-gold-600));
+}
+
+.gm-app .gm-calendar-dot.upcoming {
+  background: var(--gm-sprout-300);
+}
+
+.gm-app .gm-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--gm-radius-sm);
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-spin {
+  width: 28px;
+  height: 28px;
+  color: var(--gm-leaf-600);
+  animation: gm-spin 0.8s linear infinite;
+}
+
+@media (max-width: 1100px) {
+  .gm-app .gm-calendar-day {
+    min-height: 112px;
+  }
+
+  .gm-app .gm-calendar-day .gm-calendar-task > strong {
+    font-size: 0.66rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .gm-app .gm-calendar-grid {
+    gap: 0.3rem;
+  }
+
+  .gm-app .gm-calendar-day {
+    min-height: 88px;
+    padding: 0.35rem;
+    border-radius: var(--gm-radius-sm);
+  }
+
+  .gm-app .gm-calendar-day > div:first-child > :where(small),
+  .gm-app .gm-calendar-day .gm-calendar-task > span,
+  .gm-app .gm-calendar-day .gm-calendar-task > small,
+  .gm-app .gm-calendar-day .gm-calendar-task > strong {
+    font-size: 0.58rem;
+  }
+
+  .gm-app .gm-calendar-task {
+    padding: 0.25rem;
+  }
+
+  .gm-app .gm-calendar-task-list {
+    margin-top: 0.25rem;
+  }
+}
+
+.gm-app .gm-calendar-task.status-completed {
+  border-left: 3px solid var(--gm-leaf-600);
+}
+
+.gm-app .gm-calendar-task.status-today {
+  border-left: 3px solid var(--gm-gold-600);
+  background: var(--gm-lime-100);
+}
+
+.gm-app .gm-calendar-task.status-overdue {
+  border-left: 3px solid var(--gm-gold-600);
+  background: var(--gm-surface);
+}
+
+.gm-app .gm-calendar-task.status-upcoming,
+.gm-app .gm-calendar-task.status-scheduled,
+.gm-app .gm-calendar-task.status-future {
+  border-left: 3px solid var(--gm-sprout-300);
+}

@@ -16,6 +16,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
+import { Route as AppLabourRouteImport } from './routes/app/labour'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
@@ -66,6 +67,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppInventoryRoute = AppInventoryRouteImport.update({
   id: '/app/inventory',
   path: '/app/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppLabourRoute = AppLabourRouteImport.update({
+  id: '/app/labour',
+  path: '/app/labour',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppOnboardingRoute = AppOnboardingRouteImport.update({
@@ -156,6 +162,7 @@ export interface FileRoutesByFullPath {
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/labour': typeof AppLabourRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
@@ -181,6 +188,7 @@ export interface FileRoutesByTo {
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/labour': typeof AppLabourRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/inventory': typeof AppInventoryRoute
+  '/app/labour': typeof AppLabourRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/app/crops'
     | '/app/dashboard'
     | '/app/inventory'
+    | '/app/labour'
     | '/app/onboarding'
     | '/app/planner'
     | '/auth/account-status'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/app/crops'
     | '/app/dashboard'
     | '/app/inventory'
+    | '/app/labour'
     | '/app/onboarding'
     | '/app/planner'
     | '/auth/account-status'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/app/crops'
     | '/app/dashboard'
     | '/app/inventory'
+    | '/app/labour'
     | '/app/onboarding'
     | '/app/planner'
     | '/auth/account-status'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppInventoryRoute: typeof AppInventoryRoute
+  AppLabourRoute: typeof AppLabourRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppPlannerRoute: typeof AppPlannerRoute
   AuthAccountStatusRoute: typeof AuthAccountStatusRoute
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/app/inventory'
       fullPath: '/app/inventory'
       preLoaderRoute: typeof AppInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/labour': {
+      id: '/app/labour'
+      path: '/app/labour'
+      fullPath: '/app/labour'
+      preLoaderRoute: typeof AppLabourRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/onboarding': {
@@ -502,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppInventoryRoute: AppInventoryRoute,
+  AppLabourRoute: AppLabourRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppPlannerRoute: AppPlannerRoute,
   AuthAccountStatusRoute: AuthAccountStatusRoute,
