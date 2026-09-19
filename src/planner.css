@@ -675,3 +675,440 @@
 .gm-app .gm-calendar-task.status-future {
   border-left: 3px solid var(--gm-sprout-300);
 }
+
+/* ============================================================================
+   PAGE 7 FINANCE APPENDIX — scoped to the finance command centre.
+   Uses master theme tokens and existing dashboard primitives.
+   ========================================================================== */
+.gm-app .gm-finance-page .gm-menu-wrap {
+  position: relative;
+}
+
+.gm-app .gm-finance-page .gm-finance-menu {
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  min-width: 250px;
+  padding: 0.35rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-lg);
+  z-index: 20;
+}
+
+.gm-app .gm-finance-page .gm-finance-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.55rem;
+  padding: 0.65rem 0.7rem;
+  border: 0;
+  border-radius: var(--gm-radius-sm);
+  background: transparent;
+  color: var(--gm-ink-800);
+  font: inherit;
+  font-size: 0.83rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-app .gm-finance-page .gm-finance-menu button:hover {
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-finance-page .gm-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.65rem;
+}
+
+.gm-app .gm-finance-page .gm-filter-bar .gm-search-wrap {
+  flex: 1 1 280px;
+}
+
+.gm-app .gm-finance-page .gm-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gm-app .gm-finance-page .gm-search-wrap > svg {
+  position: absolute;
+  left: 0.85rem;
+  width: 17px;
+  height: 17px;
+  color: var(--gm-ink-400);
+  pointer-events: none;
+}
+
+.gm-app .gm-finance-page .gm-search-wrap .gm-input {
+  padding-left: 2.55rem;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-list {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.55rem 0.4rem;
+  border: 0;
+  border-bottom: 1px solid var(--gm-line-soft);
+  background: transparent;
+  color: var(--gm-ink-800);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity:hover {
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-icon,
+.gm-app .gm-finance-page .gm-action-icon {
+  display: grid;
+  place-items: center;
+  width: 35px;
+  height: 35px;
+  flex: 0 0 35px;
+  border-radius: 11px;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-icon.is-in,
+.gm-app .gm-finance-page .gm-action-icon.is-positive {
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-icon.is-out {
+  background: var(--gm-cream-50);
+  color: var(--gm-clay-500);
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-main,
+.gm-app .gm-finance-page .gm-finance-activity-main strong,
+.gm-app .gm-finance-page .gm-finance-activity-main small {
+  display: block;
+  min-width: 0;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-main strong {
+  overflow: hidden;
+  font-size: 0.8rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-main small {
+  margin-top: 0.18rem;
+  color: var(--gm-ink-400);
+  font-size: 0.71rem;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-amount {
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-amount.is-in {
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-finance-page .gm-finance-activity-amount.is-out {
+  color: var(--gm-ink-700);
+}
+
+.gm-app .gm-finance-page .gm-action-card {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  min-height: 76px;
+  padding: 0.75rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  color: var(--gm-ink-800);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--gm-t-med), border-color var(--gm-t-med), box-shadow var(--gm-t-med);
+}
+
+.gm-app .gm-finance-page .gm-action-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-mint-500);
+  box-shadow: var(--gm-shadow-sm);
+}
+
+.gm-app .gm-finance-page .gm-action-card > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.gm-app .gm-finance-page .gm-action-card small {
+  color: var(--gm-ink-400);
+  font-size: 0.72rem;
+}
+
+.gm-app .gm-finance-page .gm-action-card > svg {
+  width: 17px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-finance-page .gm-wizard-stack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.gm-app .gm-finance-page .gm-wizard-stack .gm-field {
+  margin-bottom: 0;
+}
+
+.gm-app .gm-finance-page .gm-review-card {
+  display: grid;
+  gap: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-finance-page .gm-review-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid var(--gm-line-soft);
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-finance-page .gm-review-row:last-child {
+  border-bottom: 0;
+}
+
+.gm-app .gm-finance-page .gm-review-row span {
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-finance-page .gm-review-row strong {
+  color: var(--gm-ink-900);
+  text-align: right;
+}
+
+.gm-app .gm-finance-page .gm-mpesa-hero {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-grad-soft);
+}
+
+.gm-app .gm-finance-page .gm-mpesa-hero strong,
+.gm-app .gm-finance-page .gm-mpesa-hero small {
+  display: block;
+}
+
+.gm-app .gm-finance-page .gm-mpesa-hero small {
+  margin-top: 0.2rem;
+  color: var(--gm-ink-500);
+  font-size: 0.76rem;
+}
+
+.gm-app .gm-finance-page .gm-processing {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 1.8rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  color: var(--gm-ink-800);
+  text-align: center;
+}
+
+.gm-app .gm-finance-page .gm-processing small {
+  max-width: 330px;
+  color: var(--gm-ink-400);
+  font-size: 0.75rem;
+}
+
+.gm-app .gm-finance-page .gm-success-mark {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-finance-page .gm-success-mark svg {
+  width: 31px;
+  height: 31px;
+}
+
+.gm-app .gm-finance-page .gm-receipt-code,
+.gm-app .gm-finance-page .gm-receipt-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.8rem;
+  border: 1px dashed var(--gm-mint-500);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  text-align: center;
+}
+
+.gm-app .gm-finance-page .gm-receipt-code small,
+.gm-app .gm-finance-page .gm-receipt-card small,
+.gm-app .gm-finance-page .gm-receipt-card strong {
+  display: block;
+}
+
+.gm-app .gm-finance-page .gm-receipt-code strong {
+  color: var(--gm-leaf-700);
+  letter-spacing: 0.08em;
+}
+
+.gm-app .gm-finance-page .gm-alert-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.75rem;
+  border: 1px solid var(--gm-line);
+  border-left: 4px solid var(--gm-cream-500);
+  border-radius: var(--gm-radius-sm);
+  background: var(--gm-cream-50);
+}
+
+.gm-app .gm-finance-page .gm-alert-box.is-danger {
+  border-left-color: var(--gm-clay-500);
+  background: var(--gm-cream-50);
+}
+
+.gm-app .gm-finance-page .gm-alert-box.is-success {
+  border-left-color: var(--gm-leaf-600);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-finance-page .gm-alert-box p {
+  margin: 0;
+  color: var(--gm-ink-700);
+  font-size: 0.78rem;
+}
+
+.gm-app .gm-finance-page .gm-kpi-soft {
+  display: grid;
+  gap: 0.2rem;
+  height: 100%;
+  padding: 0.8rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-finance-page .gm-kpi-soft small {
+  color: var(--gm-ink-400);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.gm-app .gm-finance-page .gm-kpi-soft strong {
+  font-size: 1.1rem;
+}
+
+.gm-app .gm-finance-page .gm-kpi-soft span {
+  color: var(--gm-ink-500);
+  font-size: 0.72rem;
+}
+
+.gm-app .gm-finance-page .gm-payee-list {
+  display: grid;
+  gap: 0.35rem;
+  max-height: 390px;
+  overflow-y: auto;
+}
+
+.gm-app .gm-finance-page .gm-payee-list .gm-check-row {
+  margin: 0;
+}
+
+.gm-app .gm-finance-page .gm-table-total td {
+  background: var(--gm-mint-50);
+  font-weight: 800;
+}
+
+.gm-app .gm-finance-page .gm-tabs-mini {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-finance-page .gm-finance-activity-amount {
+    font-size: 0.7rem;
+  }
+
+  .gm-app .gm-finance-page .gm-action-card {
+    min-height: 68px;
+  }
+}
+
+.gm-app .gm-finance-page .gm-insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-left: 4px solid var(--gm-leaf-600);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-finance-page .gm-insight-warning {
+  border-left-color: var(--gm-gold-600);
+  background: var(--gm-cream-50);
+}
+
+.gm-app .gm-finance-page .gm-insight-success {
+  border-left-color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-finance-page .gm-insight-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 10px;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-finance-page .gm-insight strong {
+  display: block;
+  color: var(--gm-ink-900);
+}
+
+.gm-app .gm-finance-page .gm-insight p {
+  margin: 0.2rem 0 0;
+  color: var(--gm-ink-600);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}

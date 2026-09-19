@@ -15,6 +15,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
+import { Route as AppFinanceRouteImport } from './routes/app/finance'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLabourRouteImport } from './routes/app/labour'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
@@ -62,6 +63,11 @@ const AppCropsRoute = AppCropsRouteImport.update({
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/app/dashboard',
   path: '/app/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppFinanceRoute = AppFinanceRouteImport.update({
+  id: '/app/finance',
+  path: '/app/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/finance': typeof AppFinanceRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/onboarding': typeof AppOnboardingRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/finance': typeof AppFinanceRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/onboarding': typeof AppOnboardingRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
+  '/app/finance': typeof AppFinanceRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/onboarding': typeof AppOnboardingRoute
@@ -242,6 +251,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/app/crops'
     | '/app/dashboard'
+    | '/app/finance'
     | '/app/inventory'
     | '/app/labour'
     | '/app/onboarding'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/app/crops'
     | '/app/dashboard'
+    | '/app/finance'
     | '/app/inventory'
     | '/app/labour'
     | '/app/onboarding'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/app/crops'
     | '/app/dashboard'
+    | '/app/finance'
     | '/app/inventory'
     | '/app/labour'
     | '/app/onboarding'
@@ -321,6 +333,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppFinanceRoute: typeof AppFinanceRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLabourRoute: typeof AppLabourRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       path: '/app/dashboard'
       fullPath: '/app/dashboard'
       preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/finance': {
+      id: '/app/finance'
+      path: '/app/finance'
+      fullPath: '/app/finance'
+      preLoaderRoute: typeof AppFinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/inventory': {
@@ -521,6 +541,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppFinanceRoute: AppFinanceRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLabourRoute: AppLabourRoute,
   AppOnboardingRoute: AppOnboardingRoute,

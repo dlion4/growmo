@@ -80,7 +80,7 @@ export const APP_NAV: AppNavGroup[] = [
     items: [
       { to: "/app/inventory", label: "Inventory", desc: "Inputs & stock", icon: Package, ready: true, page: 5 },
       { to: "/app/labour", label: "Labour", desc: "Team & payroll", icon: Users, ready: true, page: 6 },
-      { to: "/app/finance", label: "Finance", desc: "Budgets & P&L", icon: Wallet, ready: false, page: 7 },
+      { to: "/app/finance", label: "Finance", desc: "Budgets & P&L", icon: Wallet, ready: true, page: 7 },
       { to: "/app/machinery", label: "Machinery", desc: "Equipment log", icon: Tractor, ready: false, page: 20 },
       { to: "/app/records", label: "Records", desc: "Diary & certificates", icon: ClipboardList, ready: false, page: 12 },
       { to: "/app/settings", label: "Settings", desc: "Farm & team", icon: Settings, ready: false, page: 15 },
