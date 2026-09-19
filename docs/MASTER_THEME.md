@@ -200,3 +200,48 @@ seasonal outlook + AI advisory, crop engine, planting windows, alerts,
 12-month history, stations, observations, scenarios, SMS bundle, spray
 products, mitigation presets, FAQs). Money goes through `kes()` from
 `data/site`.
+
+## 14. AI advisor layer (page 9 — `/app/advisor`)
+
+Page-scoped stylesheet `src/advisor.css`, linked from `__root.tsx` after
+`weather.css` (`advisorCss` → `?url` + `?v=1`). Every selector is prefixed with
+`.gm-app`, token-only (no hex, no literal colors in the `.tsx`), and no global
+`.gm-*` component is redefined.
+
+**New `.gm-ai-*` classes (64, all additive):**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero / identity | `.gm-ai-hero` (+`::after` rings), `.gm-ai-ava-lg`, `.gm-ai-hero-strip`, `.gm-ai-hero-actions`, `.gm-ai-credit`, `.gm-ai-credit-track` |
+| 9.1 chat | `.gm-ai-layout`, `.gm-ai-side`, `.gm-ai-thread`, `.gm-ai-msg`(`.is-me`), `.gm-ai-ava`, `.gm-ai-bubble`, `.gm-ai-meta`, `.gm-ai-src`, `.gm-ai-blocks`, `.gm-ai-block`, `.gm-ai-option`, `.gm-ai-budget-row`, `.gm-ai-budget-total`, `.gm-ai-steps`, `.gm-ai-pay-row`, `.gm-ai-chips`, `.gm-ai-typing`, `.gm-ai-dot`, `.gm-ai-composer`, `.gm-ai-composer-row`, `.gm-ai-prompts`, `.gm-ai-session`, `.gm-ai-upload`, `.gm-ai-scan-preview` |
+| Insight feed | `.gm-ai-insight`(`.tone-high`/`.tone-medium`/`.tone-low`), `.gm-ai-insight-foot`, `.gm-ai-feed-btn` |
+| 9.2 plan generator | `.gm-ai-plans`, `.gm-ai-plan`, `.gm-ai-plan-meta`, `.gm-ai-scenarios`, `.gm-ai-scenario`(`.is-best`) |
+| 9.3 pest & disease | `.gm-ai-risks`, `.gm-ai-risk`(`.sev-high`/`.sev-medium`), `.gm-ai-risk-head`, `.gm-ai-risk-msg`, `.gm-ai-risk-meta`, `.gm-ai-score` |
+| 9.4 market forecast | `.gm-ai-markets`, `.gm-ai-market`, `.gm-ai-spark`, `.gm-ai-range`, `.gm-ai-range-track` |
+| 9.5 benchmarking | `.gm-ai-bench`, `.gm-ai-bench-head`, `.gm-ai-bench-bar`, `.gm-ai-bench-legend` |
+| 9.6 input optimization | `.gm-ai-programs`, `.gm-ai-program`(`.is-pick`), `.gm-ai-program-price` |
+| Shared bits | `.gm-ai-tools`, `.gm-ai-fact`, `.gm-ai-fact-grid`, `.gm-ai-note`(`.warn`/`.danger`), `.gm-ai-summary`, `.gm-ai-receipt`, `.gm-ai-kv`, `.gm-ai-empty` |
+
+**Responsive:** the chat layout is `1fr 300px` above **1080px** and stacks to a
+single column below it (the right rail becomes a card grid); grids collapse at
+**640px**; a **380px** tier reflows the hero strip and fact grid to two
+columns and the composer to a stacked column. `@media print` hides the
+composer, prompts, toolbars and hero actions. Reveal motion inherits
+`prefers-reduced-motion` from `styles.css` §16.
+
+**Reusable widgets — `src/components/app/AdvisorWidgets.tsx`:**
+`AiField`, `AiModalFooter`, `AiNote`, `AiFact`, `AiFactGrid`, `AiSummary`,
+`AiKv`, `AiEmpty`, `AiUploadDrop`, `AiTyping`, `AiChatBlock`, `AiChatBubble`,
+`AiInsightCard`, `AiPlanCard`, `AiScenarioCard`, `AiRiskCard`, `AiSparkline`
+(+ `SPARK_MONTHS`), `AiMarketCard`, `AiBenchBar`, `AiProgramCard`, plus the
+`riskTone()`, `verdictTone()` and `<TrendIcon />` helpers.
+
+**Page data:** `src/data/app/advisor.ts` — profile, 10 chat sessions with three
+full blueprint transcripts (Kiswahili maize budget, labour M-Pesa payment,
+black-rot diagnosis), 12 quick prompts with data-driven AI replies, 10
+proactive insights, the 17-row blueprint season plan + 3 revenue scenarios +
+10 saved plans, 10 pest/disease risks + 10 treatment products + 10 scouting
+rounds + 10 symptoms, 10 market forecasts + 8 price alerts, 10 benchmark
+metrics + 10 peer groups, 6 fertilizer programs + 10 fertilizer products + the
+soil test, 10 AI model cards, 10 data sources, 4 credit plans, 8 FAQs.
+Money goes through `kes()` from `data/site`.

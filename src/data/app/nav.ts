@@ -57,7 +57,7 @@ export const APP_NAV: AppNavGroup[] = [
     items: [
       { to: "/app", label: "Getting started", desc: "Setup hub", icon: Rocket, ready: true },
       { to: "/app/dashboard", label: "Dashboard", desc: "Command center", icon: LayoutDashboard, ready: true, page: 2 },
-      { to: "/app/advisor", label: "AI Advisor", desc: "Ask anything", icon: Bot, badge: "AI", ready: false, page: 9 },
+      { to: "/app/advisor", label: "AI Advisor", desc: "Ask anything", icon: Bot, badge: "AI", ready: true, page: 9 },
       { to: "/app/analytics", label: "Analytics", desc: "Reports & KPIs", icon: BarChart3, ready: false, page: 11 },
     ],
   },
