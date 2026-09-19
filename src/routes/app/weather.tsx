@@ -1953,10 +1953,7 @@ function WeatherPage() {
               setModal(null);
               toast.notify("Planting plan scheduled and budgeted", "success");
             }}
-            onPlanner={() => {
-              setModal(null);
-              toast.notify("Opening the crop planner", "info");
-            }}
+            onPlanner={() => setModal(null)}
           />
         ) : null}
       </Dialog>
@@ -6869,13 +6866,13 @@ function PlantingPlanWizard({
           nextDisabled={area <= 0 || total <= 0 || !when.trim()}
         />
       ) : null}
-      <button
-        type="button"
+      <Link
+        to="/app/planner"
         className="gm-btn gm-btn-soft gm-btn-sm gm-btn-block mt-2"
         onClick={onPlanner}
       >
         <Sprout /> Or open the full crop planner
-      </button>
+      </Link>
     </div>
   );
 }
