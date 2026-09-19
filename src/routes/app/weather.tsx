@@ -783,7 +783,7 @@ function WeatherPage() {
                   <span className="gm-wx-temp d-block">
                     {CURRENT_CONDITIONS[0].display}°C
                   </span>
-                  <small style={{ color: "rgba(255,255,255,.75)" }}>
+                  <small>
                     Feels like {CURRENT_CONDITIONS[1].display}°C · light rain
                     from 15:00
                   </small>

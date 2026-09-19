@@ -28,6 +28,11 @@
   color: var(--gm-card);
 }
 
+.gm-app .gm-wx-hero-weather small,
+.gm-app .gm-wx-summary p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
 .gm-app .gm-wx-hero::after {
   content: "";
   position: absolute;
@@ -86,7 +91,7 @@
 .gm-app .gm-wx-strip strong {
   font-family: var(--gm-font-display);
   font-size: 1rem;
-  color: #fff;
+  color: var(--gm-card);
 }
 
 /* ---------- 2. live conditions grid ---------- */
@@ -103,7 +108,7 @@
   padding: 0.85rem 0.9rem;
   border: 1px solid var(--gm-line);
   border-radius: var(--gm-r-md);
-  background: #fff;
+  background: var(--gm-card);
   text-align: left;
   font: inherit;
   cursor: pointer;
@@ -202,7 +207,7 @@
   padding: 0.55rem 0.3rem;
   border: 1px solid var(--gm-line);
   border-radius: var(--gm-r-sm);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   cursor: pointer;
   transition: border-color var(--gm-t-fast) var(--gm-ease);
@@ -257,7 +262,7 @@
   padding: 0.85rem 0.8rem;
   border: 1px solid var(--gm-line);
   border-radius: var(--gm-r-md);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -327,7 +332,7 @@
   padding: 1rem;
   border: 1px solid var(--gm-line);
   border-radius: var(--gm-r-md);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -397,7 +402,7 @@
   padding: 0.9rem;
   border: 1.5px solid var(--gm-line);
   border-radius: var(--gm-r-md);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -448,7 +453,7 @@
   padding: 0.55rem 0.9rem;
   border: 1.5px solid var(--gm-line);
   border-radius: var(--gm-r-pill);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   font-size: 0.82rem;
   font-weight: 800;
@@ -465,7 +470,7 @@
 .gm-app .gm-wx-crop-btn.on {
   background: var(--gm-grad-primary);
   border-color: transparent;
-  color: #fff;
+  color: var(--gm-card);
   box-shadow: var(--gm-shadow-glow);
 }
 
@@ -486,7 +491,7 @@
   border: 1px solid var(--gm-line);
   border-left: 4px solid var(--gm-leaf-500);
   border-radius: var(--gm-r-sm);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -582,8 +587,8 @@
     45deg,
     var(--gm-line-soft),
     var(--gm-line-soft) 3px,
-    #fff 3px,
-    #fff 6px
+    var(--gm-card) 3px,
+    var(--gm-card) 6px
   );
 }
 
@@ -630,7 +635,7 @@
   border: 1px solid var(--gm-line);
   border-left: 5px solid var(--gm-leaf-500);
   border-radius: var(--gm-r-md);
-  background: #fff;
+  background: var(--gm-card);
   font: inherit;
   text-align: left;
   cursor: pointer;
@@ -651,7 +656,7 @@
 
 .gm-app .gm-wx-alert.is-high {
   border-left-color: var(--gm-clay-500);
-  background: #fff9f7;
+  background: color-mix(in srgb, var(--gm-clay-500) 7%, var(--gm-card));
 }
 
 .gm-app .gm-wx-alert.is-low {
@@ -773,7 +778,7 @@
 
 .gm-app .gm-wx-note.danger {
   border-left-color: var(--gm-clay-500);
-  background: #fff9f7;
+  background: color-mix(in srgb, var(--gm-clay-500) 7%, var(--gm-card));
 }
 
 .gm-app .gm-wx-tools {
@@ -826,7 +831,7 @@
   padding: 1rem;
   border-radius: var(--gm-r-md);
   background: var(--gm-grad-deep);
-  color: #fff;
+  color: var(--gm-card);
 }
 
 .gm-app .gm-wx-summary strong {
@@ -837,7 +842,7 @@
 .gm-app .gm-wx-summary .gm-chip {
   background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.22);
-  color: #fff;
+  color: var(--gm-card);
 }
 
 .gm-app .gm-wx-pop {

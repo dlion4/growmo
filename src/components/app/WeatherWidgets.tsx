@@ -163,9 +163,7 @@ export function WxSummary({
     <div className="gm-wx-summary">
       <div style={{ flex: "1 1 260px" }}>
         <strong className="d-block">{title}</strong>
-        <p className="mb-0" style={{ color: "rgba(255,255,255,.82)" }}>
-          {note}
-        </p>
+        <p className="mb-0">{note}</p>
         {chips.length ? (
           <div className="d-flex flex-wrap gap-2 mt-2">
             {chips.map((chip) => (
