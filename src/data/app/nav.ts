@@ -281,7 +281,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Channels",
         desc: "USSD & SMS",
         icon: Smartphone,
-        ready: false,
+        ready: true,
         page: 16,
       },
       {

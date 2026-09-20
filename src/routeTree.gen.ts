@@ -18,7 +18,11 @@ import { Route as AppAdvisorRouteImport } from './routes/app/advisor'
 import { Route as AppCommunityRouteImport } from './routes/app/community'
 =======
 import { Route as AppAnalyticsRouteImport } from './routes/app/analytics'
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+import { Route as AppChannelsRouteImport } from './routes/app/channels'
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
@@ -88,6 +92,11 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/app/analytics',
   path: '/app/analytics',
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppChannelsRoute = AppChannelsRouteImport.update({
+  id: '/app/channels',
+  path: '/app/channels',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppCropsRoute = AppCropsRouteImport.update({
@@ -244,7 +253,11 @@ export interface FileRoutesByFullPath {
   '/app/community': typeof AppCommunityRoute
 =======
   '/app/analytics': typeof AppAnalyticsRoute
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+  '/app/channels': typeof AppChannelsRoute
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -290,7 +303,11 @@ export interface FileRoutesByTo {
   '/app/community': typeof AppCommunityRoute
 =======
   '/app/analytics': typeof AppAnalyticsRoute
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+  '/app/channels': typeof AppChannelsRoute
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -337,7 +354,11 @@ export interface FileRoutesById {
   '/app/community': typeof AppCommunityRoute
 =======
   '/app/analytics': typeof AppAnalyticsRoute
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+  '/app/channels': typeof AppChannelsRoute
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -385,7 +406,11 @@ export interface FileRouteTypes {
     | '/app/community'
 =======
     | '/app/analytics'
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+    | '/app/channels'
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -431,7 +456,11 @@ export interface FileRouteTypes {
     | '/app/community'
 =======
     | '/app/analytics'
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+    | '/app/channels'
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -477,7 +506,11 @@ export interface FileRouteTypes {
     | '/app/community'
 =======
     | '/app/analytics'
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+    | '/app/channels'
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -524,7 +557,11 @@ export interface RootRouteChildren {
   AppCommunityRoute: typeof AppCommunityRoute
 =======
   AppAnalyticsRoute: typeof AppAnalyticsRoute
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+  AppChannelsRoute: typeof AppChannelsRoute
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
@@ -612,6 +649,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/analytics'
       preLoaderRoute: typeof AppAnalyticsRouteImport
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/channels': {
+      id: '/app/channels'
+      path: '/app/channels'
+      fullPath: '/app/channels'
+      preLoaderRoute: typeof AppChannelsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/crops': {
@@ -826,7 +870,11 @@ const rootRouteChildren: RootRouteChildren = {
   AppCommunityRoute: AppCommunityRoute,
 =======
   AppAnalyticsRoute: AppAnalyticsRoute,
+<<<<<<< HEAD
 >>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
+=======
+  AppChannelsRoute: AppChannelsRoute,
+>>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,

@@ -1826,3 +1826,88 @@
   letter-spacing: 0.02em;
 }
 
+
+/* ============================================================================
+   PAGE 16 — MOBILE, OFFLINE, USSD & SMS CHANNELS  (.gm-channels-page)
+   =========================================================================== */
+
+/* USSD card simulator */
+.gm-ussd-card {
+  background: var(--gm-forest-950);
+  border-radius: var(--gm-r-md);
+  padding: 1.5rem;
+  color: #dcf5e5;
+  font-family: var(--gm-font-body, monospace);
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+
+.gm-ussd-code {
+  white-space: pre-wrap;
+}
+
+.gm-ussd-divider {
+  border-top: 1px dashed rgba(255, 255, 255, 0.2);
+  margin: 0.5rem 0;
+}
+
+.gm-ussd-option {
+  display: block;
+  background: none;
+  border: none;
+  color: var(--gm-sprout-300);
+  cursor: pointer;
+  padding: 0.2rem 0;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.gm-ussd-option:hover {
+  color: var(--gm-lime-400);
+  text-decoration: underline;
+}
+
+.gm-ussd-response {
+  white-space: pre-wrap;
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: #fff;
+}
+
+/* channels dropdown */
+.gm-channels-menu {
+  min-width: 220px;
+}
+
+/* code chip */
+.gm-app .gm-channels-page .gm-code-chip {
+  font-family: var(--gm-font-body, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: var(--gm-mint-50);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--gm-r-xs);
+  letter-spacing: 0.02em;
+}
+
+/* textarea */
+.gm-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  font-family: var(--gm-font-body);
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.gm-textarea:focus {
+  outline: none;
+  border-color: var(--gm-leaf-500);
+  box-shadow: 0 0 0 3px rgba(34, 163, 85, 0.12);
+}
