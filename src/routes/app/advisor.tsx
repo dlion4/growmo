@@ -357,7 +357,9 @@ function AdvisorPage() {
   /* ---- 9.2 plan generator ---- */
   const [plans, setPlans] = useState<SavedPlan[]>(SAVED_PLANS);
   const [activePlan, setActivePlan] = useState<SavedPlan | null>(null);
-  const [planTab, setPlanTab] = useState<"activities" | "budget" | "returns">("activities");
+  const [planTab, setPlanTab] = useState<"activities" | "budget" | "returns">(
+    "activities",
+  );
   const [planCrop, setPlanCrop] = useState(PLAN_INPUTS[0].options[0]);
   const [planAcres, setPlanAcres] = useState(PLAN_INPUTS[1].options[2]);
   const [planCounty, setPlanCounty] = useState(PLAN_INPUTS[2].options[0]);

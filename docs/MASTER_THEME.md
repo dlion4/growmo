@@ -158,7 +158,7 @@ no Tailwind/MUI/new libs · no dead buttons or links (unbuilt routes stay disabl
 "Soon", never 404) · no lorem ipsum · no `console.log`/TODOs · no other git branches ·
 no global-chrome rebuilds · mobile must stack cleanly at 1080/640.
 
-## 13. Weather & climate layer (page 8 — `/app/weather`)
+## 13. Weather & climate layer (page 8 — `/app/weather-pro`)
 
 Page-scoped stylesheet `src/weather.css`, linked from `__root.tsx` after
 `planner.css` (`weatherCss` → `?url` + `?v=1`). Every selector is prefixed with

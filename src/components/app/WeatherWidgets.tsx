@@ -1,666 +1,531 @@
 /* ============================================================================
-   PAGE 8 SHARED WIDGETS — /app/weather
-   Presentational building blocks styled only by the master theme +
-   weather.css (§19). No data fetching, no business logic.
+   PAGE 8 WIDGETS — Weather & Climate Intelligence
+   Reuses the master theme's plan, widget, timeline, table and status primitives.
    ========================================================================== */
 import {
-  ArrowRight,
-  Cloud,
-  CloudFog,
-  CloudLightning,
   CloudRain,
-  CloudSunRain,
-  Droplet,
   Droplets,
   Eye,
   Gauge,
-  Leaf,
-  type LucideIcon,
-  Navigation,
+  MapPin,
+  Sprout,
   Sun,
   Thermometer,
-  ThermometerSnowflake,
+  Umbrella,
   Waves,
   Wind,
 } from "lucide-react";
-import { type ReactNode, useId } from "react";
+import type { ReactNode } from "react";
 import type {
-  AlertContact,
-  CropPeriod,
-  CurrentDatum,
-  ExtremeAlert,
-  ForecastDay,
-  GaugeObservation,
-  HistoryMonth,
-  PlantingWindow,
-  SeasonMonth,
-  WxCondition,
-  WxSeverity,
-  WxTone,
+  CropPredictionPeriod,
+  CropWeatherPlan,
+  CurrentWeatherMetric,
+  ExtremeWeatherAlert,
+  SeasonalRisk,
+  WeatherForecastDay,
+  WeatherLocation,
 } from "../../data/app/weather";
+import { alertTone, matchTone, riskTone } from "../../data/app/weather";
 import { StatusChip } from "./DashboardWidgets";
+import { TrendChart } from "./InventoryWidgets";
 
-/* ---------- icons ---------- */
-
-export const CONDITION_ICONS: Record<WxCondition, LucideIcon> = {
-  rain: CloudRain,
-  showers: CloudSunRain,
-  storm: CloudLightning,
-  cloud: Cloud,
-  sun: Sun,
-  fog: CloudFog,
-  wind: Wind,
-};
-
-export const CURRENT_ICONS: Record<CurrentDatum["icon"], LucideIcon> = {
-  temp: Thermometer,
-  feels: ThermometerSnowflake,
-  humidity: Droplets,
-  wind: Wind,
-  compass: Navigation,
-  rain: CloudRain,
-  "rain-week": CloudSunRain,
-  "soil-temp": Thermometer,
-  "soil-moist": Droplet,
-  uv: Sun,
-  et: Waves,
-  dew: Droplet,
-  eye: Eye,
-  gauge: Gauge,
-};
-
-export function severityTone(severity: WxSeverity): WxTone {
-  return severity === "Extreme" || severity === "Warning"
-    ? "high"
-    : severity === "Watch"
-      ? "medium"
-      : "low";
-}
-
-/* ---------- form helpers (labelled, a11y-safe) ---------- */
-
-export function WxField({
-  label,
-  children,
-  full = false,
-  hint,
-}: {
+export interface WeatherKpi {
   label: string;
-  children: ReactNode;
-  full?: boolean;
-  hint?: string;
-}) {
-  const id = useId();
-  return (
-    <div className={`gm-field ${full ? "full" : ""}`}>
-      <label htmlFor={id}>{label}</label>
-      <div id={id}>{children}</div>
-      {hint ? (
-        <small style={{ fontWeight: 600, color: "var(--gm-ink-400)" }}>
-          {hint}
-        </small>
-      ) : null}
-    </div>
-  );
+  value: string;
+  note: string;
 }
 
-export function WxModalFooter({ children }: { children: ReactNode }) {
-  return (
-    <div className="d-flex flex-wrap justify-content-end gap-2 mt-3">
-      {children}
-    </div>
-  );
-}
-
-/* ---------- notes, facts, summary ---------- */
-
-export function WxNote({
-  tone = "info",
-  children,
-}: {
-  tone?: "info" | "warn" | "danger";
-  children: ReactNode;
-}) {
-  const cls = tone === "warn" ? "warn" : tone === "danger" ? "danger" : "";
-  return <p className={`gm-wx-note ${cls} mb-0`}>{children}</p>;
-}
-
-export function WxFact({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="gm-wx-fact">
-      <small>{label}</small>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-export function WxFactGrid({
-  facts,
-}: {
-  facts: { label: string; value: string }[];
-}) {
-  return (
-    <div className="gm-wx-fact-grid">
-      {facts.map((fact) => (
-        <WxFact key={fact.label} label={fact.label} value={fact.value} />
-      ))}
-    </div>
-  );
-}
-
-export function WxSummary({
-  title,
-  note,
-  chips = [],
+export function WeatherHeaderCard({
+  location,
+  kpis,
   actions,
 }: {
-  title: string;
-  note: string;
-  chips?: string[];
-  actions?: ReactNode;
+  location: WeatherLocation;
+  kpis: WeatherKpi[];
+  actions: ReactNode;
 }) {
   return (
-    <div className="gm-wx-summary">
-      <div style={{ flex: "1 1 260px" }}>
-        <strong className="d-block">{title}</strong>
-        <p className="mb-0">{note}</p>
-        {chips.length ? (
-          <div className="d-flex flex-wrap gap-2 mt-2">
-            {chips.map((chip) => (
-              <span key={chip} className="gm-chip">
-                {chip}
-              </span>
-            ))}
-          </div>
-        ) : null}
-      </div>
-      {actions ? <div className="d-flex flex-wrap gap-2">{actions}</div> : null}
-    </div>
-  );
-}
-
-/* ---------- 8.1 live conditions ---------- */
-
-export function WxConditionTile({
-  datum,
-  selected,
-  onSelect,
-}: {
-  datum: CurrentDatum;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const Icon = CURRENT_ICONS[datum.icon];
-  return (
-    <button
-      type="button"
-      className={`gm-wx-now ${selected ? "on" : ""}`}
-      onClick={onSelect}
-      aria-pressed={selected}
-    >
-      <span className="gm-wx-now-top">
-        <Icon />
-        <small>{datum.label}</small>
-      </span>
-      <span className="gm-wx-now-value">
-        {datum.display}
-        {datum.unit ? <span>{datum.unit}</span> : null}
-      </span>
-      <span className="gm-wx-now-change">24hr {datum.change}</span>
-      <span className="gm-wx-now-note">{datum.field}</span>
-    </button>
-  );
-}
-
-export function WxConditionDetail({ datum }: { datum: CurrentDatum }) {
-  return (
-    <div className="gm-wx-detail">
-      <div className="d-flex flex-wrap align-items-center gap-2">
-        <span className="gm-mega-icon">
-          {(() => {
-            const Icon = CURRENT_ICONS[datum.icon];
-            return <Icon />;
-          })()}
-        </span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <strong className="d-block font-display">
-            {datum.label} · {datum.swahili}
-          </strong>
-          <small style={{ color: "var(--gm-ink-400)", fontWeight: 700 }}>
-            {datum.value}
-            {datum.unit ? ` ${datum.unit}` : ""} · 24hr change {datum.change}
-          </small>
-        </div>
-        <StatusChip
-          label={datum.tone === "neutral" ? "Normal" : datum.tone}
-          tone={datum.tone}
-        />
-      </div>
-      <p className="mb-0" style={{ fontSize: ".86rem", fontWeight: 600 }}>
-        {datum.note}
-      </p>
-      <div className="gm-check-row mb-0">
-        <Leaf />
-        <span style={{ flex: 1 }}>
-          <small>What to do in the field</small>
-          <strong>{datum.field}</strong>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- 8.2 hourly + 7-day ---------- */
-
-export function WxHourlyStrip({
-  hours,
-  selected,
-  onSelect,
-}: {
-  hours: { hour: string; temp: number; rainPct: number; label: string }[];
-  selected: string;
-  onSelect: (hour: string) => void;
-}) {
-  return (
-    <div className="gm-wx-hours" role="tablist" aria-label="Today by the hour">
-      {hours.map((hour) => (
-        <button
-          key={hour.hour}
-          type="button"
-          role="tab"
-          aria-selected={selected === hour.hour}
-          className={`gm-wx-hour ${selected === hour.hour ? "on" : ""}`}
-          onClick={() => onSelect(hour.hour)}
-        >
-          <small>{hour.hour}</small>
-          <strong>{hour.temp}°</strong>
-          <span className="gm-wx-hour-bar" aria-hidden="true">
-            <i style={{ width: `${hour.rainPct}%` }} />
+    <header className="gm-card gm-plan-head">
+      <div className="d-flex flex-wrap align-items-start gap-4">
+        <div style={{ flex: "1 1 440px" }}>
+          <span className="gm-eyebrow on-dark">
+            <span className="dot" /> Page 8 · Weather & climate intelligence
           </span>
-          <small>{hour.rainPct}%</small>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-export function WxDayCard({
-  day,
-  selected,
-  onSelect,
-}: {
-  day: ForecastDay;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const Icon = CONDITION_ICONS[day.condition];
-  return (
-    <button
-      type="button"
-      className={`gm-wx-day ${selected ? "on" : ""}`}
-      onClick={onSelect}
-      aria-pressed={selected}
-    >
-      <span className="gm-wx-day-top">
-        <Icon />
-        <small style={{ fontWeight: 800 }}>{day.label}</small>
-      </span>
-      <span className="gm-wx-day-temp">
-        {day.max}° <small>/ {day.min}°</small>
-      </span>
-      <span className="gm-wx-day-meta">
-        <span>{day.conditionText}</span>
-        <span>
-          {day.rainPct}% · {day.rainMin}–{day.rainMax} mm
-        </span>
-        <span>
-          {day.wind} km/h {day.windDir}
-        </span>
-      </span>
-      <StatusChip label={day.spray} tone={day.tone} />
-    </button>
-  );
-}
-
-/* ---------- 8.3 seasonal ---------- */
-
-export function WxMonthCard({
-  month,
-  selected,
-  onSelect,
-}: {
-  month: SeasonMonth;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  const max = 250;
-  return (
-    <button
-      type="button"
-      className={`gm-wx-month ${selected ? "on" : ""}`}
-      onClick={onSelect}
-      aria-pressed={selected}
-    >
-      <div className="d-flex align-items-center justify-content-between gap-2">
-        <span className="gm-eyebrow">{month.month}</span>
-        <StatusChip label={month.vsAverage} tone={month.tone} />
+          <h1 className="font-display mt-2">
+            Plant with the rain, not against it
+          </h1>
+          <p className="gm-lead on-dark mb-0">
+            Hali ya hewa ya shamba — hyper-local conditions, crop-stage
+            warnings, planting windows and practical actions for {location.ward}
+            , {location.county}.
+          </p>
+          <div className="d-flex flex-wrap gap-2 mt-3">
+            <span className="gm-chip gm-chip-ghost">
+              <MapPin /> {location.ward}, {location.county}
+            </span>
+            <span className="gm-chip gm-chip-ghost">
+              <Gauge /> {location.elevation}
+            </span>
+            <span className="gm-chip gm-chip-ghost">
+              Updated {location.updated}
+            </span>
+          </div>
+        </div>
+        <div className="gm-plan-hero-actions">{actions}</div>
       </div>
-      <span className="gm-wx-month-rain">{month.rainfall}</span>
-      <span className="gm-wx-hour-bar" aria-hidden="true">
-        <i
-          style={{ width: `${Math.min(100, (month.rainMid / max) * 100)}%` }}
-        />
-      </span>
-      <span className="gm-wx-day-meta">
-        <span>
-          {month.temp} · {month.rainyDays} rainy days
-        </span>
-        <span>Dry spell risk: {month.drySpell}</span>
-        <span>Flood risk: {month.flood}</span>
-      </span>
-      <small style={{ fontWeight: 700, color: "var(--gm-ink-600)" }}>
-        {month.headline}
-      </small>
-    </button>
+      <div className="gm-plan-kpi-row mt-4">
+        {kpis.map((kpi) => (
+          <div className="gm-card p-3" key={kpi.label}>
+            <span className="gm-eyebrow">{kpi.label}</span>
+            <strong className="font-display gm-plan-fact-value">
+              {kpi.value}
+            </strong>
+            <small className="d-block text-muted">{kpi.note}</small>
+          </div>
+        ))}
+      </div>
+    </header>
   );
 }
 
-export function WxDekadalGrid({ month }: { month: SeasonMonth }) {
+function metricIcon(metric: CurrentWeatherMetric) {
+  if (metric.icon === "thermometer") return <Thermometer />;
+  if (metric.icon === "droplets") return <Droplets />;
+  if (metric.icon === "cloud-rain") return <CloudRain />;
+  if (metric.icon === "wind") return <Wind />;
+  if (metric.icon === "sun") return <Sun />;
+  if (metric.icon === "waves") return <Waves />;
+  if (metric.icon === "eye") return <Eye />;
+  return <Gauge />;
+}
+
+export function CurrentConditionsCard({
+  metrics,
+  onMetric,
+}: {
+  metrics: CurrentWeatherMetric[];
+  onMetric: (metric: CurrentWeatherMetric) => void;
+}) {
   return (
-    <div className="gm-wx-dekadal">
-      {month.dekadal.map((dek) => (
-        <div key={dek.label} className="gm-wx-dek">
-          <small>{dek.label}</small>
-          <strong>{dek.rain} mm</strong>
-          <p className="mb-0" style={{ fontSize: ".78rem", fontWeight: 600 }}>
-            {dek.note}
+    <div className="gm-card p-3">
+      <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+        <div>
+          <span className="gm-eyebrow">Section 8.1 · Live now</span>
+          <h3 className="font-display mb-1">Current conditions</h3>
+          <p className="text-muted mb-0">
+            Local probe + Kenya Met feed · 13 Nov 2026, 12:00
           </p>
         </div>
-      ))}
-    </div>
-  );
-}
-
-/* ---------- 8.4 prediction engine ---------- */
-
-export function WxStageRail({
-  periods,
-  selectedId,
-  onSelect,
-}: {
-  periods: CropPeriod[];
-  selectedId: string;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="gm-wx-stage-rail" role="tablist" aria-label="Crop stages">
-      {periods.map((period) => (
         <button
-          key={period.id}
           type="button"
-          role="tab"
-          aria-selected={selectedId === period.id}
-          className={`gm-wx-stage-item ${
-            period.tone === "high"
-              ? "is-high"
-              : period.tone === "medium"
-                ? "is-medium"
-                : ""
-          } ${selectedId === period.id ? "on" : ""}`}
-          onClick={() => onSelect(period.id)}
+          className="gm-btn gm-btn-outline gm-btn-sm"
+          onClick={() => onMetric(metrics[0])}
         >
-          <small>
-            Days {period.days} · {period.rain}
-          </small>
-          <strong>{period.stage}</strong>
-          <small>{period.period}</small>
-          <StatusChip label={period.match} tone={period.tone} />
+          <Umbrella /> Full reading
         </button>
-      ))}
+      </div>
+      <div className="gm-widget-grid">
+        {metrics.map((metric) => (
+          <button
+            type="button"
+            className="gm-widget-mini is-on text-start"
+            key={metric.id}
+            onClick={() => onMetric(metric)}
+          >
+            <div className="d-flex align-items-start justify-content-between gap-2">
+              <strong>{metric.parameter}</strong>
+              <span
+                className="gm-mega-icon"
+                style={{ width: 32, height: 32, borderRadius: 10 }}
+              >
+                {metricIcon(metric)}
+              </span>
+            </div>
+            <span
+              className="font-display d-block"
+              style={{ fontSize: "1.45rem" }}
+            >
+              {metric.value}{" "}
+              <small
+                style={{ fontFamily: "var(--gm-font-body)", fontSize: ".7rem" }}
+              >
+                {metric.unit}
+              </small>
+            </span>
+            <small className="text-muted">24hr {metric.change}</small>
+          </button>
+        ))}
+      </div>
+      <div className="gm-check-row mt-3">
+        <Droplets />
+        <span>
+          <strong>Soil moisture is 65%</strong>
+          <small>
+            Good for cabbage today; avoid irrigation while rain is expected.
+          </small>
+        </span>
+        <StatusChip label="Good" tone="low" />
+      </div>
     </div>
   );
 }
 
-export function WxBalanceBar({
-  value,
-  max = 40,
+export function ForecastDayCard({
+  day,
+  onOpen,
 }: {
-  value: number;
-  max?: number;
+  day: WeatherForecastDay;
+  onOpen: () => void;
 }) {
-  const pct = Math.min(100, (Math.abs(value) / max) * 100);
+  const icon =
+    day.icon === "rain" ? (
+      <CloudRain />
+    ) : day.icon === "sun" ? (
+      <Sun />
+    ) : day.icon === "wind" ? (
+      <Wind />
+    ) : (
+      <CloudRain />
+    );
   return (
-    <div className="gm-wx-balance" aria-hidden="true">
-      <i className={value < 0 ? "neg" : ""} style={{ width: `${pct}%` }} />
-    </div>
-  );
-}
-
-/* ---------- 8.5 planting windows ---------- */
-
-const MONTH_CELLS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-].map((month) => ({ id: month, letter: month.slice(0, 1) }));
-
-export function WxWindowTrack({ window }: { window: PlantingWindow }) {
-  const cls = (value: number) =>
-    value === 3
-      ? "t-best"
-      : value === 2
-        ? "t-good"
-        : value === 1
-          ? "t-risky"
-          : value === 0
-            ? "t-avoid"
-            : "t-blank";
-  return (
-    <div>
-      <div className="gm-wx-track" aria-hidden="true">
-        {MONTH_CELLS.map((cell) => (
-          <span
-            key={`${window.id}-${cell.id}`}
-            className={cls(window.track[MONTH_CELLS.indexOf(cell)] ?? -1)}
-          />
-        ))}
+    <button
+      type="button"
+      className="gm-card p-3 text-start h-100"
+      onClick={onOpen}
+    >
+      <div className="d-flex align-items-start justify-content-between gap-2">
+        <div>
+          <span className="gm-eyebrow">{day.date}</span>
+          <h3 className="font-display mb-0">{day.day}</h3>
+        </div>
+        <span className="gm-mega-icon">{icon}</span>
       </div>
-      <div className="gm-wx-months-mini" aria-hidden="true">
-        {MONTH_CELLS.map((cell) => (
-          <span key={`${window.id}-lbl-${cell.id}`}>{cell.letter}</span>
-        ))}
+      <strong className="d-block mt-3">{day.condition}</strong>
+      <div className="d-flex align-items-baseline gap-2 mt-1">
+        <strong className="font-display" style={{ fontSize: "1.6rem" }}>
+          {day.max}°
+        </strong>
+        <span className="text-muted">/ {day.min}°C</span>
+      </div>
+      <div className="gm-check-row mt-3">
+        <CloudRain />
+        <span>
+          <strong>{day.rainChance}% rain</strong>
+          <small>
+            {day.rainAmount} · {day.wind}
+          </small>
+        </span>
+      </div>
+      <p className="text-muted mb-0 mt-2" style={{ fontSize: ".77rem" }}>
+        {day.cropImpact}
+      </p>
+    </button>
+  );
+}
+
+export function WeatherRadarCard({
+  location,
+  onSources,
+  onRefresh,
+}: {
+  location: WeatherLocation;
+  onSources: () => void;
+  onRefresh: () => void;
+}) {
+  return (
+    <div className="gm-card p-3 h-100">
+      <div className="d-flex align-items-start justify-content-between gap-3">
+        <div>
+          <span className="gm-eyebrow">Observation layer</span>
+          <h3 className="font-display mb-1">What is feeding the forecast?</h3>
+          <p className="text-muted mb-0">
+            {location.station} · {location.distance} away
+          </p>
+        </div>
+        <span className="gm-mega-icon">
+          <MapPin />
+        </span>
+      </div>
+      <div className="gm-plan-facts mt-3">
+        <span>
+          <CloudRain />
+          <small>Rain gauge</small>
+          <strong>5.2 mm</strong>
+        </span>
+        <span>
+          <Droplets />
+          <small>Soil probe</small>
+          <strong>65%</strong>
+        </span>
+        <span>
+          <Wind />
+          <small>Wind sensor</small>
+          <strong>12 km/h</strong>
+        </span>
+        <span>
+          <Gauge />
+          <small>Last sync</small>
+          <strong>{location.updated}</strong>
+        </span>
+      </div>
+      <div className="gm-widget-mini is-on mt-3">
+        <strong>Data confidence · 86%</strong>
+        <div className="gm-widget-bars mt-2">
+          <i style={{ height: "52%" }} />
+          <i style={{ height: "78%" }} />
+          <i style={{ height: "65%" }} />
+          <i style={{ height: "88%" }} />
+          <i style={{ height: "82%" }} />
+          <i style={{ height: "94%" }} />
+        </div>
+        <small className="d-block text-muted mt-2">
+          Local observation agrees with Kenya Met and satellite trend.
+        </small>
+      </div>
+      <div className="d-flex flex-wrap gap-2 mt-3">
+        <button
+          type="button"
+          className="gm-btn gm-btn-outline gm-btn-sm"
+          onClick={onSources}
+        >
+          View data sources
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-soft gm-btn-sm"
+          onClick={onRefresh}
+        >
+          Refresh station
+        </button>
       </div>
     </div>
   );
 }
 
-export function WxWindowLegend() {
+export function SeasonalRiskCard({
+  risk,
+  onOpen,
+}: {
+  risk: SeasonalRisk;
+  onOpen: () => void;
+}) {
   return (
-    <div className="gm-wx-legend">
-      <span>
-        <i style={{ background: "var(--gm-leaf-600)" }} /> Best window
+    <button
+      type="button"
+      className="gm-check-row w-100 text-start"
+      onClick={onOpen}
+    >
+      <span className="gm-mega-icon">
+        <Sprout />
       </span>
-      <span>
-        <i style={{ background: "var(--gm-sprout-300)" }} /> Good window
+      <span style={{ flex: 1 }}>
+        <strong>
+          {risk.risk} · {risk.crop}
+        </strong>
+        <small>
+          {risk.timing} · {risk.advisory}
+        </small>
       </span>
-      <span>
-        <i style={{ background: "var(--gm-gold-400)" }} /> Risky
-      </span>
-      <span>
-        <i style={{ background: "var(--gm-clay-500)", opacity: 0.4 }} /> Avoid
-      </span>
-      <span>
-        <i style={{ background: "var(--gm-line)" }} /> Not applicable
-      </span>
+      <StatusChip label={risk.level} tone={riskTone(risk.level)} />
+    </button>
+  );
+}
+
+export function PredictionTimeline({
+  plan,
+  onPeriod,
+}: {
+  plan: CropWeatherPlan;
+  onPeriod: (period: CropPredictionPeriod) => void;
+}) {
+  return (
+    <div className="gm-card p-3">
+      <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+        <div>
+          <span className="gm-eyebrow">
+            {plan.county} · {plan.plantingDate}
+          </span>
+          <h3 className="font-display mb-1">
+            {plan.crop} {plan.variety} weather journey
+          </h3>
+          <p className="text-muted mb-0">
+            {plan.duration} · {plan.season} · crop-stage prediction
+          </p>
+        </div>
+        <StatusChip label={`${plan.periods.length} stages`} tone="low" />
+      </div>
+      <ol className="gm-timeline">
+        {plan.periods.map((period, index) => (
+          <li
+            className={`gm-tl-item ${index < 2 ? "is-done" : index === 2 ? "is-current" : ""}`}
+            key={period.id}
+          >
+            <button
+              type="button"
+              className="gm-tl-dot"
+              onClick={() => onPeriod(period)}
+              aria-label={`Open ${period.stage} weather period`}
+            >
+              <span>{index + 1}</span>
+            </button>
+            <button
+              type="button"
+              className="gm-option-row flex-grow-1 text-start mb-0"
+              onClick={() => onPeriod(period)}
+            >
+              <div className="d-flex flex-wrap justify-content-between gap-2">
+                <strong>
+                  {period.period} · {period.stage}
+                </strong>
+                <StatusChip
+                  label={period.match}
+                  tone={matchTone(period.match)}
+                />
+              </div>
+              <small className="d-block text-muted mt-1">
+                Rain {period.predictedRain} · {period.predictedTemp} · need{" "}
+                {period.cropNeed}
+              </small>
+              <span className="d-block mt-2" style={{ fontSize: ".78rem" }}>
+                {period.advisory}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
 
-/* ---------- 8.6 alerts ---------- */
-
-export function WxAlertCard({
+export function AlertCard({
   alert,
   onOpen,
 }: {
-  alert: ExtremeAlert;
+  alert: ExtremeWeatherAlert;
   onOpen: () => void;
 }) {
   return (
     <button
       type="button"
-      className={`gm-wx-alert is-${alert.tone} ${alert.ack ? "is-acked" : ""}`}
+      className="gm-check-row w-100 text-start"
       onClick={onOpen}
     >
-      <span className="gm-wx-alert-head">
-        <strong>{alert.type}</strong>
-        <StatusChip
-          label={alert.severity}
-          tone={severityTone(alert.severity)}
-        />
-        {alert.ack ? <StatusChip label="Acknowledged" tone="neutral" /> : null}
+      <span className="gm-mega-icon">
+        <CloudRain />
       </span>
-      <span className="gm-wx-alert-msg">{alert.message}</span>
-      <span className="gm-wx-alert-meta">
-        <span>{alert.counties}</span>
-        <span>· {alert.affected}</span>
-        <span>· {alert.issued}</span>
-      </span>
-      <span className="d-flex flex-wrap gap-2">
-        <span className="gm-chip">
-          <ArrowRight width={13} height={13} /> {alert.action}
-        </span>
-        <span className="gm-chip">Valid {alert.valid}</span>
-      </span>
-    </button>
-  );
-}
-
-/* ---------- 8.7 history ---------- */
-
-export function WxRainChart({
-  months,
-  selectedId,
-  onSelect,
-}: {
-  months: HistoryMonth[];
-  selectedId: string;
-  onSelect: (id: string) => void;
-}) {
-  const max = Math.max(...months.map((month) => month.rain), 1);
-  return (
-    <div
-      className="gm-wx-chart"
-      role="tablist"
-      aria-label="Average monthly rainfall"
-    >
-      {months.map((month) => (
-        <button
-          key={month.id}
-          type="button"
-          role="tab"
-          aria-selected={selectedId === month.id}
-          className={`gm-wx-bar ${selectedId === month.id ? "on" : ""}`}
-          onClick={() => onSelect(month.id)}
-        >
-          <strong>{month.rain}</strong>
-          <span className="gm-wx-bar-track" aria-hidden="true">
-            <i style={{ height: `${(month.rain / max) * 100}%` }} />
-          </span>
-          <small>{month.month}</small>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-/* ---------- misc rows ---------- */
-
-export function WxObservationRow({
-  observation,
-  onOpen,
-  onDelete,
-}: {
-  observation: GaugeObservation;
-  onOpen: () => void;
-  onDelete: () => void;
-}) {
-  const variance = Number(
-    (observation.gaugeMm - observation.stationMm).toFixed(1),
-  );
-  return (
-    <tr>
-      <td>
-        <strong>{observation.date}</strong>
-        <br />
-        <small>{observation.time}</small>
-      </td>
-      <td>{observation.plot}</td>
-      <td className="font-display">{observation.gaugeMm} mm</td>
-      <td className="font-display">{observation.stationMm} mm</td>
-      <td>
-        <StatusChip
-          label={`${variance > 0 ? "+" : ""}${variance} mm`}
-          tone={Math.abs(variance) >= 2 ? "medium" : "low"}
-        />
-      </td>
-      <td>{observation.by}</td>
-      <td>
-        <div className="d-flex gap-1">
-          <button
-            type="button"
-            className="gm-iconbtn"
-            onClick={onOpen}
-            aria-label={`Open reading from ${observation.date}`}
-          >
-            <Eye />
-          </button>
-          <button
-            type="button"
-            className="gm-iconbtn danger"
-            onClick={onDelete}
-            aria-label={`Delete reading from ${observation.date}`}
-          >
-            <CloudRain />
-          </button>
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-export function WxContactRow({
-  contact,
-  selected,
-  onToggle,
-}: {
-  contact: AlertContact;
-  selected: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      className={`gm-checkcard ${selected ? "on" : ""}`}
-      onClick={onToggle}
-      aria-pressed={selected}
-    >
-      <input type="checkbox" readOnly checked={selected} tabIndex={-1} />
       <span style={{ flex: 1 }}>
-        <strong>{contact.name}</strong>
-        <small>
-          {contact.role} · {contact.phone} · {contact.channels.join(", ")}
+        <strong>
+          {alert.type} · {alert.county}
+        </strong>
+        <small>{alert.message}</small>
+        <small className="d-block mt-1">{alert.details}</small>
+        <small className="d-block mt-1">
+          Action: {alert.action} · valid until {alert.validUntil}
         </small>
       </span>
-      <StatusChip label={contact.language} tone="neutral" />
+      <StatusChip
+        label={alert.status === "Acknowledged" ? "Seen" : alert.severity}
+        tone={
+          alert.status === "Acknowledged" ? "low" : alertTone(alert.severity)
+        }
+      />
     </button>
+  );
+}
+
+export function HistoricalWeatherChart({
+  historical,
+  onMonth,
+}: {
+  historical: {
+    id: string;
+    month: string;
+    rainfall: number;
+    minTemp: number;
+    maxTemp: number;
+    rainyDays: number;
+    drySpellProbability: number;
+    note: string;
+  }[];
+  onMonth: (month: (typeof historical)[number]) => void;
+}) {
+  return (
+    <div className="gm-card p-3">
+      <div className="d-flex flex-wrap justify-content-between gap-2 mb-3">
+        <div>
+          <span className="gm-eyebrow">Planning baseline</span>
+          <h3 className="font-display mb-1">Rainfall rhythm by month</h3>
+          <p className="text-muted mb-0">
+            NASA POWER + local history · click a month for planning notes
+          </p>
+        </div>
+        <StatusChip label="12-month history" tone="low" />
+      </div>
+      <TrendChart
+        points={historical.map((month) => ({
+          label: month.month.slice(0, 3),
+          value: month.rainfall,
+        }))}
+        formatValue={(value) => `${value} mm`}
+      />
+      <div className="gm-table-wrap mt-3">
+        <table className="gm-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Rainfall</th>
+              <th>Min / max</th>
+              <th>Rainy days</th>
+              <th>Dry spell probability</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody>
+            {historical.map((month) => (
+              <tr key={month.id}>
+                <td>
+                  <button
+                    type="button"
+                    className="gm-table-link"
+                    onClick={() => onMonth(month)}
+                  >
+                    {month.month}
+                  </button>
+                </td>
+                <td>
+                  <strong>{month.rainfall} mm</strong>
+                </td>
+                <td>
+                  {month.minTemp}–{month.maxTemp}°C
+                </td>
+                <td>{month.rainyDays}</td>
+                <td>
+                  <StatusChip
+                    label={`${month.drySpellProbability}%`}
+                    tone={
+                      month.drySpellProbability > 55
+                        ? "high"
+                        : month.drySpellProbability > 30
+                          ? "medium"
+                          : "low"
+                    }
+                  />
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    className="gm-icon-btn"
+                    aria-label={`Open ${month.month} history`}
+                    onClick={() => onMonth(month)}
+                  >
+                    <Eye />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
