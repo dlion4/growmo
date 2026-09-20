@@ -13,8 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AppIndexRouteImport } from './routes/app/index'
+<<<<<<< HEAD
 import { Route as AppAdvisorRouteImport } from './routes/app/advisor'
 import { Route as AppCommunityRouteImport } from './routes/app/community'
+=======
+import { Route as AppAnalyticsRouteImport } from './routes/app/analytics'
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
@@ -62,6 +66,7 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/app/',
   getParentRoute: () => rootRouteImport,
 } as any)
+<<<<<<< HEAD
 const AppAdvisorRoute = AppAdvisorRouteImport.update({
   id: '/app/advisor',
   path: '/app/advisor',
@@ -70,6 +75,11 @@ const AppAdvisorRoute = AppAdvisorRouteImport.update({
 const AppCommunityRoute = AppCommunityRouteImport.update({
   id: '/app/community',
   path: '/app/community',
+=======
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/app/analytics',
+  path: '/app/analytics',
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppCropsRoute = AppCropsRouteImport.update({
@@ -207,8 +217,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+<<<<<<< HEAD
   '/app/advisor': typeof AppAdvisorRoute
   '/app/community': typeof AppCommunityRoute
+=======
+  '/app/analytics': typeof AppAnalyticsRoute
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -241,8 +255,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+<<<<<<< HEAD
   '/app/advisor': typeof AppAdvisorRoute
   '/app/community': typeof AppCommunityRoute
+=======
+  '/app/analytics': typeof AppAnalyticsRoute
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -276,8 +294,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+<<<<<<< HEAD
   '/app/advisor': typeof AppAdvisorRoute
   '/app/community': typeof AppCommunityRoute
+=======
+  '/app/analytics': typeof AppAnalyticsRoute
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -312,8 +334,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+<<<<<<< HEAD
     | '/app/advisor'
     | '/app/community'
+=======
+    | '/app/analytics'
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -346,8 +372,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+<<<<<<< HEAD
     | '/app/advisor'
     | '/app/community'
+=======
+    | '/app/analytics'
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -380,8 +410,12 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+<<<<<<< HEAD
     | '/app/advisor'
     | '/app/community'
+=======
+    | '/app/analytics'
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -415,8 +449,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+<<<<<<< HEAD
   AppAdvisorRoute: typeof AppAdvisorRoute
   AppCommunityRoute: typeof AppCommunityRoute
+=======
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
@@ -476,6 +514,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+<<<<<<< HEAD
     '/app/advisor': {
       id: '/app/advisor'
       path: '/app/advisor'
@@ -488,6 +527,13 @@ declare module '@tanstack/react-router' {
       path: '/app/community'
       fullPath: '/app/community'
       preLoaderRoute: typeof AppCommunityRouteImport
+=======
+    '/app/analytics': {
+      id: '/app/analytics'
+      path: '/app/analytics'
+      fullPath: '/app/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
       parentRoute: typeof rootRouteImport
     }
     '/app/crops': {
@@ -679,8 +725,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+<<<<<<< HEAD
   AppAdvisorRoute: AppAdvisorRoute,
   AppCommunityRoute: AppCommunityRoute,
+=======
+  AppAnalyticsRoute: AppAnalyticsRoute,
+>>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,

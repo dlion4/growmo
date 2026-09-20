@@ -85,7 +85,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Analytics",
         desc: "Reports & KPIs",
         icon: BarChart3,
-        ready: false,
+        ready: true,
         page: 11,
       },
     ],
