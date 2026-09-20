@@ -43,7 +43,7 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${weatherProCss}?v=1` },
       { rel: 'stylesheet', href: `${advisorCss}?v=1` },
       { rel: 'stylesheet', href: `${recordsCss}?v=1` },
-      { rel: 'stylesheet', href: `${communityCss}?v=1` },
+      { rel: 'stylesheet', href: `${communityCss}?v=2` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

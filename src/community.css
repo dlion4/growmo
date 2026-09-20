@@ -1423,6 +1423,27 @@
   color: var(--gm-leaf-600);
 }
 
+/* ---------- 12c. inline icon sizing inside page-13 blocks ---------- */
+.gm-app .gm-cm-event > svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-modal-overlay .gm-cm-reply strong svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-cm-feature .gm-table-link {
+  margin-left: auto;
+  align-self: center;
+  white-space: nowrap;
+}
+
 /* ---------- 13. responsive + print ---------- */
 @media (max-width: 1080px) {
   .gm-app .gm-cm-hero-head {
