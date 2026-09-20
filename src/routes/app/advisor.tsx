@@ -127,6 +127,7 @@ import {
   PEST_RISKS,
   type PeerGroup,
   type PestRisk,
+  PLAN_GRAND_TOTAL,
   PLAN_INPUTS,
   PLAN_SCENARIOS,
   PLAN_TOTALS,
@@ -356,9 +357,7 @@ function AdvisorPage() {
   /* ---- 9.2 plan generator ---- */
   const [plans, setPlans] = useState<SavedPlan[]>(SAVED_PLANS);
   const [activePlan, setActivePlan] = useState<SavedPlan | null>(null);
-  const [planTab, setPlanTab] = useState<"activities" | "budget" | "returns">(
-    "activities",
-  );
+  const [planTab, setPlanTab] = useState<"activities" | "budget" | "returns">("activities");
   const [planCrop, setPlanCrop] = useState(PLAN_INPUTS[0].options[0]);
   const [planAcres, setPlanAcres] = useState(PLAN_INPUTS[1].options[2]);
   const [planCounty, setPlanCounty] = useState(PLAN_INPUTS[2].options[0]);
@@ -527,7 +526,7 @@ function AdvisorPage() {
   const acreValue = acresOf(planAcres) || 1;
   const budgetValue = budgetOf(planBudget) || 0;
   const planScale = acreValue / 2;
-  const scaledTotal = Math.round(PLAN_TOTALS.grand * planScale);
+  const scaledTotal = Math.round(PLAN_GRAND_TOTAL * planScale);
   const overBudget = budgetValue > 0 && scaledTotal > budgetValue;
   const pagedPlanRows = SEASON_PLAN_ROWS.slice(
     (planPage - 1) * 8,
@@ -815,7 +814,7 @@ function AdvisorPage() {
           "",
           PLAN_TOTALS.labour,
         ]),
-        csvLine(["", "", "GRAND TOTAL", "", "", PLAN_TOTALS.grand, "", ""]),
+        csvLine(["", "", "GRAND TOTAL", "", "", PLAN_GRAND_TOTAL, "", ""]),
       ];
       downloadText(
         `growmo-season-plan-${planCrop.toLowerCase()}.csv`,
@@ -832,7 +831,7 @@ function AdvisorPage() {
             `Week ${row.week} · ${row.date} · ${row.activity} · ${row.input} ${row.qty} · ${kes(row.cost + row.labourCost)}`,
         ),
         "",
-        `Inputs ${kes(PLAN_TOTALS.inputs)} · Labour ${kes(PLAN_TOTALS.labour)} · Grand total ${kes(PLAN_TOTALS.grand)}`,
+        `Inputs ${kes(PLAN_TOTALS.inputs)} · Labour ${kes(PLAN_TOTALS.labour)} · Grand total ${kes(PLAN_GRAND_TOTAL)}`,
       ].join("\n");
       downloadText(
         `growmo-season-plan-${planCrop.toLowerCase()}.txt`,
@@ -2751,7 +2750,7 @@ function PlanView({
           <DashboardSectionHeader
             eyebrow="Section 9.2"
             title="Crop plan generator"
-            subtitle="Eight inputs in, a full season out — 17 scheduled activities with inputs, quantities, costs and labour."
+            subtitle="Eight inputs in, a full season out — 16 scheduled activities with inputs, quantities, costs and labour."
             action={
               <div className="d-flex flex-wrap gap-2">
                 <button
@@ -2889,7 +2888,7 @@ function PlanView({
                           <strong>GRAND TOTAL</strong>
                         </th>
                         <td className="font-display" colSpan={3}>
-                          <strong>{kes(PLAN_TOTALS.grand)}</strong>
+                          <strong>{kes(PLAN_GRAND_TOTAL)}</strong>
                         </td>
                       </tr>
                     </tbody>
@@ -2909,13 +2908,13 @@ function PlanView({
                   <AiFact label="Inputs" value={kes(PLAN_TOTALS.inputs)} />
                   <AiFact label="Labour" value={kes(PLAN_TOTALS.labour)} />
                   <AiFact
-                    label="Logistics"
-                    value={kes(PLAN_TOTALS.logistics)}
+                    label="Activities"
+                    value={String(PLAN_TOTALS.activities)}
                   />
-                  <AiFact label="Grand total" value={kes(PLAN_TOTALS.grand)} />
+                  <AiFact label="Grand total" value={kes(PLAN_GRAND_TOTAL)} />
                   <AiFact
                     label="Cost per acre"
-                    value={kes(Math.round(PLAN_TOTALS.grand / 2))}
+                    value={kes(Math.round(PLAN_GRAND_TOTAL / 2))}
                   />
                   <AiFact label="Budget" value={kes(budgetValue)} />
                 </AiFactGrid>
@@ -2924,7 +2923,7 @@ function PlanView({
                     value={Math.min(
                       100,
                       Math.round(
-                        (PLAN_TOTALS.grand / Math.max(1, budgetValue)) * 100,
+                        (PLAN_GRAND_TOTAL / Math.max(1, budgetValue)) * 100,
                       ),
                     )}
                     label="Share of budget used"
@@ -3059,7 +3058,7 @@ function PlanView({
               />
               <p className="mb-2 mt-2">
                 No plan generated yet for these inputs. Run the generator and
-                the full 17-activity calendar, budget and three revenue
+                the full 16-activity calendar, budget and three revenue
                 scenarios appear here.
               </p>
               <button
@@ -5128,7 +5127,7 @@ function PlanWizard({
         <span className="gm-spinner" />
         <h3 className="font-display mt-3">Building your season plan…</h3>
         <p className="text-muted mb-0">
-          Season Planner v5.0 is costing 17 activities from KALRO calendars,
+          Season Planner v5.0 is costing 16 activities from KALRO calendars,
           local input prices and your labour rates.
         </p>
       </div>
@@ -5220,8 +5219,8 @@ function PlanWizard({
                   <th scope="row">Cost & labour split</th>
                   <td>
                     Inputs {kes(PLAN_TOTALS.inputs)} · labour{" "}
-                    {kes(PLAN_TOTALS.labour)} · logistics{" "}
-                    {kes(PLAN_TOTALS.logistics)}
+                    {kes(PLAN_TOTALS.labour)} · grand total{" "}
+                    {kes(PLAN_GRAND_TOTAL)}
                   </td>
                 </tr>
                 <tr>

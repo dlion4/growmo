@@ -989,7 +989,7 @@ export const AI_REPLIES: Record<string, AiReply> = {
   },
   plan: {
     confidence: 98,
-    text: "I can build a full season plan for 2 acres of maize in Uasin Gishu with a KES 80,000 budget. Confirm the inputs and I will generate 17 scheduled activities with costs and labour.",
+    text: "I can build a full season plan for 2 acres of maize in Uasin Gishu with a KES 80,000 budget. Confirm the inputs and I will generate 16 scheduled activities with costs and labour.",
     blocks: [
       {
         kind: "table",
@@ -1565,27 +1565,16 @@ export const SEASON_PLAN_ROWS: SeasonPlanRow[] = [
     labourCost: 1000,
     stage: "Post-harvest",
   },
-  {
-    id: "sp-17",
-    week: "19",
-    date: "Aug 5",
-    activity: "Transport to Eldoret depot",
-    swahili: "Kusafirisha sokoni",
-    input: "Lorry hire",
-    qty: "2 trips",
-    cost: 9000,
-    labour: "—",
-    labourCost: 0,
-    stage: "Post-harvest",
-  },
 ];
 
+/** Totals derived from the calendar above so the column can never drift. */
 export const PLAN_TOTALS = {
-  inputs: 52000,
-  labour: 29000,
-  logistics: 9000,
-  grand: 81000,
+  activities: SEASON_PLAN_ROWS.length,
+  inputs: SEASON_PLAN_ROWS.reduce((sum, row) => sum + row.cost, 0),
+  labour: SEASON_PLAN_ROWS.reduce((sum, row) => sum + row.labourCost, 0),
 };
+
+export const PLAN_GRAND_TOTAL = PLAN_TOTALS.inputs + PLAN_TOTALS.labour;
 
 export interface PlanScenario {
   id: string;
