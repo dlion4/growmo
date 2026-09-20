@@ -225,7 +225,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Live prices",
         icon: TrendingUp,
         badge: "Live",
-        ready: false,
+        ready: true,
         page: 10,
       },
       {

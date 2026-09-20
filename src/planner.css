@@ -1112,3 +1112,308 @@
   font-size: 0.82rem;
   line-height: 1.55;
 }
+
+/* ============================================================================
+   PAGE 10 — MARKET & SALES
+   Reuses the same layout primitives as the finance page.
+   ========================================================================== */
+.gm-app .gm-market-page .gm-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.65rem;
+}
+
+.gm-app .gm-market-page .gm-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.gm-app .gm-market-page .gm-search-wrap > svg {
+  position: absolute;
+  left: 0.85rem;
+  width: 17px;
+  height: 17px;
+  color: var(--gm-ink-400);
+  pointer-events: none;
+}
+
+.gm-app .gm-market-page .gm-search-wrap .gm-input {
+  padding-left: 2.55rem;
+}
+
+.gm-app .gm-market-page .gm-wizard-stack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.gm-app .gm-market-page .gm-wizard-stack .gm-field {
+  margin-bottom: 0;
+}
+
+.gm-app .gm-market-page .gm-review-card {
+  display: grid;
+  gap: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-market-page .gm-review-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.62rem 0;
+  border-bottom: 1px solid var(--gm-line-soft);
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-market-page .gm-review-row:last-child {
+  border-bottom: 0;
+}
+
+.gm-app .gm-market-page .gm-review-row span {
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-market-page .gm-review-row strong {
+  color: var(--gm-ink-900);
+  text-align: right;
+}
+
+.gm-app .gm-market-page .gm-plan-detail-hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem;
+  border-radius: var(--gm-radius-lg);
+  background: var(--gm-grad-soft, var(--gm-mint-50));
+  border: 1px solid var(--gm-line);
+}
+
+.gm-app .gm-market-page .gm-kpi-soft {
+  display: grid;
+  gap: 0.2rem;
+  height: 100%;
+  padding: 0.8rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-market-page .gm-kpi-soft small {
+  color: var(--gm-ink-400);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.gm-app .gm-market-page .gm-kpi-soft strong {
+  font-size: 1.1rem;
+}
+
+.gm-app .gm-market-page .gm-kpi-soft span {
+  color: var(--gm-ink-500);
+  font-size: 0.72rem;
+}
+
+.gm-app .gm-market-page .gm-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.84rem;
+  color: var(--gm-ink-400);
+  transition: color 0.16s ease;
+}
+
+.gm-app .gm-market-page .gm-back-link:hover {
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-market-page .gm-back-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.gm-app .gm-market-page .gm-breadcrumb-sep {
+  color: var(--gm-ink-400);
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-market-page .gm-market-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.gm-app .gm-market-page .gm-market-header::after {
+  content: "";
+  position: absolute;
+  right: -6rem;
+  bottom: -8rem;
+  width: 20rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 163, 85, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+/* buyer cards */
+.gm-app .gm-market-page .gm-buyer-card {
+  padding: 1.2rem;
+  height: 100%;
+}
+
+.gm-app .gm-market-page .gm-buyer-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+}
+
+.gm-app .gm-market-page .gm-buyer-header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.gm-app .gm-market-page .gm-buyer-header > div strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-market-page .gm-buyer-header > div small {
+  color: var(--gm-ink-400);
+  font-weight: 600;
+}
+
+.gm-app .gm-market-page .gm-buyer-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--gm-gold-600);
+}
+
+.gm-app .gm-market-page .gm-buyer-crops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.7rem;
+}
+
+.gm-app .gm-market-page .gm-buyer-meta {
+  display: flex;
+  gap: 1.2rem;
+  font-size: 0.8rem;
+  color: var(--gm-ink-400);
+  margin-bottom: 0.8rem;
+}
+
+.gm-app .gm-market-page .gm-buyer-meta strong {
+  color: var(--gm-ink-800);
+}
+
+.gm-app .gm-market-page .gm-buyer-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--gm-line-soft);
+}
+
+/* bar chart */
+.gm-app .gm-market-page .gm-bar-chart {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.gm-app .gm-market-page .gm-bar-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gm-app .gm-market-page .gm-bar-label strong {
+  display: block;
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-market-page .gm-bar-label small {
+  color: var(--gm-ink-400);
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+.gm-app .gm-market-page .gm-bar-track {
+  height: 24px;
+  background: var(--gm-mint-50);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gm-app .gm-market-page .gm-bar-fill {
+  height: 100%;
+  background: var(--gm-grad-primary);
+  border-radius: 8px;
+  transition: width 0.6s var(--gm-ease);
+}
+
+.gm-app .gm-market-page .gm-bar-fill.highlight {
+  background: var(--gm-grad-lime);
+  box-shadow: var(--gm-shadow-glow);
+}
+
+.gm-app .gm-market-page .gm-bar-value {
+  font-size: 0.88rem;
+  font-weight: 900;
+  min-width: 60px;
+  text-align: right;
+}
+
+/* listing stats */
+.gm-app .gm-market-page .gm-listing-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.gm-app .gm-market-page .gm-listing-stats > div {
+  padding: 0.5rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-market-page .gm-listing-stats small {
+  display: block;
+  color: var(--gm-ink-400);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gm-app .gm-market-page .gm-listing-stats strong {
+  display: block;
+  font-size: 0.88rem;
+}
+
+/* scenario recommended highlight */
+.gm-app .gm-market-page .gm-scenario-rec {
+  border-color: var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+  box-shadow: 0 0 0 3px rgba(34, 163, 85, 0.12);
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-market-page .gm-bar-row {
+    grid-template-columns: 100px 1fr auto;
+  }
+  .gm-app .gm-market-page .gm-buyer-header {
+    flex-wrap: wrap;
+  }
+  .gm-app .gm-market-page .gm-listing-stats {
+    grid-template-columns: 1fr;
+  }
+}
