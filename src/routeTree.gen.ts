@@ -28,9 +28,13 @@ import { Route as AppMarketRouteImport } from './routes/app/market'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Route as AppRecordsRouteImport } from './routes/app/records'
 import { Route as AppSoilRouteImport } from './routes/app/soil'
 =======
+=======
+import { Route as AppSettingsRouteImport } from './routes/app/settings'
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
 import { Route as AppWalletRouteImport } from './routes/app/wallet'
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
 import { Route as AppWeatherRouteImport } from './routes/app/weather'
@@ -127,6 +131,7 @@ const AppPlannerRoute = AppPlannerRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 <<<<<<< HEAD
+<<<<<<< HEAD
 const AppRecordsRoute = AppRecordsRouteImport.update({
   id: '/app/records',
   path: '/app/records',
@@ -136,6 +141,13 @@ const AppSoilRoute = AppSoilRouteImport.update({
   id: '/app/soil',
   path: '/app/soil',
 =======
+=======
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/app/settings',
+  path: '/app/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/app/wallet',
   path: '/app/wallet',
@@ -242,9 +254,13 @@ export interface FileRoutesByFullPath {
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
 <<<<<<< HEAD
+<<<<<<< HEAD
   '/app/records': typeof AppRecordsRoute
   '/app/soil': typeof AppSoilRoute
 =======
+=======
+  '/app/settings': typeof AppSettingsRoute
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
   '/app/wallet': typeof AppWalletRoute
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   '/app/weather': typeof AppWeatherRoute
@@ -284,9 +300,13 @@ export interface FileRoutesByTo {
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
 <<<<<<< HEAD
+<<<<<<< HEAD
   '/app/records': typeof AppRecordsRoute
   '/app/soil': typeof AppSoilRoute
 =======
+=======
+  '/app/settings': typeof AppSettingsRoute
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
   '/app/wallet': typeof AppWalletRoute
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   '/app/weather': typeof AppWeatherRoute
@@ -327,9 +347,13 @@ export interface FileRoutesById {
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
 <<<<<<< HEAD
+<<<<<<< HEAD
   '/app/records': typeof AppRecordsRoute
   '/app/soil': typeof AppSoilRoute
 =======
+=======
+  '/app/settings': typeof AppSettingsRoute
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
   '/app/wallet': typeof AppWalletRoute
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   '/app/weather': typeof AppWeatherRoute
@@ -371,9 +395,13 @@ export interface FileRouteTypes {
     | '/app/onboarding'
     | '/app/planner'
 <<<<<<< HEAD
+<<<<<<< HEAD
     | '/app/records'
     | '/app/soil'
 =======
+=======
+    | '/app/settings'
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
     | '/app/wallet'
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
     | '/app/weather'
@@ -413,9 +441,13 @@ export interface FileRouteTypes {
     | '/app/onboarding'
     | '/app/planner'
 <<<<<<< HEAD
+<<<<<<< HEAD
     | '/app/records'
     | '/app/soil'
 =======
+=======
+    | '/app/settings'
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
     | '/app/wallet'
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
     | '/app/weather'
@@ -455,9 +487,13 @@ export interface FileRouteTypes {
     | '/app/onboarding'
     | '/app/planner'
 <<<<<<< HEAD
+<<<<<<< HEAD
     | '/app/records'
     | '/app/soil'
 =======
+=======
+    | '/app/settings'
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
     | '/app/wallet'
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
     | '/app/weather'
@@ -498,9 +534,13 @@ export interface RootRouteChildren {
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppPlannerRoute: typeof AppPlannerRoute
 <<<<<<< HEAD
+<<<<<<< HEAD
   AppRecordsRoute: typeof AppRecordsRoute
   AppSoilRoute: typeof AppSoilRoute
 =======
+=======
+  AppSettingsRoute: typeof AppSettingsRoute
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
   AppWalletRoute: typeof AppWalletRoute
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   AppWeatherRoute: typeof AppWeatherRoute
@@ -631,6 +671,7 @@ declare module '@tanstack/react-router' {
       parentRoute: typeof rootRouteImport
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     '/app/records': {
       id: '/app/records'
       path: '/app/records'
@@ -644,6 +685,15 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/soil'
       preLoaderRoute: typeof AppSoilRouteImport
 =======
+=======
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/app/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
     '/app/wallet': {
       id: '/app/wallet'
       path: '/app/wallet'
@@ -786,9 +836,13 @@ const rootRouteChildren: RootRouteChildren = {
   AppOnboardingRoute: AppOnboardingRoute,
   AppPlannerRoute: AppPlannerRoute,
 <<<<<<< HEAD
+<<<<<<< HEAD
   AppRecordsRoute: AppRecordsRoute,
   AppSoilRoute: AppSoilRoute,
 =======
+=======
+  AppSettingsRoute: AppSettingsRoute,
+>>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
   AppWalletRoute: AppWalletRoute,
 >>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   AppWeatherRoute: AppWeatherRoute,

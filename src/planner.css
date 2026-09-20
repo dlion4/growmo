@@ -1765,3 +1765,64 @@
   }
 }
 
+/* ============================================================================
+   PAGE 15 — SETTINGS, TEAM & PERMISSIONS  (.gm-settings-page)
+   =========================================================================== */
+
+/* avatar large */
+.gm-avatar-lg {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gm-grad-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* pricing cards */
+.gm-app .gm-settings-page .gm-pricing {
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.gm-app .gm-settings-page .gm-pricing.popular {
+  border-color: var(--gm-leaf-500);
+  box-shadow: 0 0 0 3px rgba(34, 163, 85, 0.12);
+}
+
+.gm-app .gm-settings-page .gm-price-big {
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0.5rem 0;
+}
+
+.gm-app .gm-settings-page .gm-price-big small {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+/* settings dropdown menu */
+.gm-settings-menu {
+  min-width: 220px;
+}
+
+/* code chip */
+.gm-app .gm-settings-page .gm-code-chip {
+  font-family: var(--gm-font-body, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: var(--gm-mint-50);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--gm-r-xs);
+  letter-spacing: 0.02em;
+}
+

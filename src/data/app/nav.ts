@@ -210,7 +210,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Settings",
         desc: "Farm & team",
         icon: Settings,
-        ready: false,
+        ready: true,
         page: 15,
       },
     ],
