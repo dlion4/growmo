@@ -325,3 +325,67 @@ categories, 10 agronomists + 5 paid services + 10 sessions, 10 farmer groups +
 10 benchmark metrics + 10 peer groups + leaderboard + badges, group and expert
 chat seeds, activity log, settings and FAQs. Money goes through `kes()` from
 `data/site`.
+
+## 17. Soil health & testing layer (page 17 — `/app/soil`)
+
+Page-scoped stylesheet `src/soil.css`, linked from `__root.tsx` after
+`communityCss` (`soilCss` → `?url` + `?v=1`). Same rules: `.gm-app` /
+`.gm-modal-overlay` prefixes only, tokens only, no global component redefined.
+It also styles the page header hooks `.gm-soil-crumbs`, `.gm-soil-back` (with
+`.gm-breadcrumb-sep`), `.gm-soil-menu-wrap` and `.gm-soil-menu` so the "More
+soil tools" dropdown and the plot drawer behave as real pop-ups, and it reuses
+the global `.gm-checkcard`, `.gm-empty`, `.gm-filter-chip`, `.gm-table-link` and
+`.gm-spin` rather than inventing local versions.
+
+**New `.gm-soil-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + KPIs | `.gm-soil-hero`(+`-grid`, `-copy`, `-head`, `-chips`, `-actions`), `.gm-soil-score`(+`-label`, `-link`), `.gm-soil-component`(+`-head`), `.gm-soil-kpi`(+`-grid`) |
+| 17.1 Test scheduler | `.gm-soil-plot`(+`-head`, `-meta`, `-meters`, `-zone`, `-note`, `-foot`), `.gm-soil-zone`(+`-s`) |
+| 17.2 Results dashboard | `.gm-soil-meter`(+`-head`, `-track`) — optimal band + reading mark inside one track |
+| 17.3 Fertilizer programme | `.gm-soil-skip`(+`-icon`, `-evidence`, `-saved`), `.gm-soil-bar-row`/`.gm-soil-bars` (NPK bars), `.gm-soil-temp` |
+| 17.4 History & trend | `.gm-soil-chart`(+`-unit`, `-note`), `.gm-soil-score-trend`, `.gm-soil-score-col`, `.gm-soil-score-bar`, `.gm-soil-bars-legend` |
+| 17.5 Sampling guide | `.gm-soil-step`(+`-num`) — EN/SW instructions, kit checklist uses `.gm-checkcard` |
+| 17.6 Lab directory | `.gm-soil-lab`(+`-head`, `-meta`, `-prices`, `-note`, `-foot`) |
+| 17.7 Improvement plan | `.gm-soil-practice`(+`-head`, `-meta`, `-progress`, `-foot`) |
+| 17.8 Moisture monitoring | `.gm-soil-moisture`(+`-bars`, `-legend`, `-row`, `-week`, `-net`), `.gm-soil-net`(`.is-positive`/`.is-negative`), `.gm-soil-signal`(`.is-off`, `.is-none`, `.is-low`), `.gm-soil-method`(+`-head`, `-meta`, `-best`) |
+| Records tab & shared bits | `.gm-soil-kv`, `.gm-soil-partner`, `.gm-soil-callout`(`.tone-warn`/`.tone-good`), `.gm-soil-feature`(+`-grid`) |
+| Toolbars & lists | `.gm-soil-toolbar`, `.gm-soil-search`, `.gm-soil-count`, `.gm-soil-faq`(+`-row`) |
+| Modal wizard bits | `.gm-soil-stack`, `.gm-soil-review`, `.gm-soil-step-list`, `.gm-soil-pay`, `.gm-soil-processing` (reuses `gm-spin`), `.gm-soil-success`(+`-mark`), `.gm-soil-receipt` |
+
+**Responsive:** the hero, plot, lab, practice, method and feature grids collapse
+at **1080px**, toolbars/search/dropdowns and week rows go full-width at **640px**,
+plot and lab card footers stack at **380px**; `@media print` hides hero actions,
+toolbars, card footers and the menu, and neutralises the hero gradient so the
+sampling guide and the test report print legibly. Reveal motion inherits
+`prefers-reduced-motion` from `styles.css` §16.
+
+**Reusable widgets — `src/components/app/SoilWidgets.tsx`:** `SoilHero`,
+`SoilPlotCard`, `SoilPlotRow`, `LabCard`, `ParameterRow`, `ParameterMeter`,
+`ProgramStepRow`, `SkippedInputRow`, `TrendLineChart`, `NpkBarChart`,
+`ScoreTrendChart`, `SamplingStepCard`, `PracticeCard`, `MoistureWeekRow`,
+`MoistureBalanceChart`, `SensorRow`, `CompostRow`, `LimeRateRowView`,
+`SoilOrderRow`, `MoistureMethodCard`, `SoilPartnerCard`, `SoilKv`, `SoilCallout`
+(reuses `ProgressLine`/`StatusChip` from `DashboardWidgets` and `ScoreRing` from
+`auth/controls`). **Workflows:** `src/components/app/SoilModals.tsx` (27
+dialogs/wizards: test booking wizard with lab/test-type/plot steps, lime order
+with the M-Pesa path, illustrated sampling guide, lab detail and contact, 15
+parameter dialogs, score breakdown, history report, compare tests, trend point,
+fertilizer programme with CSV export, product detail with substitution, skip
+reason, amendment log, compost batch wizard and batch detail, practice plan,
+moisture log, irrigation plan, sensor wizard, share access links, export,
+settings, FAQ/glossary, order receipt, confirm pause and the input order
+wizard). Money flows reuse the Amount → OTP (`123456`) → processing → receipt
+shape from finance.
+
+**Page data:** `src/data/app/soil.ts` — 10 plots, 3 test types, 10 labs,
+15 parameters with blueprints values (pH 5.8, OM 3.2%, N 15, P 25, K 180, Ca
+1,200, Mg 200, S 12, Zn 1.8, B 0.4, Cu 1.2, Fe 45, Mn 8, CEC 12, clay loam),
+7-line fertilizer programme at KES 54,000, 3 skipped inputs saving KES 13,300,
+10 history rows 2023–2026, 5 score components totalling 58/100 (35 in 2023,
+70 projected), 9 sampling steps + 6 kit items, 10 improvement practices,
+10 moisture weeks + 4 methods + 6 sensors, 10 compost batches, 10 lime rate
+rows, 12 products, 6 alerts, 10 activity rows, 10 lab orders, settings, FAQ and
+glossary. Money goes through `kes()` from `data/site`; every figure is stated in
+KES and dated in the Sep 2026 Kenya farming calendar used by pages 1–13.

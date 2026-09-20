@@ -115,7 +115,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Soil Health",
         desc: "Tests & recipes",
         icon: FlaskConical,
-        ready: false,
+        ready: true,
         page: 17,
       },
       {

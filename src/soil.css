@@ -1,0 +1,1757 @@
+/* ============================================================================
+   PAGE 17 — SOIL HEALTH & TESTING  (/app/soil)   —   soil.css
+
+   Additive, token-only layer scoped to the authenticated app shell (.gm-app)
+   and to modals raised from it (.gm-modal-overlay). No master token is
+   redefined and no global .gm-* component is overridden. Documented in
+   docs/MASTER_THEME.md §17.
+
+   1.  Hero, score ring, components, KPI grid
+   2.  Plot cards (17.1)
+   3.  Lab cards (17.6)
+   4.  Parameter meters (17.2)
+   5.  Skipped inputs (17.3)
+   6.  Charts — line, NPK bars, score columns (17.4)
+   7.  Sampling steps (17.5)
+   8.  Practice cards (17.7)
+   9.  Moisture balance + sensors (17.8)
+   10. Methods, partners, kw, compost, lime
+   11. Page header, toolbars, FAQ/glossary
+   12. Modal wizard bits
+   13. Responsive (1080 / 640 / 380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-soil-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-soil-hero::after {
+  content: "";
+  position: absolute;
+  right: -7rem;
+  bottom: -9rem;
+  width: 22rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 0 3.5rem rgba(255, 255, 255, 0.04),
+    0 0 0 8rem rgba(255, 255, 255, 0.02);
+  pointer-events: none;
+}
+
+.gm-app .gm-soil-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-soil-hero h1 {
+  color: var(--gm-card);
+}
+
+.gm-app .gm-soil-hero-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.gm-app .gm-soil-hero-copy {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.gm-app .gm-soil-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.gm-app .gm-soil-score {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--gm-card);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-soil-score:hover {
+  transform: translateY(-2px);
+}
+
+.gm-app .gm-soil-score .gm-score-center strong {
+  color: var(--gm-card);
+}
+
+.gm-app .gm-soil-score .gm-score-center small {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gm-app .gm-soil-score-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  max-width: 190px;
+}
+
+.gm-app .gm-soil-score-label strong {
+  font-size: 1.35rem;
+  line-height: 1;
+  color: var(--gm-lime-300);
+}
+
+.gm-app .gm-soil-score-label small {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.gm-app .gm-soil-score-link {
+  margin-top: 0.25rem;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--gm-sprout-300);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.gm-app .gm-soil-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+
+.gm-app .gm-soil-component {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--gm-card);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-soil-component:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.gm-app .gm-soil-component-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-soil-component-head strong {
+  font-size: 0.8rem;
+}
+
+.gm-app .gm-soil-component-head span {
+  font-size: 0.9rem;
+  color: var(--gm-lime-300);
+}
+
+.gm-app .gm-soil-component small {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.gm-app .gm-soil-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.7rem;
+  margin-top: 1.1rem;
+}
+
+.gm-app .gm-soil-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.09);
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-soil-kpi:hover {
+  transform: translateY(-2px);
+}
+
+.gm-app .gm-soil-kpi .gm-mega-icon {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--gm-lime-300);
+}
+
+.gm-app .gm-soil-kpi strong {
+  font-size: 1.25rem;
+  line-height: 1.1;
+  color: var(--gm-card);
+}
+
+.gm-app .gm-soil-kpi span {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--gm-sprout-300);
+}
+
+.gm-app .gm-soil-kpi small {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gm-app .gm-soil-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+/* ---------- 2. plot cards ---------- */
+.gm-app .gm-soil-plot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-soil-plot:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-soil-plot-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-soil-plot-head strong {
+  display: block;
+  font-size: 0.94rem;
+}
+
+.gm-app .gm-soil-plot-head small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-plot-head .gm-chip {
+  margin-left: auto;
+}
+
+.gm-app .gm-soil-plot-meters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.gm-app .gm-soil-plot-meters > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-grad-mist);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-soil-plot-meters small {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-plot-meters strong {
+  font-size: 1.05rem;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-soil-plot-meters .gm-chip {
+  align-self: flex-start;
+}
+
+.gm-app .gm-soil-plot-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-plot-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-soil-plot-meta svg {
+  width: 13px;
+  height: 13px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-soil-plot-note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-plot-zone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-plot-zone svg {
+  width: 13px;
+  height: 13px;
+}
+
+.gm-app .gm-soil-plot-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--gm-line);
+}
+
+/* ---------- 3. lab cards ---------- */
+.gm-app .gm-soil-lab {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-soil-lab-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-soil-lab-head strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.gm-app .gm-soil-lab-head small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-lab-head small svg {
+  width: 13px;
+  height: 13px;
+}
+
+.gm-app .gm-soil-lab-meta {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-lab-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-soil-lab-meta svg {
+  width: 13px;
+  height: 13px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-soil-lab-prices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.gm-app .gm-soil-lab-prices > span {
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-soil-lab-prices small {
+  display: block;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-lab-prices strong {
+  font-size: 0.92rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-lab-note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-lab-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--gm-line);
+}
+
+/* ---------- 4. parameter meters ---------- */
+.gm-app .gm-soil-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-soil-meter:hover {
+  border-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-soil-meter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-soil-meter-head strong {
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-soil-meter-track {
+  position: relative;
+  height: 10px;
+  border-radius: var(--gm-r-pill);
+  background: var(--gm-grad-mist);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-soil-meter-track .band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--gm-r-pill);
+  background: var(--gm-mint-200);
+}
+
+.gm-app .gm-soil-meter-track .mark {
+  position: absolute;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--gm-grad-primary);
+  box-shadow:
+    0 0 0 3px var(--gm-card),
+    var(--gm-shadow-glow);
+}
+
+.gm-app .gm-soil-meter small {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 5. skipped inputs ---------- */
+.gm-app .gm-soil-skip {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-soil-skip-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-cream-100);
+  color: var(--gm-gold-600);
+}
+
+.gm-app .gm-soil-skip-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-soil-skip-evidence {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-skip-saved {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 96px;
+}
+
+.gm-app .gm-soil-skip-saved small {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-skip-saved strong {
+  font-size: 1rem;
+  color: var(--gm-leaf-700);
+}
+
+/* ---------- 6. charts ---------- */
+.gm-app .gm-soil-chart {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-soil-chart figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.gm-app .gm-soil-chart-unit {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-chart svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.gm-app .gm-soil-chart .axis {
+  stroke: var(--gm-line);
+  stroke-width: 1;
+}
+
+.gm-app .gm-soil-chart .target {
+  stroke: var(--gm-sprout-400);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+
+.gm-app .gm-soil-chart .target-label {
+  fill: var(--gm-leaf-700);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.gm-app .gm-soil-chart .series {
+  fill: none;
+  stroke: var(--gm-leaf-600);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.gm-app .gm-soil-chart .point {
+  cursor: pointer;
+}
+
+.gm-app .gm-soil-chart .point .hit {
+  fill: transparent;
+}
+
+.gm-app .gm-soil-chart .point .dot {
+  fill: var(--gm-leaf-500);
+  stroke: var(--gm-card);
+  stroke-width: 2;
+}
+
+.gm-app .gm-soil-chart .point:hover .dot {
+  fill: var(--gm-gold-500);
+}
+
+.gm-app .gm-soil-chart .tick,
+.gm-app .gm-soil-chart .value {
+  fill: var(--gm-ink-400);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.gm-app .gm-soil-chart .value {
+  fill: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-chart-note {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-soil-bars-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-bars-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-soil-bars-legend em,
+.gm-app .gm-soil-bars .gm-soil-bar-track i {
+  display: inline-block;
+  border-radius: var(--gm-r-pill);
+}
+
+.gm-app .gm-soil-bars-legend em {
+  width: 10px;
+  height: 10px;
+}
+
+.gm-app .gm-soil-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-soil-bar-row:last-child {
+  border-bottom: 0;
+}
+
+.gm-app .gm-soil-bar-year {
+  flex: 0 0 110px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-soil-bar-track {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.gm-app .gm-soil-bar-track i {
+  height: 6px;
+}
+
+.gm-app .gm-soil-bar-values {
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-bars em.n,
+.gm-app .gm-soil-bar-track i.n {
+  background: var(--gm-leaf-500);
+}
+
+.gm-app .gm-soil-bars em.p,
+.gm-app .gm-soil-bar-track i.p {
+  background: var(--gm-gold-500);
+}
+
+.gm-app .gm-soil-bars em.k,
+.gm-app .gm-soil-bar-track i.k {
+  background: var(--gm-sprout-400);
+}
+
+.gm-app .gm-soil-score-trend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 0.6rem;
+  align-items: end;
+}
+
+.gm-app .gm-soil-score-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 0.3rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  cursor: pointer;
+}
+
+.gm-app .gm-soil-score-col:hover {
+  border-color: var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-soil-score-col > span:first-child {
+  font-size: 0.95rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-score-bar {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 88px;
+  border-radius: var(--gm-r-xs);
+  background: var(--gm-grad-mist);
+  overflow: hidden;
+}
+
+.gm-app .gm-soil-score-bar i {
+  width: 100%;
+  background: var(--gm-grad-primary);
+  border-radius: var(--gm-r-xs);
+}
+
+.gm-app .gm-soil-score-col small {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 7. sampling steps ---------- */
+.gm-app .gm-soil-step {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+  position: relative;
+}
+
+.gm-app .gm-soil-step-num {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.9rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--gm-mint-100);
+}
+
+.gm-app .gm-soil-step.is-sw strong {
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-step strong {
+  font-size: 0.9rem;
+  padding-right: 2rem;
+}
+
+.gm-app .gm-soil-step p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-step .gm-btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+/* ---------- 8. practice cards ---------- */
+.gm-app .gm-soil-practice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-left: 3px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-soil-practice.is-started {
+  border-left-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-soil-practice-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-soil-practice-head strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.gm-app .gm-soil-practice-head small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-practice-head .gm-chip {
+  margin-left: auto;
+}
+
+.gm-app .gm-soil-practice p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-practice-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-soil-practice-progress {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-practice-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--gm-line);
+}
+
+/* ---------- 9. moisture ---------- */
+.gm-app .gm-soil-net.is-negative {
+  color: var(--gm-clay-500);
+}
+
+.gm-app .gm-soil-net.is-positive {
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-moisture {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gm-app .gm-soil-moisture-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-moisture-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-soil-moisture-legend em,
+.gm-app .gm-soil-moisture-bars i {
+  display: inline-block;
+  border-radius: var(--gm-r-pill);
+}
+
+.gm-app .gm-soil-moisture-legend em {
+  width: 10px;
+  height: 10px;
+}
+
+.gm-app .gm-soil-moisture-legend em.rain,
+.gm-app .gm-soil-moisture-bars i.rain {
+  background: var(--gm-sprout-400);
+}
+
+.gm-app .gm-soil-moisture-legend em.et,
+.gm-app .gm-soil-moisture-bars i.et {
+  background: var(--gm-gold-500);
+}
+
+.gm-app .gm-soil-moisture-legend em.irr,
+.gm-app .gm-soil-moisture-bars i.irr {
+  background: var(--gm-pine-700);
+}
+
+.gm-app .gm-soil-moisture-legend em.net,
+.gm-app .gm-soil-moisture-bars i.net {
+  background: var(--gm-leaf-500);
+}
+
+.gm-app .gm-soil-moisture-bars i.net.is-negative {
+  background: var(--gm-clay-500);
+}
+
+.gm-app .gm-soil-moisture-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid transparent;
+  border-bottom: 1px dashed var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-app .gm-soil-moisture-row:hover {
+  border-color: var(--gm-line-soft);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-soil-moisture-week {
+  flex: 0 0 148px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-soil-moisture-bars {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.gm-app .gm-soil-moisture-bars i {
+  height: 6px;
+}
+
+.gm-app .gm-soil-moisture-net {
+  flex: 0 0 72px;
+  font-size: 0.82rem;
+  color: var(--gm-leaf-700);
+  text-align: right;
+}
+
+.gm-app .gm-soil-moisture-net.is-negative {
+  color: var(--gm-clay-500);
+}
+
+.gm-app .gm-soil-signal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-signal svg {
+  width: 14px;
+  height: 14px;
+}
+
+.gm-app .gm-soil-signal.is-off {
+  color: var(--gm-gold-600);
+}
+
+.gm-app .gm-soil-signal.is-none {
+  color: var(--gm-ink-400);
+  font-weight: 700;
+}
+
+.gm-app .gm-soil-signal.is-low {
+  color: var(--gm-clay-500);
+}
+
+/* ---------- 10. methods, partners, kv, compost, lime ---------- */
+.gm-app .gm-soil-method {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px dashed var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  opacity: 0.82;
+}
+
+.gm-app .gm-soil-method.is-active {
+  opacity: 1;
+  border-style: solid;
+  border-color: var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-soil-method-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-soil-method-head strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-soil-method-head small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-method-head .gm-chip {
+  margin-left: auto;
+}
+
+.gm-app .gm-soil-method-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-method-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-soil-method-meta svg {
+  width: 13px;
+  height: 13px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-soil-method p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-method-best {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-method .gm-btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.gm-app .gm-soil-partner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-grad-mist);
+}
+
+.gm-app .gm-soil-partner strong {
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-soil-partner p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-soil-partner small {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-partner .gm-btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.gm-app .gm-soil-kv,
+.gm-modal-overlay .gm-soil-kv {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.gm-app .gm-soil-kv > div,
+.gm-modal-overlay .gm-soil-kv > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-soil-kv dt,
+.gm-modal-overlay .gm-soil-kv dt {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-kv dd,
+.gm-modal-overlay .gm-soil-kv dd {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-soil-temp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gm-gold-600);
+}
+
+.gm-app .gm-soil-temp svg {
+  width: 13px;
+  height: 13px;
+}
+
+.gm-app .gm-soil-callout,
+.gm-modal-overlay .gm-soil-callout {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-soil-callout svg,
+.gm-modal-overlay .gm-soil-callout svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-callout strong,
+.gm-modal-overlay .gm-soil-callout strong {
+  display: block;
+  font-size: 0.86rem;
+}
+
+.gm-app .gm-soil-callout small,
+.gm-modal-overlay .gm-soil-callout small {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-callout.tone-warn,
+.gm-modal-overlay .gm-soil-callout.tone-warn {
+  background: var(--gm-cream-50);
+  border-color: var(--gm-gold-400);
+}
+
+.gm-app .gm-soil-callout.tone-warn svg,
+.gm-modal-overlay .gm-soil-callout.tone-warn svg {
+  color: var(--gm-gold-600);
+}
+
+.gm-app .gm-soil-callout.tone-good,
+.gm-modal-overlay .gm-soil-callout.tone-good {
+  background: var(--gm-mint-100);
+  border-color: var(--gm-leaf-500);
+}
+
+/* ---------- 11. header, toolbars, faq ---------- */
+.gm-app .gm-soil-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-crumbs .gm-breadcrumb-sep {
+  color: var(--gm-line);
+  font-weight: 400;
+}
+
+.gm-app .gm-soil-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--gm-r-pill);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gm-leaf-700);
+  text-decoration: none;
+}
+
+.gm-app .gm-soil-back:hover {
+  border-color: var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-soil-back svg {
+  width: 14px;
+  height: 14px;
+}
+
+.gm-app .gm-soil-menu-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.gm-app .gm-soil-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 262px;
+  padding: 0.4rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-lg);
+}
+
+.gm-app .gm-soil-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 0;
+  border-radius: var(--gm-r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gm-forest-900);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-app .gm-soil-menu button:hover {
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-menu button svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-soil-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.gm-app .gm-soil-search {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+
+.gm-app .gm-soil-search > svg {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--gm-ink-400);
+  pointer-events: none;
+}
+
+.gm-app .gm-soil-search .gm-input {
+  padding-left: 2.35rem;
+}
+
+.gm-app .gm-soil-toolbar .gm-select {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 162px;
+}
+
+.gm-app .gm-soil-count {
+  margin-left: auto;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-faq {
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  overflow: hidden;
+}
+
+.gm-app .gm-soil-faq-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 0;
+  border-bottom: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+  text-align: left;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--gm-forest-900);
+  cursor: pointer;
+}
+
+.gm-app .gm-soil-faq-row:last-of-type {
+  border-bottom: 0;
+}
+
+.gm-app .gm-soil-faq-row:hover {
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-soil-faq-row svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-soil-faq-row i {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(212px, 1fr));
+  gap: 0.55rem;
+}
+
+.gm-app .gm-soil-feature {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-grad-mist);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-soil-feature svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-soil-feature strong {
+  display: block;
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-soil-feature small {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-soil-feature .gm-table-link {
+  margin-left: auto;
+  align-self: center;
+  white-space: nowrap;
+}
+
+.gm-app .gm-soil-zones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.gm-app .gm-soil-zone {
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px dashed var(--gm-line);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-soil-zone strong {
+  display: block;
+  font-size: 0.84rem;
+}
+
+.gm-app .gm-soil-zone small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 12. modal wizard bits ---------- */
+.gm-modal-overlay .gm-soil-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gm-modal-overlay .gm-soil-stack .gm-field {
+  margin: 0;
+}
+
+.gm-modal-overlay .gm-soil-review {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.4rem;
+}
+
+.gm-modal-overlay .gm-soil-review > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--gm-line-soft);
+}
+
+.gm-modal-overlay .gm-soil-review span {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-soil-review strong {
+  font-size: 0.86rem;
+  text-align: right;
+}
+
+.gm-modal-overlay .gm-soil-pay {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-grad-primary);
+  color: var(--gm-card);
+}
+
+.gm-modal-overlay .gm-soil-pay strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-modal-overlay .gm-soil-pay small {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.gm-modal-overlay .gm-soil-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1.4rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px dashed var(--gm-leaf-500);
+  text-align: center;
+}
+
+.gm-modal-overlay .gm-soil-processing svg {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-600);
+  animation: gm-spin 0.8s linear infinite;
+}
+
+.gm-modal-overlay .gm-soil-processing small {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-soil-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0 0.2rem;
+  text-align: center;
+}
+
+.gm-modal-overlay .gm-soil-success-mark {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--gm-grad-lime);
+  color: var(--gm-forest-900);
+  box-shadow: var(--gm-shadow-lime);
+}
+
+.gm-modal-overlay .gm-soil-success-mark svg {
+  width: 28px;
+  height: 28px;
+}
+
+.gm-modal-overlay .gm-soil-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px dashed var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+  font-family: ui-monospace, monospace;
+}
+
+.gm-modal-overlay .gm-soil-receipt small {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-soil-receipt strong {
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  color: var(--gm-forest-900);
+}
+
+.gm-modal-overlay .gm-soil-step-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.gm-modal-overlay .gm-soil-step-list > div {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+}
+
+.gm-modal-overlay .gm-soil-step-list span.num {
+  display: grid;
+  place-items: center;
+  flex: 0 0 26px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+/* ---------- 13. responsive + print ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-soil-hero-head {
+    flex-direction: column;
+  }
+
+  .gm-app .gm-soil-score {
+    width: 100%;
+  }
+
+  .gm-app .gm-soil-score-label {
+    max-width: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-soil-kpi-grid,
+  .gm-app .gm-soil-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-soil-search,
+  .gm-app .gm-soil-toolbar .gm-select {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .gm-app .gm-soil-count {
+    margin-left: 0;
+  }
+
+  .gm-app .gm-soil-bar-row,
+  .gm-app .gm-soil-moisture-row {
+    flex-wrap: wrap;
+  }
+
+  .gm-app .gm-soil-bar-year,
+  .gm-app .gm-soil-moisture-week {
+    flex: 1 1 100%;
+  }
+
+  .gm-app .gm-soil-moisture-net {
+    flex: 0 0 auto;
+    text-align: left;
+  }
+
+  .gm-app .gm-soil-hero-actions .gm-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .gm-app .gm-soil-plot-meters,
+  .gm-app .gm-soil-lab-prices {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-soil-score {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media print {
+  .gm-app .gm-soil-hero-actions,
+  .gm-app .gm-soil-plot-foot,
+  .gm-app .gm-soil-lab-foot,
+  .gm-app .gm-soil-practice-foot,
+  .gm-app .gm-soil-toolbar,
+  .gm-app .gm-soil-menu-wrap {
+    display: none !important;
+  }
+
+  .gm-app .gm-soil-hero {
+    background: none;
+    color: var(--gm-ink-950);
+    border: 1px solid var(--gm-line);
+  }
+
+  .gm-app .gm-soil-hero h1,
+  .gm-app .gm-soil-kpi strong,
+  .gm-app .gm-soil-kpi span,
+  .gm-app .gm-soil-kpi small,
+  .gm-app .gm-soil-component strong,
+  .gm-app .gm-soil-component small,
+  .gm-app .gm-soil-component-head span,
+  .gm-app .gm-soil-score-label strong,
+  .gm-app .gm-soil-score-label small,
+  .gm-app .gm-soil-score-link {
+    color: var(--gm-ink-950);
+  }
+}
