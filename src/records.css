@@ -1,0 +1,1061 @@
+/* ============================================================================
+   PAGE 12 — RECORDS, TRACEABILITY & COMPLIANCE  (records.css)
+
+   Additive layer, token-only. Every selector is scoped to the authenticated
+   app shell (.gm-app) or to modals raised from it (.gm-modal-overlay), so the
+   marketing and auth chrome is untouched. No master token is redefined and no
+   global .gm-* component is overridden. Documented in docs/MASTER_THEME.md §15.
+
+   1.  Hero + compliance ring + KPI grid
+   2.  PHI / progress meter (shots, certifications, scores)
+   3.  Farm diary cards
+   4.  Batch traceability + QR
+   5.  Certification cards
+   6.  Soil test chart + rows
+   7.  Monthly record chart
+   8.  Evidence rows, compliance gaps, key-value lists
+   9.  Wizard bits raised inside modals
+   10. Responsive (1080 / 640 / 380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-rec-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-rec-hero::after {
+  content: "";
+  position: absolute;
+  right: -8rem;
+  bottom: -10rem;
+  width: 24rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 3.5rem rgba(255, 255, 255, 0.04),
+    0 0 0 8rem rgba(255, 255, 255, 0.025);
+  pointer-events: none;
+}
+
+.gm-app .gm-rec-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-rec-hero h1 {
+  color: var(--gm-card);
+}
+
+.gm-app .gm-rec-hero-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.4rem;
+}
+
+.gm-app .gm-rec-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--gm-r-md);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  min-width: 168px;
+}
+
+.gm-app .gm-rec-ring-num {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gm-lime-300);
+}
+
+.gm-app .gm-rec-ring small {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.gm-app .gm-rec-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 0.7rem;
+  margin-top: 1.2rem;
+}
+
+.gm-app .gm-rec-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: var(--gm-r-md);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-rec-kpi:hover {
+  transform: translateY(-2px);
+}
+
+.gm-app .gm-rec-kpi .gm-mega-icon {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--gm-lime-300);
+}
+
+.gm-app .gm-rec-kpi strong {
+  font-size: 1.25rem;
+  line-height: 1.1;
+  color: var(--gm-card);
+}
+
+.gm-app .gm-rec-kpi span {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--gm-sprout-300);
+}
+
+.gm-app .gm-rec-kpi small {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gm-app .gm-rec-alert-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.gm-app .gm-rec-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+/* ---------- 2. progress / PHI meter ---------- */
+.gm-app .gm-rec-phi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.gm-app .gm-rec-phi-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.gm-app .gm-rec-phi-head strong {
+  display: block;
+  font-size: 0.88rem;
+}
+
+.gm-app .gm-rec-phi-head small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-phi-track,
+.gm-modal-overlay .gm-rec-phi-track {
+  position: relative;
+  height: 9px;
+  border-radius: var(--gm-r-pill);
+  background: var(--gm-mint-100);
+  overflow: hidden;
+}
+
+.gm-app .gm-rec-phi-track i,
+.gm-modal-overlay .gm-rec-phi-track i {
+  display: block;
+  height: 100%;
+  border-radius: var(--gm-r-pill);
+  background: var(--gm-grad-primary);
+  transition: width var(--gm-t-med) var(--gm-ease);
+}
+
+.gm-app .gm-rec-phi-note {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-mini-track {
+  display: block;
+  height: 5px;
+  border-radius: var(--gm-r-pill);
+  background: var(--gm-mint-100);
+  overflow: hidden;
+  margin-top: 0.3rem;
+}
+
+.gm-app .gm-rec-mini-track i {
+  display: block;
+  height: 100%;
+  background: var(--gm-grad-lime);
+}
+
+/* ---------- 3. farm diary ---------- */
+.gm-app .gm-rec-diary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-left: 3px solid var(--gm-leaf-500);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+  transition:
+    transform var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-rec-diary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-rec-diary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-rec-diary-date {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-rec-diary-body {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--gm-ink-600);
+  line-height: 1.5;
+}
+
+.gm-app .gm-rec-diary-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-diary-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-rec-diary-meta svg {
+  width: 14px;
+  height: 14px;
+}
+
+.gm-app .gm-rec-diary-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-rec-photos {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-rec-photo {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--gm-r-xs);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+  cursor: pointer;
+  transition: background var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-rec-photo:hover {
+  background: var(--gm-mint-100);
+}
+
+.gm-app .gm-rec-photo svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- 4. batch traceability + QR ---------- */
+.gm-app .gm-rec-qr,
+.gm-modal-overlay .gm-rec-qr {
+  padding: 8px;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  box-shadow: var(--gm-shadow-sm);
+  margin-inline: auto;
+}
+
+.gm-app .gm-rec-qr svg,
+.gm-modal-overlay .gm-rec-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.gm-app .gm-rec-batch {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-rec-batch:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-rec-batch-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.gm-app .gm-rec-batch-head strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.gm-app .gm-rec-batch-head small {
+  display: block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-batch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+  padding: 0.6rem 0;
+  border-top: 1px dashed var(--gm-line);
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-rec-batch-grid small {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-batch-grid strong {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-rec-batch-grid svg {
+  width: 15px;
+  height: 15px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-rec-batch-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-batch-foot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-rec-batch-foot svg {
+  width: 15px;
+  height: 15px;
+  color: var(--gm-leaf-600);
+}
+
+/* ---------- 5. certifications ---------- */
+.gm-app .gm-rec-cert {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  height: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-rec-cert-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-rec-cert-head .gm-mega-icon {
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-rec-cert-head strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.gm-app .gm-rec-cert-head small {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-cert-head .gm-chip {
+  margin-left: auto;
+}
+
+.gm-app .gm-rec-cert-req {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-rec-cert-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-rec-cert-progress .gm-rec-phi-track {
+  flex: 1;
+}
+
+.gm-app .gm-rec-cert-progress span {
+  font-size: 0.9rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-rec-cert-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-cert-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--gm-line);
+}
+
+/* ---------- 6. soil chart + rows ---------- */
+.gm-app .gm-rec-soil-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.6rem 0.2rem 0;
+  overflow-x: auto;
+}
+
+.gm-app .gm-rec-soil-bar {
+  flex: 1 0 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.gm-app .gm-rec-soil-value {
+  font-size: 0.8rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-rec-soil-col {
+  display: flex;
+  align-items: flex-end;
+  height: 118px;
+  width: 100%;
+  max-width: 44px;
+  border-radius: var(--gm-r-xs);
+  background: var(--gm-grad-mist);
+  border: 1px solid var(--gm-line-soft);
+  overflow: hidden;
+}
+
+.gm-app .gm-rec-soil-col i {
+  display: block;
+  width: 100%;
+  background: var(--gm-grad-primary);
+  border-radius: var(--gm-r-xs) var(--gm-r-xs) 0 0;
+  transition: height var(--gm-t-med) var(--gm-ease);
+}
+
+.gm-app .gm-rec-soil-label,
+.gm-app .gm-rec-soil-plot {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+  text-align: center;
+}
+
+.gm-app .gm-rec-soil-plot {
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-rec-soil-row {
+  gap: 0.7rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-rec-soil-date {
+  font-size: 0.82rem;
+  min-width: 92px;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-rec-soil-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+/* ---------- 7. monthly record chart ---------- */
+.gm-app .gm-rec-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+}
+
+.gm-app .gm-rec-bar {
+  flex: 1 0 46px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  padding: 0.2rem;
+  border-radius: var(--gm-r-xs);
+  transition: background var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-rec-bar:hover {
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-rec-bar-col {
+  display: flex;
+  align-items: flex-end;
+  height: 96px;
+  width: 100%;
+  max-width: 30px;
+  border-radius: var(--gm-r-xs);
+  background: var(--gm-grad-mist);
+  overflow: hidden;
+}
+
+.gm-app .gm-rec-bar-col i {
+  display: block;
+  width: 100%;
+  background: var(--gm-grad-primary);
+}
+
+.gm-app .gm-rec-bar-label {
+  font-size: 0.64rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-bar-value {
+  font-size: 0.76rem;
+  color: var(--gm-leaf-700);
+}
+
+/* ---------- 8. evidence, gaps, kv ---------- */
+.gm-app .gm-rec-evidence {
+  gap: 0.7rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-rec-evidence .gm-mega-icon {
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-rec-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-rec-gap-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-rec-gap-head .gm-eyebrow {
+  margin: 0;
+}
+
+.gm-app .gm-rec-gap strong {
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-rec-gap p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-rec-gap-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: auto;
+}
+
+.gm-app .gm-rec-gap-foot small {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-kv,
+.gm-modal-overlay .gm-rec-kv {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.gm-app .gm-rec-kv > div,
+.gm-modal-overlay .gm-rec-kv > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-rec-kv dt,
+.gm-modal-overlay .gm-rec-kv dt {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-rec-kv dd,
+.gm-modal-overlay .gm-rec-kv dd {
+  margin: 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--gm-forest-900);
+}
+
+/* toolbar dropdown (page-12 "More record tools" menu) */
+.gm-records-page .gm-menu-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.gm-records-page .gm-finance-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 268px;
+  padding: 0.4rem;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  box-shadow: var(--gm-shadow-lg);
+}
+
+.gm-records-page .gm-finance-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.6rem 0.7rem;
+  border: 0;
+  border-radius: var(--gm-r-sm);
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gm-forest-900);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gm-records-page .gm-finance-menu button:hover {
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+}
+
+.gm-records-page .gm-finance-menu button svg {
+  width: 16px;
+  height: 16px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-records-page .gm-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--gm-r-pill);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gm-leaf-700);
+  text-decoration: none;
+}
+
+.gm-records-page .gm-back-link:hover {
+  border-color: var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+}
+
+.gm-records-page .gm-back-link svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---------- 9. wizard bits inside modals ---------- */
+.gm-modal-overlay .gm-rec-callout {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+
+.gm-modal-overlay .gm-rec-callout svg {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  color: var(--gm-leaf-700);
+}
+
+.gm-modal-overlay .gm-rec-callout strong {
+  display: block;
+  font-size: 0.86rem;
+}
+
+.gm-modal-overlay .gm-rec-callout small {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-rec-review {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.4rem;
+}
+
+.gm-modal-overlay .gm-rec-review > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-bottom: 1px solid var(--gm-line-soft);
+}
+
+.gm-modal-overlay .gm-rec-review span {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-rec-review strong {
+  font-size: 0.86rem;
+  text-align: right;
+}
+
+.gm-modal-overlay .gm-rec-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gm-modal-overlay .gm-rec-stack .gm-field {
+  margin: 0;
+}
+
+.gm-modal-overlay .gm-rec-pay {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-grad-primary);
+  color: var(--gm-card);
+}
+
+.gm-modal-overlay .gm-rec-pay svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+}
+
+.gm-modal-overlay .gm-rec-pay strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-modal-overlay .gm-rec-pay small {
+  font-size: 0.76rem;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.gm-modal-overlay .gm-rec-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1.4rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px dashed var(--gm-leaf-400);
+  text-align: center;
+}
+
+.gm-modal-overlay .gm-rec-processing svg {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-600);
+  animation: gm-spin 0.8s linear infinite;
+}
+
+.gm-modal-overlay .gm-rec-processing small {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-rec-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  padding: 0.6rem 0 0.2rem;
+}
+
+.gm-modal-overlay .gm-rec-success-mark {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--gm-grad-lime);
+  color: var(--gm-forest-900);
+  box-shadow: var(--gm-shadow-lime);
+}
+
+.gm-modal-overlay .gm-rec-success-mark svg {
+  width: 30px;
+  height: 30px;
+}
+
+.gm-modal-overlay .gm-rec-receipt {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.7rem 1rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px dashed var(--gm-leaf-400);
+  background: var(--gm-mint-50);
+  font-family: ui-monospace, monospace;
+}
+
+.gm-modal-overlay .gm-rec-receipt small {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-rec-receipt strong {
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-rec-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: flex-end;
+  margin-bottom: 0.9rem;
+}
+
+.gm-app .gm-rec-toolbar .gm-field {
+  flex: 1 1 190px;
+  margin: 0;
+}
+
+.gm-app .gm-rec-toolbar .gm-search-field {
+  margin: 0;
+}
+
+/* ---------- 10. responsive + print ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-rec-hero-head {
+    flex-direction: column;
+  }
+
+  .gm-app .gm-rec-ring {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.8rem;
+  }
+
+  .gm-app .gm-rec-ring small {
+    margin-left: auto;
+  }
+
+  .gm-app .gm-rec-batch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-rec-kpi-grid,
+  .gm-app .gm-rec-batch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-rec-ring {
+    flex-wrap: wrap;
+  }
+
+  .gm-app .gm-rec-diary-foot,
+  .gm-app .gm-rec-batch-foot,
+  .gm-app .gm-rec-gap-foot {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gm-app .gm-rec-cert-foot .gm-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .gm-app .gm-rec-ring-num {
+    font-size: 2rem;
+  }
+
+  .gm-app .gm-rec-soil-chart {
+    gap: 0.3rem;
+  }
+
+  .gm-app .gm-rec-soil-bar {
+    flex-basis: 46px;
+  }
+}
+
+@media print {
+  .gm-app .gm-rec-hero-actions,
+  .gm-app .gm-rec-cert-foot,
+  .gm-app .gm-rec-batch-foot {
+    display: none !important;
+  }
+
+  .gm-app .gm-rec-hero {
+    background: none;
+    color: var(--gm-ink-950);
+    border: 1px solid var(--gm-line);
+  }
+
+  .gm-app .gm-rec-ring-num,
+  .gm-app .gm-rec-kpi strong,
+  .gm-app .gm-rec-kpi span,
+  .gm-app .gm-rec-kpi small {
+    color: var(--gm-ink-950);
+  }
+}

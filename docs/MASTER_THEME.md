@@ -245,3 +245,83 @@ rounds + 10 symptoms, 10 market forecasts + 8 price alerts, 10 benchmark
 metrics + 10 peer groups, 6 fertilizer programs + 10 fertilizer products + the
 soil test, 10 AI model cards, 10 data sources, 4 credit plans, 8 FAQs.
 Money goes through `kes()` from `data/site`.
+
+## 15. Records layer (page 12 — `/app/records`)
+
+Page-scoped stylesheet `src/records.css`, linked from `__root.tsx` after
+`advisorCss` (`recordsCss` → `?url` + `?v=1`). Every selector is prefixed with
+`.gm-app` or `.gm-modal-overlay`, token-only, and no global `.gm-*` component is
+redefined. It also styles the page header hooks the master theme leaves
+unstyled: `.gm-menu-wrap` / `.gm-finance-menu` (the "More record tools" dropdown)
+and `.gm-back-link`.
+
+**New `.gm-rec-*` classes (all additive):** hero `.gm-rec-hero`(+`-head`,
+`-actions`), `.gm-rec-kpi`(+`-grid`), `.gm-rec-ring`(+`-num`); `.gm-rec-phi`(
+`-head`, `-track`, `-note`), `.gm-rec-alert-row`; diary `.gm-rec-diary`(
+`-top`, `-date`, `-meta`, `-body`, `-foot`), `.gm-rec-photos`, `.gm-rec-photo`;
+batches `.gm-rec-batch`(+`-grid`, `-head`, `-foot`), `.gm-rec-qr`;
+certification `.gm-rec-cert`(+`-head`, `-meta`, `-progress`, `-foot`, `-req`),
+`.gm-rec-mini-track`; soil `.gm-rec-soil-chart`, `.gm-rec-soil-col`,
+`.gm-rec-soil-bar`(`-plot`, `-date`, `-value`, `-label`, `-pills`),
+`.gm-rec-soil-row`; activity `.gm-rec-bars`, `.gm-rec-bar`(+`-col`, `-label`,
+`-value`); compliance `.gm-rec-evidence`, `.gm-rec-gap`(+`-head`, `-foot`),
+`.gm-rec-kv`, `.gm-rec-toolbar`, `.gm-rec-callout`, `.gm-rec-review`; wizard bits
+`.gm-rec-stack`, `.gm-rec-pay`, `.gm-rec-processing` (reuses the global
+`@keyframes gm-spin`), `.gm-rec-success`(+`-mark`), `.gm-rec-receipt`.
+
+**Reusable widgets — `src/components/app/RecordsWidgets.tsx`:** `RecordsHero`,
+`PhiMeter`, `DiaryEntryCard`, `QrTile`, `BatchSummaryCard`, `TraceTimeline`,
+`CertProgressCard`, `SoilTrendChart`, `SoilSampleRow`, `RecordsMonthChart`,
+`EvidenceDocRow`, `ComplianceGapRow`, `RecordKvList` (+ `RecordKpi`).
+**Workflows:** `src/components/app/RecordsModals.tsx` (23 dialogs/wizards,
+including the M-Pesa OTP + PIN confirmation shape shared with finance).
+
+## 16. Community layer (page 13 — `/app/community`)
+
+Page-scoped stylesheet `src/community.css`, linked from `__root.tsx` after
+`recordsCss` (`communityCss` → `?url` + `?v=1`). Same rules: `.gm-app` /
+`.gm-modal-overlay` prefixes only, tokens only, no global component redefined.
+It also styles the page header hooks `.gm-cm-crumbs`, `.gm-cm-back`,
+`.gm-cm-menu-wrap` and `.gm-cm-menu` so the community tools dropdown is a real
+styled pop-up.
+
+**New `.gm-cm-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + points | `.gm-cm-hero`(+`-head`, `-actions`), `.gm-cm-score`, `.gm-cm-badge-line`, `.gm-cm-kpi`(+`-grid`) |
+| 13.1 Forums | `.gm-cm-cat`(+`-foot`), `.gm-cm-thread`(`-main`, `-head`, `-title`, `-body`, `-meta`, `-side`), `.gm-cm-likes`, `.gm-cm-reply`(`.is-verified`, `-foot`), `.gm-cm-thread-full` |
+| 13.2 Library | `.gm-cm-resource`(+`-top`, `-sw`, `-meta`, `-foot`) |
+| 13.3 Agronomist connect | `.gm-cm-expert`(+`-head`, `-spec`, `-meta`, `-counties`, `-foot`) |
+| 13.4 Groups | `.gm-cm-group`(+`-head`, `-stats`, `-tags`, `-savings`, `-foot`), `.gm-cm-event`, `.gm-cm-feature`(+`-grid`) |
+| 13.5 Stories | `.gm-cm-story`(+`-head`, `-achievement`, `-compare`, `-foot`), `.gm-cm-quote` |
+| 13.6 Benchmarking | `.gm-cm-bench`(+`-head`, `-track` with `.mark.mine/.county/.top25/.peerTop`, `-values`), `.gm-cm-leader`(`.is-mine`), `.gm-cm-rank`, `.gm-cm-badge`(`.is-earned`) |
+| Chat (drawer + expert) | `.gm-cm-chat`(+`-thread`), `.gm-cm-msg`(`.is-me`), `.gm-cm-msg-ava`, `.gm-cm-bubble`, `.gm-cm-composer`, `.gm-cm-chat-note` |
+| Toolbars & lists | `.gm-cm-toolbar`, `.gm-cm-search`, `.gm-cm-count`, `.gm-cm-activity`, `.gm-cm-faq`(+`-row`), `.gm-cm-kv` |
+| Modal wizard bits | `.gm-cm-stack`, `.gm-cm-callout`, `.gm-cm-review`, `.gm-cm-pay`, `.gm-cm-processing` (reuses `gm-spin`), `.gm-cm-success`(+`-mark`), `.gm-cm-receipt` |
+
+**Responsive:** KPI and card grids collapse at **1080px**, thread rows stack and
+toolbars go full-width at **640px**, story comparison returns to one column at
+**380px**; `@media print` hides hero actions, composers, card footers and side
+rails. Reveal motion inherits `prefers-reduced-motion` from `styles.css` §16.
+
+**Reusable widgets — `src/components/app/CommunityWidgets.tsx`:** `CommunityHero`,
+`ForumCategoryCard`, `ThreadRow`, `ResourceCard`, `AgronomistCard`, `ServiceRow`,
+`GroupCard`, `EventRow`, `StoryCard`, `BenchmarkBar`, `LeaderboardRow`,
+`BadgeTile`, `ChatThread`, `CommunityKv` (+ `CommunityKpi`, `ChatMessage`).
+**Workflows:** `src/components/app/CommunityModals.tsx` (22 dialogs/wizards:
+thread composer, thread reader with replies and best-answer, report, category
+browser, resource preview/offline/bookmark, agronomist request wizard, profile,
+session detail, rating, contact, ask-expert, group join/leave, group buying,
+contributions, event registration, story reader/share, benchmark compare, invite
+and settings), plus the FAQ pop-up in the route file. Paid flows reuse the
+Amount → OTP (`123456`) → processing → receipt shape from finance.
+
+**Page data:** `src/data/app/community.ts` — 13 forum threads with replies
+(incl. the black-rot thread with @maryWanjiku, @johnFarmer and verified
+@agronomistPeter), 10 forum categories, 12 library resources + 10 library
+categories, 10 agronomists + 5 paid services + 10 sessions, 10 farmer groups +
+10 events + 10 group-buying items + 10 contributions, 10 success stories,
+10 benchmark metrics + 10 peer groups + leaderboard + badges, group and expert
+chat seeds, activity log, settings and FAQs. Money goes through `kes()` from
+`data/site`.

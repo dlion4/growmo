@@ -202,7 +202,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Records",
         desc: "Diary & certificates",
         icon: ClipboardList,
-        ready: false,
+        ready: true,
         page: 12,
       },
       {
@@ -273,7 +273,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Community",
         desc: "Learn & compare",
         icon: MessagesSquare,
-        ready: false,
+        ready: true,
         page: 13,
       },
       {
