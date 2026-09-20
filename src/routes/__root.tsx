@@ -13,6 +13,10 @@ import appCss from '../styles.css?url'
 import dashboardCss from '../dashboard.css?url'
 // Page 3 crop-planner additions — token-only and .gm-app scoped
 import plannerCss from '../planner.css?url'
+// Page 8 weather & climate additions — token-only and .gm-app scoped
+import weatherProCss from '../weather-pro.css?url'
+// Page 9 AI advisor additions — token-only and .gm-app scoped
+import advisorCss from '../advisor.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -32,6 +36,8 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${appCss}?v=5` },
       { rel: 'stylesheet', href: `${dashboardCss}?v=1` },
       { rel: 'stylesheet', href: `${plannerCss}?v=1` },
+      { rel: 'stylesheet', href: `${weatherProCss}?v=1` },
+      { rel: 'stylesheet', href: `${advisorCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

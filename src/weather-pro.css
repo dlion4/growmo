@@ -1,0 +1,962 @@
+/* ============================================================================
+   PAGE 8 — WEATHER & CLIMATE INTELLIGENCE  (weather.css)
+   Additive, token-only rules scoped to the authenticated app shell (.gm-app)
+   and to modals raised from it (.gm-modal-overlay). No master token is
+   redefined and no global .gm-* component is overridden.
+   Documented in docs/MASTER_THEME.md §13.
+
+   1.  Hero + profile strip
+   2.  Live conditions grid (8.1)
+   3.  Hourly strip + 7-day cards (8.2)
+   4.  Seasonal outlook (8.3) — month cards, dekadal bars, scenario rail
+   5.  Prediction engine (8.4) — stage rail + water balance bars
+   6.  Planting windows (8.5) — month track
+   7.  Alerts (8.6) — alert cards with severity rail
+   8.  History (8.7) — rainfall bar chart
+   9.  Shared bits — notes, legend, toolbars, popovers
+   10. Responsive (1080 / 640)
+   11. Small-screen (380px) + stacking safety nets
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-wx-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.25rem, 3vw, 2.1rem);
+  border-radius: var(--gm-r-lg);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-wx-hero-weather small,
+.gm-app .gm-wx-summary p {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.gm-app .gm-wx-hero::after {
+  content: "";
+  position: absolute;
+  right: -6rem;
+  top: -8rem;
+  width: 20rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3rem rgba(255, 255, 255, 0.05),
+    0 0 0 7rem rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+.gm-app .gm-wx-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-wx-temp {
+  font-family: var(--gm-font-display);
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.gm-app .gm-wx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.gm-app .gm-wx-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+  gap: 0.55rem;
+}
+
+.gm-app .gm-wx-strip > div {
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--gm-r-sm);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.gm-app .gm-wx-strip small {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.gm-app .gm-wx-strip strong {
+  font-family: var(--gm-font-display);
+  font-size: 1rem;
+  color: var(--gm-card);
+}
+
+/* ---------- 2. live conditions grid ---------- */
+.gm-app .gm-wx-now-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+  gap: 0.65rem;
+}
+
+.gm-app .gm-wx-now {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform var(--gm-t-fast) var(--gm-ease),
+    border-color var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-now:hover {
+  transform: translateY(-3px);
+  border-color: var(--gm-leaf-500);
+  box-shadow: var(--gm-shadow-sm);
+}
+
+.gm-app .gm-wx-now.on {
+  border-color: var(--gm-leaf-600);
+  background: var(--gm-mint-50);
+  box-shadow: 0 0 0 3px rgba(34, 163, 85, 0.12);
+}
+
+.gm-app .gm-wx-now-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-wx-now-top svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-wx-now-top small {
+  flex: 1;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-now-value {
+  font-family: var(--gm-font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--gm-ink-950);
+}
+
+.gm-app .gm-wx-now-value span {
+  font-family: var(--gm-font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+  margin-left: 0.2rem;
+}
+
+.gm-app .gm-wx-now-change {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-wx-now-note {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-wx-detail {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem;
+  border-radius: var(--gm-r-md);
+  border: 1px dashed var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+}
+
+/* ---------- 3. hourly strip + 7-day cards ---------- */
+.gm-app .gm-wx-hours {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.gm-app .gm-wx-hour {
+  flex: 0 0 74px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.55rem 0.3rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-hour:hover {
+  border-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-wx-hour.on {
+  border-color: var(--gm-leaf-600);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-wx-hour small {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-hour strong {
+  font-family: var(--gm-font-display);
+  font-size: 1rem;
+  color: var(--gm-ink-950);
+}
+
+.gm-app .gm-wx-hour-bar {
+  width: 100%;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--gm-mint-100);
+  overflow: hidden;
+}
+
+.gm-app .gm-wx-hour-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gm-grad-primary);
+}
+
+.gm-app .gm-wx-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.gm-app .gm-wx-day {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.85rem 0.8rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--gm-t-fast) var(--gm-ease),
+    border-color var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-day:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--gm-shadow-sm);
+  border-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-wx-day.on {
+  border-color: var(--gm-leaf-600);
+  box-shadow: 0 0 0 3px rgba(34, 163, 85, 0.12);
+}
+
+.gm-app .gm-wx-day-top {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-wx-day-top svg {
+  width: 20px;
+  height: 20px;
+}
+
+.gm-app .gm-wx-day-temp {
+  font-family: var(--gm-font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--gm-ink-950);
+}
+
+.gm-app .gm-wx-day-temp small {
+  font-family: var(--gm-font-body);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-day-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-600);
+}
+
+/* ---------- 4. seasonal outlook ---------- */
+.gm-app .gm-wx-months {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.gm-app .gm-wx-month {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 1rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--gm-t-fast) var(--gm-ease),
+    border-color var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-month:hover {
+  transform: translateY(-3px);
+  border-color: var(--gm-leaf-500);
+  box-shadow: var(--gm-shadow-sm);
+}
+
+.gm-app .gm-wx-month.on {
+  border-color: var(--gm-leaf-600);
+  box-shadow: 0 0 0 3px rgba(34, 163, 85, 0.12);
+}
+
+.gm-app .gm-wx-month-rain {
+  font-family: var(--gm-font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-wx-dekadal {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.gm-app .gm-wx-dek {
+  padding: 0.8rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mist);
+  border: 1px solid var(--gm-line);
+}
+
+.gm-app .gm-wx-dek small {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-dek strong {
+  font-family: var(--gm-font-display);
+  font-size: 1.15rem;
+  color: var(--gm-ink-950);
+}
+
+.gm-app .gm-wx-scenarios {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.gm-app .gm-wx-scenario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.9rem;
+  border: 1.5px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-scenario:hover {
+  border-color: var(--gm-leaf-500);
+  box-shadow: var(--gm-shadow-sm);
+}
+
+.gm-app .gm-wx-scenario.on {
+  border-color: var(--gm-leaf-600);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-wx-prob {
+  position: relative;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--gm-mint-100);
+  overflow: hidden;
+}
+
+.gm-app .gm-wx-prob i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gm-grad-primary);
+}
+
+/* ---------- 5. prediction engine ---------- */
+.gm-app .gm-wx-engine-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.gm-app .gm-wx-crop-btn {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  border: 1.5px solid var(--gm-line);
+  border-radius: var(--gm-r-pill);
+  background: var(--gm-card);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--gm-ink-600);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-crop-btn:hover {
+  border-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-wx-crop-btn.on {
+  background: var(--gm-grad-primary);
+  border-color: transparent;
+  color: var(--gm-card);
+  box-shadow: var(--gm-shadow-glow);
+}
+
+.gm-app .gm-wx-stage-rail {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  scrollbar-width: thin;
+}
+
+.gm-app .gm-wx-stage-item {
+  flex: 1 0 128px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.7rem;
+  border: 1px solid var(--gm-line);
+  border-left: 4px solid var(--gm-leaf-500);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-stage-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-sm);
+}
+
+.gm-app .gm-wx-stage-item.on {
+  background: var(--gm-mint-50);
+  box-shadow: 0 0 0 2px var(--gm-leaf-500);
+}
+
+.gm-app .gm-wx-stage-item.is-high {
+  border-left-color: var(--gm-clay-500);
+}
+
+.gm-app .gm-wx-stage-item.is-medium {
+  border-left-color: var(--gm-gold-500);
+}
+
+.gm-app .gm-wx-stage-item small {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-stage-item strong {
+  font-size: 0.84rem;
+  color: var(--gm-ink-950);
+}
+
+.gm-app .gm-wx-balance {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 10px;
+  border-radius: 99px;
+  background: var(--gm-mint-100);
+  overflow: hidden;
+}
+
+.gm-app .gm-wx-balance i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--gm-grad-primary);
+}
+
+.gm-app .gm-wx-balance i.neg {
+  background: var(--gm-grad-gold);
+}
+
+/* ---------- 6. planting windows ---------- */
+.gm-app .gm-wx-track {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 2px;
+  min-width: 168px;
+}
+
+.gm-app .gm-wx-track span {
+  height: 16px;
+  border-radius: 3px;
+  background: var(--gm-mint-100);
+}
+
+.gm-app .gm-wx-track span.t-best {
+  background: var(--gm-grad-primary);
+}
+
+.gm-app .gm-wx-track span.t-good {
+  background: var(--gm-sprout-300);
+}
+
+.gm-app .gm-wx-track span.t-risky {
+  background: var(--gm-gold-400);
+}
+
+.gm-app .gm-wx-track span.t-avoid {
+  background: rgba(198, 91, 59, 0.35);
+}
+
+.gm-app .gm-wx-track span.t-blank {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--gm-line-soft),
+    var(--gm-line-soft) 3px,
+    var(--gm-card) 3px,
+    var(--gm-card) 6px
+  );
+}
+
+.gm-app .gm-wx-months-mini {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 2px;
+  min-width: 168px;
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-months-mini span {
+  text-align: center;
+}
+
+.gm-app .gm-wx-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-wx-legend i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 0.3rem;
+  border-radius: 3px;
+  vertical-align: -1px;
+}
+
+/* ---------- 7. alerts ---------- */
+.gm-app .gm-wx-alert {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.95rem 1rem 0.95rem 1.15rem;
+  border: 1px solid var(--gm-line);
+  border-left: 5px solid var(--gm-leaf-500);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  transition:
+    transform var(--gm-t-fast) var(--gm-ease),
+    box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+
+.gm-app .gm-wx-alert:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-sm);
+}
+
+.gm-app .gm-wx-alert.is-medium {
+  border-left-color: var(--gm-gold-500);
+}
+
+.gm-app .gm-wx-alert.is-high {
+  border-left-color: var(--gm-clay-500);
+  background: color-mix(in srgb, var(--gm-clay-500) 7%, var(--gm-card));
+}
+
+.gm-app .gm-wx-alert.is-low {
+  border-left-color: var(--gm-sprout-400);
+}
+
+.gm-app .gm-wx-alert.is-acked {
+  opacity: 0.72;
+}
+
+.gm-app .gm-wx-alert-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-wx-alert-head strong {
+  flex: 1;
+  font-family: var(--gm-font-display);
+  font-size: 1rem;
+  color: var(--gm-forest-900);
+}
+
+.gm-app .gm-wx-alert-msg {
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-wx-alert-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 8. history bars ---------- */
+.gm-app .gm-wx-chart {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 0.4rem;
+  align-items: end;
+  min-height: 168px;
+  padding: 0.6rem 0.2rem 0;
+}
+
+.gm-app .gm-wx-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.gm-app .gm-wx-bar-track {
+  width: 100%;
+  height: 130px;
+  display: flex;
+  align-items: flex-end;
+  border-radius: var(--gm-r-xs);
+  background: var(--gm-mist);
+  overflow: hidden;
+}
+
+.gm-app .gm-wx-bar-track i {
+  display: block;
+  width: 100%;
+  border-radius: var(--gm-r-xs) var(--gm-r-xs) 0 0;
+  background: var(--gm-grad-primary);
+  transition: height 0.6s var(--gm-ease);
+}
+
+.gm-app .gm-wx-bar:hover .gm-wx-bar-track i {
+  background: var(--gm-grad-lime);
+}
+
+.gm-app .gm-wx-bar.on .gm-wx-bar-track {
+  outline: 2px solid var(--gm-leaf-600);
+  outline-offset: 2px;
+}
+
+.gm-app .gm-wx-bar small {
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-bar strong {
+  font-family: var(--gm-font-display);
+  font-size: 0.78rem;
+  color: var(--gm-ink-950);
+}
+
+/* ---------- 9. shared bits ---------- */
+.gm-app .gm-wx-note {
+  padding: 0.8rem 0.95rem;
+  border-left: 4px solid var(--gm-leaf-600);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--gm-ink-800);
+}
+
+.gm-app .gm-wx-note.warn {
+  border-left-color: var(--gm-gold-500);
+  background: var(--gm-cream-50);
+}
+
+.gm-app .gm-wx-note.danger {
+  border-left-color: var(--gm-clay-500);
+  background: color-mix(in srgb, var(--gm-clay-500) 7%, var(--gm-card));
+}
+
+.gm-app .gm-wx-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.gm-app .gm-wx-tools .gm-search-field {
+  flex: 1 1 240px;
+  margin: 0;
+}
+
+.gm-app .gm-wx-fact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 0.6rem;
+}
+
+.gm-app .gm-wx-fact {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mist);
+}
+
+.gm-app .gm-wx-fact small {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-wx-fact strong {
+  font-family: var(--gm-font-display);
+  font-size: 1.1rem;
+  color: var(--gm-ink-950);
+}
+
+.gm-app .gm-wx-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-wx-summary strong {
+  font-family: var(--gm-font-display);
+  font-size: 1.15rem;
+}
+
+.gm-app .gm-wx-summary .gm-chip {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-wx-pop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.6rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mist);
+}
+
+.gm-app .gm-wx-receipt {
+  padding: 0.95rem;
+  border: 1px dashed var(--gm-leaf-600);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-wx-receipt strong {
+  font-family: var(--gm-font-display);
+}
+
+/* ---------- 10. responsive ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-wx-days {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-months {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-wx-dekadal {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-scenarios {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-chart {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-wx-hero {
+    padding: 1.1rem;
+  }
+
+  .gm-app .gm-wx-now-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-dekadal {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-wx-scenarios {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-wx-chart {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-stage-item {
+    flex-basis: 150px;
+  }
+}
+
+@media print {
+  .gm-app .gm-wx-actions,
+  .gm-app .gm-wx-tools {
+    display: none;
+  }
+}
+
+/* ---------- 11. small-screen + stacking safety nets ---------- */
+
+/* `.gm-stat` is used as a button for the live quick actions — inherit the
+   page typography and keep the label left aligned. */
+.gm-app button.gm-stat {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* The hero stacks its children above the decorative rings, which also lifts
+   the dropdown catcher into that layer. Keep it under the menu (1070) but
+   above the hero content so a click outside still closes the menu. */
+.gm-app .gm-wx-hero > .gm-drop-close {
+  z-index: 1060;
+}
+
+@media (max-width: 380px) {
+  .gm-app .gm-wx-now-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gm-app .gm-wx-hero-weather {
+    padding: 0.9rem 1rem;
+  }
+
+  .gm-app .gm-wx-window {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-wx-track {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+}

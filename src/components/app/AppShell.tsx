@@ -402,13 +402,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <small>{r.t}</small>
                   </div>
                 ))}
-                <button
-                  type="button"
+                <Link
+                  to="/app/weather"
                   className="gm-btn gm-btn-soft gm-btn-sm gm-btn-block mt-2"
-                  onClick={() => soon("Weather")}
+                  onClick={() => setDrop(null)}
                 >
                   Full forecast <ArrowRight width={14} height={14} />
-                </button>
+                </Link>
               </div>
             </div>
 
