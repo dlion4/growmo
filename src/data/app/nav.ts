@@ -265,7 +265,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Wallet",
         desc: "M-Pesa & payouts",
         icon: Banknote,
-        ready: false,
+        ready: true,
         page: 14,
       },
       {

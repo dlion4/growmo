@@ -1552,3 +1552,216 @@
     grid-template-columns: 120px 1fr auto;
   }
 }
+
+/* ============================================================================
+   PAGE 14 — PAYMENTS, WALLET & MOBILE MONEY  (.gm-wallet-page)
+   =========================================================================== */
+
+/* balance card background */
+.gm-app .gm-wallet-page .gm-wallet-balance-card {
+  background: var(--gm-grad-deep);
+  color: #fff;
+  border-radius: var(--gm-r-lg);
+  padding: 2rem;
+}
+
+.gm-app .gm-wallet-page .gm-wallet-balance-value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 0;
+}
+
+.gm-app .gm-wallet-page .gm-wallet-balance-meta small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gm-app .gm-wallet-page .gm-wallet-balance-meta strong {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+/* wallet ring */
+.gm-wallet-ring-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gm-wallet-ring-center {
+  position: absolute;
+  text-align: center;
+}
+
+.gm-wallet-ring-center strong {
+  display: block;
+  font-size: 0.88rem;
+}
+
+.gm-wallet-ring-center small {
+  color: var(--gm-ink-400);
+  font-size: 0.68rem;
+}
+
+/* bar chart (wallet) */
+.gm-app .gm-wallet-page .gm-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.gm-app .gm-wallet-page .gm-bar-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.gm-app .gm-wallet-page .gm-bar-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gm-app .gm-wallet-page .gm-bar-label strong {
+  font-size: 0.84rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gm-app .gm-wallet-page .gm-bar-label small {
+  color: var(--gm-ink-400);
+  font-weight: 600;
+  font-size: 0.72rem;
+}
+
+.gm-app .gm-wallet-page .gm-bar-track {
+  height: 22px;
+  background: var(--gm-mint-50);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.gm-app .gm-wallet-page .gm-bar-fill {
+  height: 100%;
+  background: var(--gm-grad-primary);
+  border-radius: 8px;
+  transition: width 0.6s var(--gm-ease);
+}
+
+.gm-app .gm-wallet-page .gm-bar-value {
+  font-size: 0.88rem;
+  font-weight: 900;
+  min-width: 80px;
+  text-align: right;
+}
+
+/* stacked bar */
+.gm-app .gm-wallet-page .gm-stacked-bar-wrap {
+  margin-top: 0.5rem;
+}
+
+.gm-app .gm-wallet-page .gm-stacked-bar {
+  display: flex;
+  height: 16px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--gm-line);
+}
+
+.gm-app .gm-wallet-page .gm-stacked-segment {
+  transition: width 0.6s var(--gm-ease);
+}
+
+/* activity mini list */
+.gm-app .gm-wallet-page .gm-wallet-activity-mini {
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-app .gm-wallet-page .gm-wallet-activity-mini .gm-check-row {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--gm-line-soft);
+}
+
+.gm-app .gm-wallet-page .gm-wallet-activity-mini .gm-check-row:last-child {
+  border-bottom: none;
+}
+
+/* wallet menu dropdown */
+.gm-wallet-menu {
+  min-width: 220px;
+}
+
+/* kpi-soft for wallet */
+.gm-app .gm-wallet-page .gm-kpi-soft {
+  background: var(--gm-mint-50);
+  border-radius: var(--gm-r-sm);
+  padding: 0.75rem;
+}
+
+.gm-app .gm-wallet-page .gm-kpi-soft small {
+  display: block;
+  color: var(--gm-ink-400);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gm-app .gm-wallet-page .gm-kpi-soft strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.gm-app .gm-wallet-page .gm-kpi-soft span {
+  display: block;
+  color: var(--gm-ink-400);
+  font-size: 0.72rem;
+  margin-top: 0.15rem;
+}
+
+/* progress mini */
+.gm-app .gm-wallet-page .gm-progress-mini {
+  height: 6px;
+  background: var(--gm-mint-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.gm-app .gm-wallet-page .gm-progress-mini-fill {
+  height: 100%;
+  background: var(--gm-grad-primary);
+  border-radius: 3px;
+  transition: width 0.5s var(--gm-ease);
+}
+
+/* method grid for wallet */
+.gm-app .gm-wallet-page .gm-method-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* code chip */
+.gm-code-chip {
+  font-family: var(--gm-font-body, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  background: var(--gm-mint-50);
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--gm-r-xs);
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-wallet-page .gm-bar-row {
+    grid-template-columns: 100px 1fr auto;
+  }
+}
+
