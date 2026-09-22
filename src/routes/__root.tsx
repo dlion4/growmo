@@ -17,6 +17,12 @@ import plannerCss from '../planner.css?url'
 import weatherProCss from '../weather-pro.css?url'
 // Page 9 AI advisor additions — token-only and .gm-app scoped
 import advisorCss from '../advisor.css?url'
+// Page 12 records & compliance additions — token-only and .gm-app scoped
+import recordsCss from '../records.css?url'
+// Page 13 community & learning additions — token-only and .gm-app scoped
+import communityCss from '../community.css?url'
+// Page 17 soil health & testing layer — token-only and .gm-app scoped
+import soilCss from '../soil.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -38,6 +44,9 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${plannerCss}?v=1` },
       { rel: 'stylesheet', href: `${weatherProCss}?v=1` },
       { rel: 'stylesheet', href: `${advisorCss}?v=1` },
+      { rel: 'stylesheet', href: `${recordsCss}?v=2` },
+      { rel: 'stylesheet', href: `${communityCss}?v=2` },
+      { rel: 'stylesheet', href: `${soilCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],
