@@ -613,7 +613,7 @@
 }
 
 .gm-app .gm-app-search kbd {
-  font-family: ui-monospace, monospace;
+  font-family: var(--gm-font-mono);
   font-size: 0.62rem;
   font-weight: 800;
   padding: 0.1rem 0.35rem;

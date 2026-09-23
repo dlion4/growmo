@@ -1,0 +1,992 @@
+/* ============================================================================
+   PAGE 14 — PAYMENTS, WALLET & MOBILE MONEY  (wallet.css)
+
+   Additive, token-only layer. Every selector is scoped to the authenticated
+   shell (.gm-app) or the modals raised from it (.gm-modal-overlay) so the
+   marketing chrome is untouched and no master token is redefined.
+   Documented in docs/MASTER_THEME.md §20.
+
+   1. Hero + balance panel + quick actions
+   2. Deposit / pay-type / recipient tiles
+   3. Auto-pay rules, budgets, security rows
+   4. Ledger table, limits, key-value lists, callouts
+   5. Wizard + receipt bits raised inside modals
+   6. Responsive (1080 / 640 / 380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-w-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-w-hero::after {
+  content: "";
+  position: absolute;
+  right: -8rem;
+  top: -10rem;
+  width: 24rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 3.5rem rgba(255, 255, 255, 0.04),
+    0 0 0 8rem rgba(255, 255, 255, 0.025);
+  pointer-events: none;
+}
+
+.gm-app .gm-w-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-w-hero h1 {
+  color: var(--gm-card);
+  margin: 0.6rem 0 0.4rem;
+}
+
+.gm-app .gm-w-hero-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.4rem;
+}
+
+.gm-app .gm-w-hero-copy {
+  flex: 1 1 380px;
+  min-width: 0;
+}
+
+.gm-app .gm-w-hero-copy p {
+  max-width: 60ch;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.gm-app .gm-w-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+}
+
+.gm-app .gm-w-balance {
+  flex: 0 1 300px;
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--gm-r-md);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(2px);
+}
+
+.gm-app .gm-w-balance small {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.gm-app .gm-w-balance > strong {
+  display: block;
+  font-size: clamp(1.7rem, 4vw, 2.2rem);
+  line-height: 1.1;
+  color: var(--gm-lime-200);
+  margin: 0.25rem 0 0.6rem;
+}
+
+.gm-app .gm-w-bal-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.32rem 0;
+  font-size: 0.82rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.gm-app .gm-w-bal-row span {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.gm-app .gm-w-bal-row b {
+  color: var(--gm-card);
+}
+
+.gm-app .gm-w-bal-row.is-warn b {
+  color: #ffc4b6;
+}
+
+.gm-app .gm-w-bal-row.is-strong b {
+  color: var(--gm-lime-200);
+}
+
+.gm-app .gm-w-bal-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.gm-app .gm-w-bal-foot span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-w-bal-foot svg {
+  width: 14px;
+  height: 14px;
+}
+
+.gm-app .gm-w-hero-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+
+.gm-app .gm-w-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.85rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    background var(--gm-t-fast);
+}
+
+.gm-app .gm-w-action:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.gm-app .gm-w-action.is-quiet {
+  border-style: dashed;
+}
+
+.gm-app .gm-w-action-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.gm-app .gm-w-action-ic svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-app .gm-w-action strong {
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-w-action small {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.76);
+}
+
+.gm-app .gm-w-hero-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.gm-app .gm-w-hero-strip small {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gm-app .gm-w-hero-strip b {
+  font-size: 1.05rem;
+  color: var(--gm-lime-200);
+}
+
+/* ---------- 2. deposit / pay tiles ---------- */
+.gm-app .gm-w-method-grid,
+.gm-app .gm-w-paytype-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 0.7rem;
+}
+
+.gm-app .gm-w-method,
+.gm-app .gm-w-paytype {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 1rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast),
+    box-shadow var(--gm-t-fast);
+}
+
+.gm-app .gm-w-method:hover,
+.gm-app .gm-w-paytype:hover,
+.gm-app .gm-w-recipient:hover,
+.gm-app .gm-w-budget:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-leaf-400);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-w-paytype.is-on {
+  border-color: var(--gm-lime-500);
+  background: var(--gm-lime-50);
+}
+
+.gm-app .gm-w-method-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--gm-mint-100);
+  font-size: 1.35rem;
+}
+
+.gm-app .gm-w-method strong,
+.gm-app .gm-w-paytype strong {
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-w-method small,
+.gm-app .gm-w-paytype small {
+  color: var(--gm-ink-400);
+  font-size: 0.75rem;
+}
+
+.gm-app .gm-w-method-facts {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  width: 100%;
+}
+
+.gm-app .gm-w-method-facts li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.28rem 0;
+  font-size: 0.76rem;
+  border-top: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-w-method-facts span {
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-method-facts b {
+  color: var(--gm-ink-700);
+  text-align: right;
+}
+
+.gm-app .gm-w-method-cta {
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gm-leaf-600);
+}
+
+.gm-app .gm-w-paytype-hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.76rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-w-recipient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.55rem;
+}
+
+.gm-app .gm-w-recipient {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  text-align: left;
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast);
+}
+
+.gm-app .gm-w-recipient.is-on {
+  border-color: var(--gm-lime-500);
+  background: var(--gm-lime-50);
+}
+
+.gm-app .gm-w-recipient-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.gm-app .gm-w-recipient-copy strong {
+  font-size: 0.88rem;
+}
+
+.gm-app .gm-w-recipient-copy small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-recipient-last {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--gm-ink-500);
+}
+
+/* ---------- 3. rules / budgets / security ---------- */
+.gm-app .gm-w-rule {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+}
+
+.gm-app .gm-w-rule.is-off {
+  opacity: 0.78;
+  border-style: dashed;
+}
+
+.gm-app .gm-w-rule-main {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.gm-app .gm-w-rule-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-w-rule-main > small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--gm-ink-500);
+  margin-top: 0.15rem;
+}
+
+.gm-app .gm-w-rule-meta {
+  color: var(--gm-ink-400) !important;
+}
+
+.gm-app .gm-w-rule-note {
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-w-rule-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-w-budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 0.7rem;
+}
+
+.gm-app .gm-w-budget {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 1rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast);
+}
+
+.gm-app .gm-w-budget-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-w-budget-emoji {
+  font-size: 1.35rem;
+}
+
+.gm-app .gm-w-budget-head strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-w-budget-head small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-budget-figures {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-w-budget-figures span {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.gm-app .gm-w-budget-figures small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-budget > small.is-good {
+  color: var(--gm-leaf-600);
+  font-weight: 700;
+}
+
+.gm-app .gm-w-budget > small.is-quiet {
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-sec {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-w-sec:last-child {
+  border-bottom: none;
+}
+
+.gm-app .gm-w-sec-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: var(--gm-ink-50);
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-sec-ic.is-on {
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-w-sec-ic svg {
+  width: 16px;
+  height: 16px;
+}
+
+.gm-app .gm-w-sec-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.gm-app .gm-w-sec-copy strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-w-sec-copy small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 4. ledger + lists ---------- */
+.gm-app .gm-w-txn {
+  cursor: pointer;
+}
+
+.gm-app .gm-w-txn:hover {
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-w-dir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+
+.gm-app .gm-w-dir.in {
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-w-dir.out {
+  background: var(--gm-clay-50);
+  color: var(--gm-clay-700);
+}
+
+.gm-app .gm-w-dir svg {
+  width: 15px;
+  height: 15px;
+}
+
+.gm-app .gm-w-txn td small {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-txn td.is-up {
+  color: var(--gm-leaf-700);
+  font-weight: 800;
+}
+
+.gm-app .gm-w-txn td.is-down {
+  color: var(--gm-clay-700);
+  font-weight: 800;
+}
+
+.gm-app .gm-w-bal {
+  font-variant-numeric: tabular-nums;
+  color: var(--gm-ink-500);
+  font-size: 0.82rem;
+}
+
+.gm-app .gm-w-method {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--gm-ink-500);
+  background: var(--gm-ink-50);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.gm-app .gm-w-ref {
+  font-family: var(--gm-font-mono);
+  font-size: 0.76rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-w-up {
+  color: var(--gm-leaf-700);
+  font-weight: 800;
+}
+
+.gm-app .gm-w-limit {
+  padding: 0.55rem 0 0.8rem;
+}
+
+.gm-app .gm-w-limit-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.gm-app .gm-w-limit-head span {
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-w-limit small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-kv {
+  margin: 0;
+  padding: 0;
+}
+
+.gm-app .gm-w-kv-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-w-kv-row:last-child {
+  border-bottom: none;
+}
+
+.gm-app .gm-w-kv-row dt {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-kv-row dd {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--gm-ink-700);
+}
+
+.gm-app .gm-w-callout {
+  padding: 0.8rem 1rem;
+  border-radius: var(--gm-r-md);
+  border-left: 3px solid var(--gm-line);
+  background: var(--gm-ink-50);
+  height: 100%;
+}
+
+.gm-app .gm-w-callout strong {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+}
+
+.gm-app .gm-w-callout p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-w-callout.is-info {
+  background: var(--gm-ocean-50);
+  border-color: var(--gm-ocean-400);
+}
+
+.gm-app .gm-w-callout.is-info strong {
+  color: var(--gm-ocean-800);
+}
+
+.gm-app .gm-w-callout.is-good {
+  background: var(--gm-mint-100);
+  border-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-w-callout.is-good strong {
+  color: var(--gm-leaf-800);
+}
+
+.gm-app .gm-w-callout.is-warn {
+  background: var(--gm-clay-50);
+  border-color: var(--gm-clay-500);
+}
+
+.gm-app .gm-w-callout.is-warn strong {
+  color: var(--gm-clay-800);
+}
+
+.gm-app .gm-w-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+
+.gm-app .gm-field-inline {
+  min-width: 150px;
+}
+
+.gm-app .gm-field-inline span {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-w-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-w-faq-row {
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  overflow: hidden;
+}
+
+.gm-app .gm-w-faq-row button {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gm-app .gm-w-faq-row.is-open button {
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-w-faq-row p {
+  margin: 0;
+  padding: 0 0.9rem 0.85rem 2rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-w-glossary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.gm-app .gm-w-glossary > div {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-app .gm-w-glossary strong {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-w-glossary span {
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+
+/* ---------- 5. wizard + receipt (inside modals) ---------- */
+.gm-modal-overlay .gm-w-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.gm-modal-overlay .gm-w-note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-w-note.is-small {
+  font-size: 0.78rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-quick-amounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.gm-modal-overlay .gm-w-steps {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-w-steps li {
+  padding: 0.15rem 0;
+}
+
+.gm-modal-overlay .gm-w-radio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.8rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  cursor: pointer;
+}
+
+.gm-modal-overlay .gm-w-radio.is-on {
+  border-color: var(--gm-lime-500);
+  background: var(--gm-lime-50);
+}
+
+.gm-modal-overlay .gm-w-radio small {
+  color: var(--gm-ink-400);
+  font-size: 0.76rem;
+}
+
+.gm-modal-overlay .gm-w-processing,
+.gm-modal-overlay .gm-w-receipt-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1.6rem 1rem;
+}
+
+.gm-modal-overlay .gm-w-processing p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-modal-overlay .gm-w-processing .spin {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-600);
+  animation: gm-w-spin 1s linear infinite;
+}
+
+@keyframes gm-w-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gm-modal-overlay .gm-w-receipt-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: var(--gm-lime-400);
+  color: var(--gm-leaf-800);
+  animation: gm-w-pop 0.45s ease;
+}
+
+.gm-modal-overlay .gm-w-receipt-mark svg {
+  width: 34px;
+  height: 34px;
+}
+
+@keyframes gm-w-pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gm-modal-overlay .gm-w-receipt-block h3 {
+  margin: 0;
+  color: var(--gm-leaf-700);
+}
+
+.gm-modal-overlay .gm-w-receipt-amount {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--gm-ink-800);
+}
+
+.gm-modal-overlay .gm-w-receipt-block .gm-code-chip {
+  font-size: 1rem;
+  letter-spacing: 0.1em;
+}
+
+.gm-modal-overlay .gm-w-receipt-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-paytype-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.6rem;
+}
+
+/* ---------- 6. responsive + print ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-w-hero-head {
+    flex-direction: column;
+  }
+
+  .gm-app .gm-w-balance {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-w-hero-actions,
+  .gm-app .gm-w-hero-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gm-app .gm-w-method-grid,
+  .gm-app .gm-w-paytype-grid,
+  .gm-app .gm-w-budget-grid,
+  .gm-app .gm-w-recipient-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .gm-app .gm-w-hero-actions,
+  .gm-app .gm-w-hero-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .gm-app .gm-w-hero-actions,
+  .gm-app .gm-w-toolbar,
+  .gm-app .gm-menu-wrap {
+    display: none !important;
+  }
+
+  .gm-app .gm-w-hero {
+    background: none;
+    color: var(--gm-ink-800);
+    padding: 0 0 0.6rem;
+  }
+
+  .gm-app .gm-w-balance {
+    border-color: var(--gm-line);
+    background: none;
+    color: var(--gm-ink-800);
+  }
+}

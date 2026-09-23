@@ -23,6 +23,16 @@ import recordsCss from '../records.css?url'
 import communityCss from '../community.css?url'
 // Page 17 soil health & testing layer — token-only and .gm-app scoped
 import soilCss from '../soil.css?url'
+// Page 10 market & sales layer — token-only and .gm-app scoped
+import marketCss from '../market.css?url'
+// Page 11 analytics & reporting layer — token-only and .gm-app scoped
+import analyticsCss from '../analytics.css?url'
+// Page 14 wallet / mobile-money layer
+import walletCss from '../wallet.css?url'
+// Page 15 settings / team / permissions
+import settingsCss from '../settings.css?url'
+// Page 16 channels (PWA offline, USSD, SMS, WhatsApp, agents)
+import channelsCss from '../channels.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -39,14 +49,19 @@ export const Route = createRootRoute({
     ],
     links: [
       // ?v= busts preview/proxy CSS caches — bump it whenever a stylesheet changes
-      { rel: 'stylesheet', href: `${appCss}?v=5` },
-      { rel: 'stylesheet', href: `${dashboardCss}?v=1` },
+      { rel: 'stylesheet', href: `${appCss}?v=6` },
+      { rel: 'stylesheet', href: `${dashboardCss}?v=2` },
       { rel: 'stylesheet', href: `${plannerCss}?v=1` },
       { rel: 'stylesheet', href: `${weatherProCss}?v=1` },
       { rel: 'stylesheet', href: `${advisorCss}?v=1` },
-      { rel: 'stylesheet', href: `${recordsCss}?v=2` },
-      { rel: 'stylesheet', href: `${communityCss}?v=2` },
-      { rel: 'stylesheet', href: `${soilCss}?v=1` },
+      { rel: 'stylesheet', href: `${recordsCss}?v=3` },
+      { rel: 'stylesheet', href: `${communityCss}?v=3` },
+      { rel: 'stylesheet', href: `${soilCss}?v=2` },
+      { rel: 'stylesheet', href: `${marketCss}?v=2` },
+      { rel: 'stylesheet', href: `${analyticsCss}?v=2` },
+      { rel: 'stylesheet', href: `${walletCss}?v=2` },
+      { rel: 'stylesheet', href: `${settingsCss}?v=2` },
+      { rel: 'stylesheet', href: `${channelsCss}?v=2` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

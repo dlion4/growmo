@@ -1180,7 +1180,7 @@ function OverviewDashboard({
       {sections.weather ? (
         <Reveal>
           <section
-            className="gm-card p-3 p-md-4"
+            className="gm-card gm-d-hero p-3 p-md-4"
             aria-labelledby="weather-heading"
             style={{
               background: "var(--gm-grad-deep)",

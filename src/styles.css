@@ -27,32 +27,80 @@
   --gm-leaf-700: #166534;
   --gm-leaf-600: #1d8345;
   --gm-leaf-500: #22a355;
+  --gm-sprout-700: #1b6a49;
+  --gm-sprout-600: #24835a;
+  --gm-sprout-500: #2f9d6b;
   --gm-sprout-400: #4cc38a;
   --gm-sprout-300: #86ddb0;
+  --gm-mint-500: #6dd39d;
   --gm-mint-200: #b9efcf;
   --gm-mint-100: #dcf5e5;
   --gm-mint-50: #f0faf3;
+  --gm-leaf-800: #124d28;
+  --gm-leaf-400: #3aa96f;
+  --gm-leaf-300: #7fd0a4;
+  --gm-leaf-50: #eef8f1;
 
   /* --- Accents --- */
+  --gm-lime-50: #f8feec;
+  --gm-lime-100: #f2fcd6;
+  --gm-lime-200: #e6f8a8;
   --gm-lime-300: #d8f65f;
   --gm-lime-400: #c4ef3c;
   --gm-lime-500: #a8d92b;
+  --gm-gold-50: #fef8ec;
+  --gm-gold-100: #fdf1d9;
+  --gm-gold-200: #fbe6b9;
+  --gm-gold-300: #f8d48b;
   --gm-gold-400: #f2b950;
   --gm-gold-500: #e8a02c;
   --gm-gold-600: #c77f14;
+  --gm-gold-800: #8a5a0e;
   --gm-cream-50: #fbf8f0;
   --gm-cream-100: #f5eeda;
+  --gm-cream-500: #e8d7a8;
+  --gm-sand-50: #fbf7ee;
+  --gm-earth-50: #f7f1e9;
+  --gm-clay-50: #fdf3ef;
+  --gm-clay-300: #e2a08c;
+  --gm-clay-400: #d47a5c;
   --gm-clay-500: #c65b3b;
+  --gm-clay-700: #9d4326;
+  --gm-clay-800: #7a3320;
+  --gm-berry-500: #b03a72;
+  /* Info tone — cool teal, the fourth semantic hue (good / warn / danger / info) */
+  --gm-ocean-50: #eef6f8;
+  --gm-ocean-400: #4ea6bd;
+  --gm-ocean-500: #2f8aa3;
+  --gm-ocean-700: #1a5d72;
+  --gm-ocean-800: #124a5c;
+
+  /* --- Transparent rails (for dark surfaces) --- */
+  --gm-white-04: rgba(255, 255, 255, 0.04);
+  --gm-white-06: rgba(255, 255, 255, 0.06);
+  --gm-white-10: rgba(255, 255, 255, 0.1);
+  --gm-white-20: rgba(255, 255, 255, 0.2);
 
   /* --- Ink & neutrals --- */
   --gm-ink-950: #0b120d;
+  --gm-ink-900: #101a14;
   --gm-ink-800: #1b261f;
+  --gm-ink-700: #2a3a30;
   --gm-ink-600: #3c4d43;
+  --gm-ink-500: #54665b;
   --gm-ink-400: #6b7d72;
+  --gm-ink-300: #93a49a;
+  --gm-ink-50: #f6f9f7;
+  --gm-ink: #1b261f;
+  --gm-muted: #6b7d72;
   --gm-line: #dfe9e1;
   --gm-line-soft: #ecf2ed;
   --gm-mist: #f3f6f3;
   --gm-card: #ffffff;
+  --gm-surface: #ffffff;
+  --gm-paper: #f3f6f3;
+  --gm-deep: #0c2317;
+  --gm-risk-high: #c65b3b;
 
   /* --- Signature gradients (the "constant flowing" feel) --- */
   --gm-grad-primary: linear-gradient(135deg, #166534 0%, #22a355 52%, #4cc38a 100%);
@@ -60,11 +108,13 @@
   --gm-grad-lime: linear-gradient(135deg, #d8f65f 0%, #a8d92b 100%);
   --gm-grad-gold: linear-gradient(135deg, #f6c863 0%, #e8a02c 60%, #c77f14 100%);
   --gm-grad-mist: linear-gradient(180deg, #fbf8f0 0%, #f0faf3 100%);
+  --gm-grad-soft: linear-gradient(180deg, #fbf8f0 0%, #f0faf3 100%);
   --gm-grad-sheen: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.45) 50%, transparent 75%);
 
   /* --- Typography --- */
   --gm-font-display: "Fraunces", "Georgia", serif;
   --gm-font-body: "Plus Jakarta Sans", -apple-system, "Segoe UI", sans-serif;
+  --gm-font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   /* --- Shape --- */
   --gm-r-xs: 8px;
@@ -73,6 +123,10 @@
   --gm-r-lg: 26px;
   --gm-r-xl: 36px;
   --gm-r-pill: 999px;
+  /* long-form aliases (page CSS uses both spellings) */
+  --gm-radius-sm: 12px;
+  --gm-radius-md: 18px;
+  --gm-radius-lg: 26px;
 
   /* --- Shadows (green-tinted, soft) --- */
   --gm-shadow-xs: 0 1px 3px rgba(12, 35, 23, 0.1);
@@ -81,13 +135,17 @@
   --gm-shadow-lg: 0 28px 60px -18px rgba(12, 35, 23, 0.3);
   --gm-shadow-glow: 0 8px 30px -6px rgba(34, 163, 85, 0.5);
   --gm-shadow-lime: 0 8px 28px -8px rgba(168, 217, 43, 0.55);
+  --gm-shadow-card: 0 4px 14px -4px rgba(12, 35, 23, 0.14);
 
   /* --- Motion --- */
   --gm-ease: cubic-bezier(0.22, 1, 0.36, 1);
   --gm-ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --gm-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --gm-transition: 0.2s cubic-bezier(0.22, 1, 0.36, 1);
   --gm-t-fast: 0.18s;
   --gm-t-med: 0.35s;
   --gm-t-slow: 0.6s;
+  --gm-d: 0s;
 
   /* --- Layout --- */
   --gm-max: 1240px;
@@ -430,9 +488,10 @@ img, svg {
   height: 14px;
 }
 .gm-chip-lime {
-  background: rgba(216, 246, 95, 0.16);
-  color: #eefbca;
-  border-color: rgba(216, 246, 95, 0.35);
+  /* solid lime pill — readable on both dark heroes and white cards */
+  background: var(--gm-lime-300);
+  color: var(--gm-forest-950);
+  border-color: var(--gm-lime-400);
 }
 .gm-chip-gold {
   background: rgba(232, 160, 44, 0.14);
@@ -2574,7 +2633,7 @@ img, svg {
   border-color: rgba(216, 246, 95, 0.4);
 }
 .gm-ussd-code {
-  font-family: ui-monospace, monospace;
+  font-family: var(--gm-font-mono);
   font-weight: 800;
   color: var(--gm-lime-300);
   font-size: 1.05rem;
@@ -3764,6 +3823,8 @@ img, svg {
   align-items: center;
   justify-content: center;
   font-weight: 800;
+  /* owns its own surface so initials stay readable on white cards too */
+  background: var(--gm-grad-primary);
   color: #fff;
   font-size: 0.9rem;
 }
@@ -4058,7 +4119,7 @@ img, svg {
   background: transparent;
 }
 .gm-kbd {
-  font-family: ui-monospace, monospace;
+  font-family: var(--gm-font-mono);
   font-size: 0.7rem;
   font-weight: 800;
   background: var(--gm-mist);
@@ -4212,7 +4273,7 @@ img, svg {
   background: #fff;
 }
 .gm-code-chip {
-  font-family: ui-monospace, monospace;
+  font-family: var(--gm-font-mono);
   font-weight: 800;
   letter-spacing: 0.12em;
   background: var(--gm-forest-950);
@@ -4787,4 +4848,86 @@ img, svg {
 @media print {
   .gm-app .gm-app-side, .gm-app .gm-app-top, .gm-app .gm-fab, .gm-app .gm-fab-menu, .gm-app .gm-app-scrim { display: none !important; }
   .gm-app .gm-app-inner { max-width: none; padding: 0; }
+}
+
+/* ==========================================================================
+   §23 CONTRAST SAFETY (app-wide)
+
+   Audit rule: every element that paints its own light surface owns its text
+   colour, and every heading inside a dark hero inherits the hero's colour.
+   Without these, a white card nested inside a dark hero (whose subtree is
+   color:var(--gm-card)) rendered white-on-white, and the global
+   `h1..h5 { color: var(--gm-ink-950) }` default painted dark headings onto
+   the dark hero gradients (dark-on-dark).
+   ========================================================================== */
+
+/* 1 — light surfaces reset ink */
+.gm-card,
+.gm-check-row,
+.gm-stat {
+  color: var(--gm-ink-800);
+}
+.gm-card .gm-lead:not(.on-dark),
+.gm-card .gm-eyebrow:not(.on-dark),
+.gm-check-row .gm-lead:not(.on-dark) {
+  color: var(--gm-ink-600);
+}
+
+/* 2 — headings inside dark heroes/panels inherit the light surface colour */
+.gm-hero h1, .gm-hero h2, .gm-hero h3, .gm-hero h4,
+.gm-page-hero h1, .gm-page-hero h2, .gm-page-hero h3, .gm-page-hero h4,
+.gm-app .gm-plan-head h1, .gm-app .gm-plan-head h2, .gm-app .gm-plan-head h3, .gm-app .gm-plan-head h4,
+.gm-app .gm-wx-hero h1, .gm-app .gm-wx-hero h2, .gm-app .gm-wx-hero h3,
+.gm-app .gm-ai-hero h1, .gm-app .gm-ai-hero h2, .gm-app .gm-ai-hero h3,
+.gm-app .gm-ch-hero h1, .gm-app .gm-ch-hero h2, .gm-app .gm-ch-hero h3,
+.gm-app .gm-mk-hero h1, .gm-app .gm-mk-hero h2, .gm-app .gm-mk-hero h3,
+.gm-app .gm-an-hero h1, .gm-app .gm-an-hero h2, .gm-app .gm-an-hero h3,
+.gm-app .gm-d-hero h1, .gm-app .gm-d-hero h2, .gm-app .gm-d-hero h3,
+.gm-app .gm-d-hero .font-display {
+  color: inherit;
+}
+
+/* 3 — muted text inside dark heroes stays legible */
+.gm-app .gm-plan-head .gm-plan-fact-value,
+.gm-app .gm-plan-head .gm-check-row strong,
+.gm-app .gm-plan-head .gm-check-row small {
+  color: var(--gm-ink-800);
+}
+.gm-app .gm-plan-head .gm-check-row small {
+  color: var(--gm-ink-500);
+}
+
+/* 4 — one hero-title scale app-wide. Pages 12/13/17 shipped with the
+      `.gm-h-section` scale on their hero h1; every other app hero used to
+      fall back to Bootstrap's 2.5rem/500 h1 default, so titles changed size
+      and weight from page to page. */
+.gm-app .gm-plan-head h1,
+.gm-app .gm-mk-hero h1,
+.gm-app .gm-an-hero h1,
+.gm-app .gm-w-hero h1,
+.gm-app .gm-st-hero h1,
+.gm-app .gm-ch-hero h1,
+.gm-app .gm-rec-hero h1,
+.gm-app .gm-soil-hero h1,
+.gm-app .gm-cm-hero h1 {
+  font-family: var(--gm-font-display);
+  font-size: clamp(1.9rem, 4.2vw, 3rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+}
+
+/* 5 — inside the app, `.gm-h-section` is the in-card section title at the
+      scale pages 12/13/17 already use (via `.gm-dash-section-title h2`).
+      Without this, plain `<h3 class="gm-h-section">` kept the marketing
+      3rem display size and dwarfed everything around it. Page heroes set
+      their own h1 scale in rule 4 above. */
+.gm-app h2.gm-h-section,
+.gm-app h3.gm-h-section,
+.gm-app h4.gm-h-section,
+.gm-app h5.gm-h-section,
+.gm-modal-overlay h2.gm-h-section,
+.gm-modal-overlay h3.gm-h-section,
+.gm-modal-overlay h4.gm-h-section {
+  font-size: 1.15rem;
 }

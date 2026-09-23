@@ -1,0 +1,612 @@
+/* ============================================================================
+   PAGE 10 — MARKET & SALES  (/app/market)   —   market.css
+
+   Additive, token-only layer scoped to .gm-app and .gm-modal-overlay. No
+   master token is redefined. Documented in docs/MASTER_THEME.md §18.
+
+   1.  Hero (score, live chip, KPIs)
+   2.  Section headings, toolbars, filters
+   3.  Live price grid (10.1)
+   4.  Trend chart (10.2)
+   5.  Best-market recommendations (10.3)
+   6.  Buyer directory cards (10.4)
+   7.  Sales planner scenarios (10.5)
+   8.  Sales records table (10.6)
+   9.  Contract cards (10.7)
+   10. KV lists, callouts, empty states
+   11. Modal wizard bits (success, receipt, OTP)
+   12. Menu/dropdown, FAQ, glossary, alerts
+   13. Responsive (1080/640/380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-mk-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: linear-gradient(135deg, var(--gm-leaf-700) 0%, var(--gm-sprout-700) 55%, var(--gm-gold-600) 100%);
+  color: var(--gm-card);
+  margin-bottom: 1.8rem;
+}
+.gm-app .gm-mk-hero::after {
+  content: "";
+  position: absolute;
+  right: -7rem;
+  top: -8rem;
+  width: 22rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 3.5rem rgba(255,255,255,0.04), 0 0 0 8rem rgba(255,255,255,0.02);
+  pointer-events: none;
+}
+.gm-app .gm-mk-hero > * { position: relative; z-index: 1; }
+.gm-app .gm-mk-hero h1 { color: var(--gm-card); }
+.gm-app .gm-mk-hero-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.gm-app .gm-mk-hero-copy { flex: 1 1 420px; min-width: 0; }
+.gm-app .gm-mk-hero-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+.gm-app .gm-mk-hero-chips .gm-chip {
+  background: rgba(255,255,255,0.14);
+  color: var(--gm-card);
+  border-color: rgba(255,255,255,0.22);
+}
+.gm-app .gm-chip-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.18);
+  color: var(--gm-card);
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.gm-app .gm-dot-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gm-lime-300);
+  box-shadow: 0 0 0 0 var(--gm-lime-300);
+  animation: gm-mk-pulse 1.6s ease-out infinite;
+}
+@keyframes gm-mk-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(163,230,53,0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(163,230,53,0); }
+  100% { box-shadow: 0 0 0 0 rgba(163,230,53,0); }
+}
+.gm-app .gm-mk-hero-score {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: var(--gm-card);
+  text-align: left;
+  cursor: pointer;
+  transition: transform var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-mk-hero-score:hover { transform: translateY(-2px); }
+.gm-app .gm-mk-hero-score-num {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--gm-lime-400);
+  color: var(--gm-leaf-800);
+  font-weight: 900;
+}
+.gm-app .gm-mk-hero-score-num strong { font-size: 1.8rem; line-height: 1; }
+.gm-app .gm-mk-hero-score-num small { font-size: 0.75rem; font-weight: 800; }
+.gm-app .gm-mk-hero-score-label { display: flex; flex-direction: column; gap: 0.2rem; max-width: 200px; }
+.gm-app .gm-mk-hero-score-label strong { font-size: 1.1rem; color: var(--gm-lime-200); }
+.gm-app .gm-mk-hero-score-label small { font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.78); }
+.gm-app .gm-mk-hero-score-link { margin-top: 0.3rem; font-size: 0.74rem; font-weight: 800; color: var(--gm-gold-200); text-decoration: underline; text-underline-offset: 3px; }
+.gm-app .gm-mk-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+.gm-app .gm-mk-hero-grid .gm-stat { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); color: var(--gm-card); }
+.gm-app .gm-mk-hero-grid .gm-stat-label,
+.gm-app .gm-mk-hero-grid .gm-stat-sub { color: rgba(255,255,255,0.8); }
+.gm-app .gm-mk-hero-grid .gm-mega-icon { color: var(--gm-lime-300); }
+.gm-app .gm-stat-progress { margin-top: 0.45rem; }
+.gm-app .gm-stat-progress small { font-size: 0.7rem; color: rgba(255,255,255,0.8); }
+
+/* ---------- 2. section headings / toolbars ---------- */
+.gm-app .gm-mk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.9rem;
+}
+.gm-app .gm-mk-toolbar .gm-mk-search {
+  position: relative;
+  flex: 1 1 240px;
+  min-width: 200px;
+}
+.gm-app .gm-mk-search input { padding-left: 2.4rem; }
+.gm-app .gm-mk-search svg {
+  position: absolute;
+  left: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gm-ink-400);
+}
+.gm-app .gm-mk-count { font-size: 0.8rem; font-weight: 700; color: var(--gm-ink-400); }
+.gm-app .gm-mk-menu-wrap { position: relative; }
+.gm-app .gm-mk-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  min-width: 220px;
+  padding: 0.4rem;
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  box-shadow: var(--gm-shadow-lg);
+  display: none;
+}
+.gm-app .gm-mk-menu.is-open { display: block; }
+.gm-app .gm-mk-menu button {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: var(--gm-r-sm);
+  font-weight: 600;
+  color: var(--gm-ink-700);
+}
+.gm-app .gm-mk-menu button:hover { background: var(--gm-mint-50); color: var(--gm-leaf-700); }
+
+/* ---------- 3. price grid ---------- */
+.gm-app .gm-mk-price-table { overflow-x: auto; }
+.gm-app .gm-mk-price-row td { vertical-align: middle; }
+.gm-app .gm-mk-crop-cell { min-width: 200px; }
+.gm-app .gm-mk-crop-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--gm-r-sm);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.gm-app .gm-mk-crop-btn:hover { background: var(--gm-mint-50); }
+.gm-app .gm-mk-crop-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.gm-app .gm-mk-crop-name { display: flex; flex-direction: column; }
+.gm-app .gm-mk-crop-name strong { font-size: 0.92rem; }
+.gm-app .gm-mk-crop-name small { color: var(--gm-ink-400); font-size: 0.72rem; }
+.gm-app .gm-mk-price-cell { text-align: center; }
+.gm-app .gm-mk-price-link {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  align-items: center;
+  padding: 0.3rem 0.45rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  cursor: pointer;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+  min-width: 80px;
+}
+.gm-app .gm-mk-price-link:hover { border-color: var(--gm-leaf-400); transform: translateY(-1px); }
+.gm-app .gm-mk-price-link.is-best { background: var(--gm-lime-50); border-color: var(--gm-lime-400); }
+.gm-app .gm-mk-price-range { font-weight: 800; font-size: 0.82rem; color: var(--gm-leaf-700); }
+.gm-app .gm-mk-best-tag { font-size: 0.6rem; color: var(--gm-gold-600); font-weight: 800; letter-spacing: 0.04em; }
+.gm-app .gm-mk-trend-cell { text-align: center; }
+.gm-app .gm-mk-trend { display: inline-flex; align-items: center; gap: 0.2rem; font-weight: 800; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 999px; }
+.gm-app .gm-mk-trend-up { color: var(--gm-leaf-700); background: var(--gm-mint-100); }
+.gm-app .gm-mk-trend-down { color: var(--gm-clay-700); background: var(--gm-clay-50); }
+.gm-app .gm-mk-trend-stable { color: var(--gm-ink-500); background: var(--gm-ink-50); }
+
+/* ---------- 4. trend chart ---------- */
+.gm-app .gm-mk-chart {
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  padding: 1rem;
+}
+.gm-app .gm-mk-chart.is-lg { padding: 1.4rem; }
+.gm-app .gm-mk-chart-body { display: flex; flex-direction: column; gap: 0; position: relative; }
+.gm-app .gm-mk-chart-row { display: flex; align-items: stretch; gap: 0.6rem; height: 34px; }
+.gm-app .gm-mk-chart-y {
+  width: 32px;
+  font-size: 0.7rem;
+  color: var(--gm-ink-400);
+  text-align: right;
+  font-weight: 700;
+  line-height: 34px;
+}
+.gm-app .gm-mk-chart-track {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+  border-bottom: 1px solid var(--gm-line);
+  position: relative;
+  padding: 0 0.2rem;
+}
+.gm-modal-overlay .gm-mk-chart-body { display: flex; align-items: flex-end; gap: 0.35rem; height: 200px; padding: 0.5rem; }
+.gm-app .gm-mk-chart-bar {
+  flex: 1;
+  background: linear-gradient(to top, var(--gm-leaf-500), var(--gm-sprout-400));
+  border: none;
+  border-radius: 4px 4px 0 0;
+  min-height: 6px;
+  position: relative;
+  cursor: pointer;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.gm-app .gm-mk-chart-bar:hover, .gm-app .gm-mk-chart-bar.is-on { background: linear-gradient(to top, var(--gm-gold-500), var(--gm-gold-300)); }
+.gm-app .gm-mk-chart-tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--gm-ink-800);
+  color: var(--gm-card);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--gm-r-sm);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  font-weight: 600;
+  z-index: 2;
+}
+.gm-app .gm-mk-chart-bar:hover .gm-mk-chart-tip { opacity: 1; }
+.gm-app .gm-mk-chart-x { display: flex; gap: 0.35rem; padding: 0.35rem 0 0 38px; }
+.gm-app .gm-mk-chart-x span { flex: 1; text-align: center; font-size: 0.7rem; font-weight: 700; color: var(--gm-ink-400); }
+
+/* ---------- 5. recommendations ---------- */
+.gm-app .gm-mk-rec-list { display: grid; gap: 0.6rem; }
+.gm-app .gm-mk-rec {
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.1rem;
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-mk-rec:hover { border-color: var(--gm-leaf-400); transform: translateY(-2px); box-shadow: var(--gm-shadow-md); }
+.gm-app .gm-mk-rec.is-pick,
+.gm-app .gm-mk-rec-best { border-color: var(--gm-lime-400); background: var(--gm-lime-50); }
+.gm-app .gm-mk-rec-rank {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+}
+.gm-app .gm-mk-rec-best .gm-mk-rec-rank { background: var(--gm-lime-400); color: var(--gm-leaf-800); }
+.gm-app .gm-mk-rec-head { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+.gm-app .gm-mk-rec-head strong { font-size: 1rem; }
+.gm-app .gm-mk-rec-meta { display: flex; gap: 1rem; font-size: 0.78rem; color: var(--gm-ink-500); margin-bottom: 0.25rem; flex-wrap: wrap; }
+.gm-app .gm-mk-rec-meta svg { margin-right: 0.2rem; }
+.gm-app .gm-mk-rec-note { font-size: 0.82rem; color: var(--gm-ink-500); margin-bottom: 0.4rem; }
+.gm-app .gm-mk-rec-bar { max-width: 420px; }
+.gm-app .gm-mk-rec-net { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+.gm-app .gm-mk-rec-net small { font-size: 0.7rem; color: var(--gm-ink-400); font-weight: 700; }
+.gm-app .gm-mk-rec-net strong { font-size: 1.15rem; color: var(--gm-leaf-700); }
+.gm-app .gm-mk-rec-net svg { color: var(--gm-leaf-500); }
+.gm-app .gm-mk-rec-higher { border-left: 3px solid var(--gm-gold-400); }
+.gm-app .gm-mk-rec-far { opacity: 0.85; }
+
+/* ---------- 6. buyer cards ---------- */
+.gm-app .gm-mk-buyer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.8rem;
+}
+.gm-app .gm-mk-buyer {
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-mk-buyer:hover { transform: translateY(-2px); box-shadow: var(--gm-shadow-md); border-color: var(--gm-leaf-300); }
+.gm-app .gm-mk-buyer-head { display: flex; align-items: center; gap: 0.7rem; }
+.gm-app .gm-mk-buyer-ava {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1rem;
+  color: #fff;
+}
+.gm-app .gm-mk-buyer-broker { background: var(--gm-sprout-500); }
+.gm-app .gm-mk-buyer-supermarket { background: var(--gm-leaf-600); }
+.gm-app .gm-mk-buyer-restaurant { background: var(--gm-gold-500); }
+.gm-app .gm-mk-buyer-exporter { background: var(--gm-ocean-500); }
+.gm-app .gm-mk-buyer-processor { background: var(--gm-clay-500); }
+.gm-app .gm-mk-buyer-cooperative { background: var(--gm-leaf-500); }
+.gm-app .gm-mk-buyer-online { background: var(--gm-berry-500); }
+.gm-app .gm-mk-buyer-direct { background: var(--gm-gold-400); color: var(--gm-ink-800); }
+.gm-app .gm-mk-buyer-ident { flex: 1; min-width: 0; }
+.gm-app .gm-mk-buyer-ident strong { display: block; font-size: 0.95rem; }
+.gm-app .gm-mk-buyer-ident small { display: flex; align-items: center; gap: 0.25rem; color: var(--gm-ink-400); font-size: 0.72rem; }
+.gm-app .gm-mk-v { color: var(--gm-ocean-500); margin-left: 0.25rem; }
+.gm-app .gm-mk-buyer-rating { display: inline-flex; align-items: center; gap: 0.2rem; font-weight: 800; color: var(--gm-gold-600); font-size: 0.82rem; }
+.gm-app .gm-mk-buyer-crops { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.4rem; }
+.gm-app .gm-mk-buyer-kv { display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem 0.6rem; font-size: 0.78rem; }
+.gm-app .gm-mk-buyer-kv strong { color: var(--gm-ink-500); font-weight: 700; }
+.gm-app .gm-mk-buyer-last { font-size: 0.72rem; color: var(--gm-ink-400); }
+.gm-app .gm-mk-buyer-foot { display: flex; gap: 0.4rem; margin-top: auto; }
+.gm-app .gm-mk-buyer-foot .gm-btn { flex: 1; justify-content: center; }
+
+.gm-app .gm-mk-buyer-lg { display: grid; grid-template-columns: 180px 1fr; gap: 1.2rem; }
+.gm-app .gm-mk-buyer-rating-lg { background: var(--gm-mint-50); border-radius: var(--gm-r-md); padding: 1rem; text-align: center; }
+.gm-app .gm-mk-buyer-rating-lg strong { font-size: 2.2rem; color: var(--gm-gold-500); }
+.gm-app .gm-mk-buyer-rating-lg small { display: block; color: var(--gm-ink-400); }
+
+/* ---------- 7. scenarios ---------- */
+.gm-app .gm-mk-scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.8rem;
+}
+.gm-app .gm-mk-scenario {
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  padding: 1rem 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-mk-scenario:hover { transform: translateY(-2px); box-shadow: var(--gm-shadow-md); border-color: var(--gm-leaf-300); }
+.gm-app .gm-mk-scenario.is-pick { border-color: var(--gm-lime-400); background: var(--gm-lime-50); }
+.gm-app .gm-mk-scenario-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.gm-app .gm-mk-scenario-head strong { font-size: 0.98rem; }
+.gm-app .gm-mk-scenario-sw { font-size: 0.75rem; color: var(--gm-ink-400); font-style: italic; }
+.gm-app .gm-mk-scenario-figures { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.5rem; margin: 0.3rem 0; padding: 0.6rem; background: var(--gm-ink-50); border-radius: var(--gm-r-sm); }
+.gm-app .gm-mk-fig-label { display: block; font-size: 0.68rem; color: var(--gm-ink-400); font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+.gm-app .gm-mk-scenario-figures strong { font-size: 0.95rem; color: var(--gm-ink-800); }
+.gm-app .gm-mk-scenario-figures strong.up { color: var(--gm-leaf-700); }
+.gm-app .gm-mk-scenario-figures strong.down { color: var(--gm-clay-700); }
+.gm-app .gm-mk-scenario-note { font-size: 0.8rem; color: var(--gm-ink-500); }
+.gm-app .gm-mk-scenario-foot { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 800; color: var(--gm-leaf-600); margin-top: auto; }
+
+/* ---------- 8. sales records table ---------- */
+.gm-app .gm-mk-sale-row { cursor: pointer; }
+.gm-app .gm-mk-sale-row:hover { background: var(--gm-mint-50); }
+.gm-app .gm-mk-sale-date strong { display: block; font-size: 0.95rem; }
+.gm-app .gm-mk-sale-date small { font-size: 0.7rem; color: var(--gm-ink-400); }
+.gm-app .gm-mk-pay { font-size: 0.82rem; color: var(--gm-ink-500); font-family: var(--gm-font-mono); font-weight: 700; }
+.gm-app .gm-grade { font-weight: 800; background: var(--gm-mint-100); color: var(--gm-leaf-700); }
+
+/* ---------- 9. contract cards ---------- */
+.gm-app .gm-mk-contract-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 0.8rem;
+}
+.gm-app .gm-mk-contract {
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-mk-contract:hover { transform: translateY(-2px); box-shadow: var(--gm-shadow-md); border-color: var(--gm-leaf-300); }
+.gm-app .gm-mk-contract-head { display: flex; align-items: flex-start; gap: 0.7rem; }
+.gm-app .gm-mk-contract-co {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--gm-leaf-500), var(--gm-sprout-500));
+  color: var(--gm-card); font-weight: 900; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.gm-app .gm-mk-contract-head > div:nth-child(2) { flex: 1; min-width: 0; }
+.gm-app .gm-mk-contract-head strong { display: block; font-size: 0.98rem; }
+.gm-app .gm-mk-contract-head small { display: flex; align-items: center; gap: 0.25rem; color: var(--gm-ink-400); font-size: 0.72rem; }
+.gm-app .gm-mk-contract-body { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; }
+.gm-app .gm-mk-contract-row { display: flex; justify-content: space-between; gap: 0.5rem; }
+.gm-app .gm-mk-contract-k { color: var(--gm-ink-400); font-weight: 700; }
+.gm-app .gm-mk-price-k { color: var(--gm-leaf-700); }
+.gm-app .gm-mk-reqs { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.gm-app .gm-mk-contract-foot { display: flex; gap: 0.4rem; margin-top: auto; }
+.gm-app .gm-mk-contract-foot .gm-btn { flex: 1; justify-content: center; }
+
+/* ---------- 10. KV, callouts, form grids ---------- */
+.gm-app .gm-mk-kv { display: flex; flex-direction: column; gap: 0.35rem; }
+.gm-app .gm-mk-kv.is-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1.2rem; }
+.gm-app .gm-mk-kv-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+  font-size: 0.85rem;
+}
+.gm-app .gm-mk-kv-row:last-child { border-bottom: none; }
+.gm-app .gm-mk-kv-k { color: var(--gm-ink-400); font-weight: 700; }
+.gm-app .gm-mk-kv-v { font-weight: 600; text-align: right; }
+.gm-app .gm-mk-kv-row.is-good .gm-mk-kv-v { color: var(--gm-leaf-700); }
+.gm-app .gm-mk-kv-row.is-warn .gm-mk-kv-v { color: var(--gm-gold-600); }
+.gm-app .gm-mk-kv-row.is-bad .gm-mk-kv-v { color: var(--gm-clay-700); }
+.gm-app .gm-mk-callout {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0.6rem 0;
+}
+.gm-app .gm-mk-callout.tone-info { background: var(--gm-ocean-50); color: var(--gm-ocean-800); border-left: 3px solid var(--gm-ocean-400); }
+.gm-app .gm-mk-callout.tone-warn { background: var(--gm-clay-50); color: var(--gm-clay-800); border-left: 3px solid var(--gm-clay-400); }
+.gm-app .gm-mk-callout.tone-good { background: var(--gm-mint-100); color: var(--gm-leaf-800); border-left: 3px solid var(--gm-leaf-400); }
+.gm-app .gm-mk-callout svg { flex-shrink: 0; margin-top: 2px; }
+.gm-app .gm-mk-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.gm-app .gm-mk-dlg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.gm-app .gm-mk-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.gm-app .gm-mk-list li { display: flex; gap: 0.45rem; align-items: flex-start; font-size: 0.85rem; color: var(--gm-ink-600); }
+.gm-app .gm-mk-list svg { color: var(--gm-leaf-500); margin-top: 3px; flex-shrink: 0; }
+.gm-app .gm-mk-help { display: block; margin-top: 0.3rem; font-size: 0.78rem; color: var(--gm-ink-400); }
+.gm-app .gm-mk-err { color: var(--gm-clay-700); font-size: 0.8rem; font-weight: 700; margin-top: 0.4rem; display: block; }
+
+/* ---------- 11. modal wizard bits ---------- */
+.gm-app .gm-mk-stack, .gm-modal-overlay .gm-mk-stack { display: flex; flex-direction: column; gap: 0.2rem; min-height: 220px; }
+.gm-app .gm-mk-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.4rem 0; }
+.gm-modal-overlay .gm-mk-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; }
+.gm-app .gm-mk-opt-icon { font-size: 1.5rem; }
+.gm-app .gm-mk-processing, .gm-modal-overlay .gm-mk-processing {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem;
+  padding: 2rem; color: var(--gm-ink-500);
+}
+.gm-app .gm-mk-processing .spin, .gm-modal-overlay .gm-mk-processing .spin { animation: gm-spin 1s linear infinite; color: var(--gm-leaf-500); }
+@keyframes gm-spin { to { transform: rotate(360deg); } }
+.gm-app .gm-mk-success, .gm-modal-overlay .gm-mk-success { text-align: center; padding: 1.5rem 1rem; }
+.gm-app .gm-mk-success-mark, .gm-modal-overlay .gm-mk-success-mark {
+  width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 1rem;
+  background: var(--gm-lime-400); color: var(--gm-leaf-800);
+  display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  animation: gm-mk-pop 0.5s var(--gm-ease);
+}
+@keyframes gm-mk-pop { 0% { transform: scale(0); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.gm-app .gm-mk-success h3, .gm-modal-overlay .gm-mk-success h3 { color: var(--gm-leaf-700); margin-bottom: 0.3rem; }
+.gm-app .gm-mk-success p, .gm-modal-overlay .gm-mk-success p { color: var(--gm-ink-500); }
+.gm-app .gm-mk-receipt, .gm-modal-overlay .gm-mk-receipt {
+  margin-top: 0.7rem; font-family: var(--gm-font-mono);
+  font-size: 0.95rem; font-weight: 700; color: var(--gm-ink-800);
+  background: var(--gm-ink-50); padding: 0.5rem 0.9rem; border-radius: var(--gm-r-sm);
+  display: inline-block; border: 1px dashed var(--gm-line);
+}
+.gm-app .gm-mk-receipt strong, .gm-modal-overlay .gm-mk-receipt strong { color: var(--gm-leaf-700); letter-spacing: 0.08em; }
+.gm-app .gm-mk-pay-note, .gm-modal-overlay .gm-mk-pay-note { font-size: 0.88rem; color: var(--gm-ink-600); margin-bottom: 0.8rem; }
+.gm-app .gm-mk-pay-note code, .gm-modal-overlay .gm-mk-pay-note code {
+  background: var(--gm-mint-100); padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700; color: var(--gm-leaf-800);
+}
+.gm-app .gm-mk-receipt-lg { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin: 1rem 0; }
+.gm-app .gm-mk-receipt-lg svg { color: var(--gm-leaf-500); }
+.gm-app .gm-mk-receipt-lg code { font-size: 1.5rem; letter-spacing: 0.18em; color: var(--gm-leaf-700); background: var(--gm-mint-100); padding: 0.7rem 1.3rem; border-radius: var(--gm-r-md); font-weight: 900; }
+.gm-app .gm-mk-share-btns { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+
+/* ---------- 12. FAQ, glossary, alerts, phone ---------- */
+.gm-app .gm-mk-faq { display: flex; flex-direction: column; gap: 0.25rem; }
+.gm-app .gm-mk-faq-row { border: 1px solid var(--gm-line); border-radius: var(--gm-r-sm); overflow: hidden; }
+.gm-app .gm-mk-faq-row button {
+  width: 100%; text-align: left; padding: 0.75rem 0.9rem; background: transparent; border: none; cursor: pointer;
+  display: flex; gap: 0.5rem; font-size: 0.88rem; font-weight: 600;
+}
+.gm-app .gm-mk-faq-row.is-on button { background: var(--gm-mint-50); color: var(--gm-leaf-700); }
+.gm-app .gm-mk-faq-row p { padding: 0 0.9rem 0.8rem 2rem; margin: 0; font-size: 0.85rem; color: var(--gm-ink-500); }
+.gm-app .gm-mk-glossary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+.gm-app .gm-mk-glossary-row { padding: 0.6rem 0.8rem; background: var(--gm-ink-50); border-radius: var(--gm-r-sm); }
+.gm-app .gm-mk-glossary-row strong { display: block; color: var(--gm-leaf-700); font-size: 0.82rem; margin-bottom: 0.15rem; }
+.gm-app .gm-mk-glossary-row span { font-size: 0.78rem; color: var(--gm-ink-500); }
+.gm-app .gm-mk-alert-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.gm-app .gm-mk-alert {
+  display: flex; justify-content: space-between; align-items: center; gap: 0.8rem;
+  padding: 0.75rem 0.9rem; border: 1px solid var(--gm-line); border-radius: var(--gm-r-md);
+}
+.gm-app .gm-mk-alert.is-hot { border-color: var(--gm-clay-400); background: var(--gm-clay-50); }
+.gm-app .gm-mk-alert strong { display: block; }
+.gm-app .gm-mk-alert small { color: var(--gm-ink-400); font-size: 0.75rem; }
+.gm-app .gm-mk-alert-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.78rem; font-weight: 700; color: var(--gm-ink-500); }
+.gm-app .gm-mk-score-break { display: flex; flex-direction: column; gap: 0.8rem; }
+.gm-app .gm-mk-phone { text-align: center; padding: 1.5rem; }
+.gm-app .gm-mk-phone-num { font-size: 2.2rem; font-weight: 900; color: var(--gm-leaf-700); font-family: var(--gm-font-mono); letter-spacing: 0.04em; margin-bottom: 0.8rem; }
+
+/* ---------- 13. responsive ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-mk-dlg-grid, .gm-app .gm-mk-buyer-lg { grid-template-columns: 1fr; }
+  .gm-app .gm-mk-rec { grid-template-columns: 50px 1fr; }
+  .gm-app .gm-mk-rec-net { grid-column: 2; flex-direction: row; align-items: center; justify-content: flex-start; }
+}
+@media (max-width: 640px) {
+  .gm-app .gm-mk-hero-head { flex-direction: column; }
+  .gm-app .gm-mk-form-grid { grid-template-columns: 1fr; }
+  .gm-app .gm-mk-kv.is-2 { grid-template-columns: 1fr; }
+  .gm-app .gm-mk-scenario-figures { grid-template-columns: 1fr 1fr; }
+  .gm-app .gm-mk-toolbar { flex-wrap: wrap; }
+  .gm-app .gm-mk-rec { padding: 0.8rem; gap: 0.7rem; }
+}
+@media (max-width: 380px) {
+  .gm-app .gm-mk-hero-grid { grid-template-columns: 1fr; }
+  .gm-app .gm-mk-buyer-foot { flex-direction: column; }
+  .gm-app .gm-mk-contract-foot { flex-direction: column; }
+  .gm-app .gm-mk-scenario-figures { grid-template-columns: 1fr; }
+}
+@media print {
+  .gm-app .gm-mk-hero-chips,
+  .gm-app .gm-mk-toolbar .gm-btn,
+  .gm-app .gm-mk-buyer-foot,
+  .gm-app .gm-mk-contract-foot,
+  .gm-app .gm-menu-wrap,
+  .gm-app .gm-mk-menu-wrap { display: none !important; }
+  .gm-app .gm-mk-hero { background: #fff !important; color: #000 !important; border: 1px solid #ccc; }
+  .gm-app .gm-mk-hero h1 { color: #000 !important; }
+}
+
+/* ---------- hero contrast (audit §23) ----------
+   The hero is a dark gradient; the KPI tiles sitting on it are translucent
+   glass, so their value/label text must stay light (the dashboard default
+   for .gm-stat-value is deep ink, which vanished on the gradient). */
+.gm-app .gm-mk-hero .gm-lead { color: rgba(240, 250, 243, 0.85); }
+.gm-app .gm-mk-hero-grid .gm-stat .gm-stat-value { color: var(--gm-card); }
+.gm-app .gm-mk-hero-grid .gm-stat .gm-stat-label { color: var(--gm-lime-200); }
+.gm-app .gm-mk-hero-grid .gm-stat .gm-stat-sub,
+.gm-app .gm-mk-hero-grid .gm-stat small { color: rgba(240, 250, 243, 0.82); }
+.gm-app .gm-mk-hero-grid .gm-stat .gm-stat-progress small { color: rgba(240, 250, 243, 0.75); }

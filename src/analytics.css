@@ -1,0 +1,226 @@
+/* ============================================================================
+   PAGE 11 — ANALYTICS & REPORTING (/app/analytics)   —   analytics.css
+
+   Additive, token-only layer scoped to .gm-app / .gm-modal-overlay.
+   Documented in docs/MASTER_THEME.md §19.
+
+   1. Hero (grade A chip, KPI grid)
+   2. Section headings, subtabs, toolbars
+   3. KPI tiles with delta chips (11.1)
+   4. Crop performance bars (11.2)
+   5. Cost breakdown bars (11.3)
+   6. Revenue month columns (11.4)
+   7. Worker table (11.5)
+   8. Weather impact rows (11.6)
+   9. Report cards (11.8)
+   10. Check lists, options, KV lists, callouts
+   11. Modal wizard bits (processing, success, receipt)
+   12. Responsive (1080/640/380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-an-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: linear-gradient(135deg, var(--gm-ocean-700) 0%, var(--gm-leaf-700) 60%, var(--gm-sprout-600) 100%);
+  color: var(--gm-card);
+  margin-bottom: 1.8rem;
+}
+.gm-app .gm-an-hero::after {
+  content: "";
+  position: absolute;
+  right: -7rem; top: -8rem;
+  width: 22rem; aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 0 3.5rem rgba(255,255,255,0.04), 0 0 0 8rem rgba(255,255,255,0.02);
+  pointer-events: none;
+}
+.gm-app .gm-an-hero > * { position: relative; z-index: 1; }
+.gm-app .gm-an-hero h1 { color: var(--gm-card); }
+.gm-app .gm-an-hero-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1.5rem; }
+.gm-app .gm-an-hero-copy { flex: 1 1 420px; min-width: 0; }
+.gm-app .gm-an-hero-score { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; border-radius: var(--gm-r-md); border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.08); color: var(--gm-card); cursor: pointer; transition: transform var(--gm-t-fast); }
+.gm-app .gm-an-hero-score:hover { transform: translateY(-2px); }
+.gm-app .gm-an-hero-score-num { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 80px; height: 80px; border-radius: 50%; background: var(--gm-gold-400); color: var(--gm-ink-800); font-weight: 900; }
+.gm-app .gm-an-hero-score-num strong { font-size: 1.8rem; line-height: 1; }
+.gm-app .gm-an-hero-score-num small { font-size: 0.75rem; font-weight: 800; }
+.gm-app .gm-an-hero-score-label { display: flex; flex-direction: column; gap: 0.2rem; max-width: 200px; }
+.gm-app .gm-an-hero-score-label strong { font-size: 1.1rem; color: var(--gm-gold-200); }
+.gm-app .gm-an-hero-score-label small { font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.78); }
+.gm-app .gm-an-score-link { margin-top: 0.3rem; font-size: 0.74rem; font-weight: 800; color: var(--gm-lime-200); text-decoration: underline; }
+.gm-app .gm-an-hero-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.6rem; margin-top: 1.3rem; }
+.gm-app .gm-an-hero-grid .gm-stat { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); color: var(--gm-card); }
+.gm-app .gm-an-hero-grid .gm-stat-label, .gm-app .gm-an-hero-grid .gm-stat-sub { color: rgba(255,255,255,0.8); }
+.gm-app .gm-an-hero-grid .gm-mega-icon { color: var(--gm-lime-300); }
+
+/* ---------- 2. toolbars / menus ---------- */
+.gm-app .gm-an-toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; margin-bottom: 0.9rem; }
+.gm-app .gm-an-search { position: relative; flex: 1 1 240px; min-width: 200px; }
+.gm-app .gm-an-search input { padding-left: 2.4rem; }
+.gm-app .gm-an-search svg { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--gm-ink-400); }
+.gm-app .gm-an-menu-wrap { position: relative; }
+.gm-app .gm-an-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 220px; padding: 0.4rem; background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); box-shadow: var(--gm-shadow-lg); display: none; }
+.gm-app .gm-an-menu.is-open { display: block; }
+.gm-app .gm-an-menu button { display: flex; gap: 0.6rem; align-items: center; width: 100%; padding: 0.55rem 0.75rem; border: none; background: transparent; text-align: left; border-radius: var(--gm-r-sm); font-weight: 600; color: var(--gm-ink-700); }
+.gm-app .gm-an-menu button:hover { background: var(--gm-mint-50); color: var(--gm-leaf-700); }
+
+/* ---------- 3. KPI tiles ---------- */
+.gm-app .gm-an-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.7rem; }
+.gm-app .gm-an-kpi {
+  background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); padding: 1rem;
+  display: flex; flex-direction: column; gap: 0.25rem; transition: all var(--gm-t-fast); cursor: pointer;
+}
+.gm-app .gm-an-kpi:hover { transform: translateY(-2px); box-shadow: var(--gm-shadow-md); border-color: var(--gm-leaf-300); }
+.gm-app .gm-an-kpi-icon { font-size: 1.6rem; }
+.gm-app .gm-an-kpi strong { font-size: 1.3rem; color: var(--gm-ink-800); }
+.gm-app .gm-an-kpi-label { font-size: 0.78rem; color: var(--gm-ink-500); font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; }
+.gm-app .gm-an-kpi-deltas { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.35rem; }
+.gm-app .gm-an-delta {
+  display: inline-flex; align-items: center; gap: 0.2rem;
+  padding: 0.15rem 0.5rem; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 800;
+}
+.gm-app .gm-an-delta-up { background: var(--gm-mint-100); color: var(--gm-leaf-700); }
+.gm-app .gm-an-delta-down { background: var(--gm-clay-50); color: var(--gm-clay-700); }
+.gm-app .gm-an-delta-flat { background: var(--gm-ink-50); color: var(--gm-ink-500); }
+
+/* ---------- 4. Crop performance bars ---------- */
+.gm-app .gm-an-crop-grid { display: flex; flex-direction: column; gap: 0.7rem; }
+.gm-app .gm-an-crop-bar-row { background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); padding: 0.9rem 1rem; }
+.gm-app .gm-an-crop-bar-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.55rem; font-size: 0.9rem; }
+.gm-app .gm-an-crop-emo { font-size: 1.2rem; }
+.gm-app .gm-an-crop-bar-head small { color: var(--gm-ink-400); }
+.gm-app .gm-an-crop-rank { margin-left: auto; font-weight: 900; color: var(--gm-gold-600); background: var(--gm-gold-50); padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.78rem; }
+.gm-app .gm-an-crop-bar-track { position: relative; height: 28px; background: var(--gm-ink-50); border-radius: 999px; overflow: hidden; }
+.gm-app .gm-an-crop-bar-fill { height: 100%; display: flex; align-items: center; justify-content: flex-end; padding: 0 0.7rem; color: #fff; font-weight: 800; font-size: 0.8rem; border-radius: 999px; transition: width 1s var(--gm-ease); }
+.gm-app .gm-an-crop-bar-meta { display: flex; gap: 1.2rem; margin-top: 0.45rem; font-size: 0.75rem; color: var(--gm-ink-500); }
+.gm-app .gm-an-roi { margin-left: auto; font-weight: 800; color: var(--gm-leaf-700); }
+
+/* ---------- 5. Cost rows ---------- */
+.gm-app .gm-an-cost-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.gm-app .gm-an-cost-row { background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); padding: 0.85rem 1rem; }
+.gm-app .gm-an-cost-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; font-size: 0.88rem; }
+.gm-app .gm-an-cost-ico { font-size: 1.2rem; }
+.gm-app .gm-an-cost-pct { margin-left: auto; font-weight: 800; color: var(--gm-ink-600); min-width: 44px; text-align: right; }
+.gm-app .gm-an-cost-bar { position: relative; height: 14px; background: var(--gm-ink-50); border-radius: 999px; overflow: hidden; }
+.gm-app .gm-an-cost-fill { position: absolute; top: 0; left: 0; bottom: 0; background: linear-gradient(90deg, var(--gm-leaf-500), var(--gm-sprout-400)); border-radius: 999px; }
+.gm-app .gm-an-cost-bar small { position: relative; z-index: 1; font-weight: 800; color: var(--gm-card); padding-left: 0.6rem; font-size: 0.72rem; line-height: 14px; }
+
+/* ---------- 6. Revenue month chart ---------- */
+.gm-app .gm-an-rev-chart {
+  background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); padding: 1rem;
+  display: flex; align-items: flex-end; gap: 0.5rem; height: 260px; overflow-x: auto;
+}
+.gm-app .gm-an-rev-col { flex: 1 0 60px; display: flex; flex-direction: column; align-items: center; gap: 0.3rem; height: 100%; }
+.gm-app .gm-an-rev-track { flex: 1; width: 100%; position: relative; display: flex; align-items: flex-end; justify-content: center; padding: 0.4rem 0; }
+.gm-app .gm-an-rev-target { position: absolute; bottom: 0; width: 100%; border-top: 2px dashed var(--gm-gold-400); border-radius: 0; background: transparent; }
+.gm-app .gm-an-rev-fill { width: 70%; background: linear-gradient(to top, var(--gm-leaf-500), var(--gm-sprout-400)); border-radius: 6px 6px 0 0; min-height: 6px; position: relative; display: flex; align-items: flex-start; justify-content: center; cursor: pointer; transition: all var(--gm-t-fast); }
+.gm-app .gm-an-rev-fill.is-miss { background: linear-gradient(to top, var(--gm-clay-500), var(--gm-clay-300)); }
+.gm-app .gm-an-rev-fill:hover { filter: brightness(1.1); }
+.gm-app .gm-an-rev-tip { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--gm-ink-800); color: #fff; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; white-space: nowrap; opacity: 0; pointer-events: none; }
+.gm-app .gm-an-rev-fill:hover .gm-an-rev-tip { opacity: 1; }
+.gm-app .gm-an-rev-col small { font-size: 0.72rem; font-weight: 700; color: var(--gm-ink-500); }
+
+/* ---------- 7. Worker table ---------- */
+.gm-app .gm-an-worker-row { cursor: pointer; }
+.gm-app .gm-an-worker-row:hover { background: var(--gm-mint-50); }
+.gm-app .gm-an-w-ava { width: 36px; height: 36px; border-radius: 50%; background: var(--gm-mint-100); color: var(--gm-leaf-700); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+.gm-app .gm-an-rating { display: inline-flex; align-items: center; gap: 0.2rem; color: var(--gm-gold-500); font-weight: 800; font-size: 0.82rem; }
+
+/* ---------- 8. Weather rows ---------- */
+.gm-app .gm-an-wx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.7rem; }
+.gm-app .gm-an-wx-row {
+  background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); padding: 0.9rem;
+  display: flex; flex-direction: column; gap: 0.4rem; border-left: 4px solid var(--gm-leaf-400);
+}
+.gm-app .gm-an-wx-row.tone-good { border-left-color: var(--gm-leaf-500); }
+.gm-app .gm-an-wx-row.tone-warn { border-left-color: var(--gm-gold-500); }
+.gm-app .gm-an-wx-row.tone-bad { border-left-color: var(--gm-clay-500); }
+.gm-app .gm-an-wx-row small { color: var(--gm-ink-400); font-size: 0.78rem; }
+.gm-app .gm-an-wx-impact span.up { color: var(--gm-leaf-700); font-weight: 800; }
+.gm-app .gm-an-wx-impact span.down { color: var(--gm-clay-700); font-weight: 800; }
+
+/* ---------- 9. Report cards ---------- */
+.gm-app .gm-an-report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.8rem; }
+.gm-app .gm-an-report { display: grid; grid-template-columns: 48px 1fr; gap: 0.8rem; background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: var(--gm-r-md); padding: 0.9rem; transition: all var(--gm-t-fast); }
+.gm-app .gm-an-report:hover { transform: translateY(-2px); box-shadow: var(--gm-shadow-md); border-color: var(--gm-leaf-300); }
+.gm-app .gm-an-report-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; }
+.gm-app .gm-an-report-body { display: flex; flex-direction: column; gap: 0.15rem; }
+.gm-app .gm-an-report-body strong { font-size: 0.95rem; }
+.gm-app .gm-an-report-body small { color: var(--gm-ink-400); font-size: 0.76rem; }
+.gm-app .gm-an-report-use { color: var(--gm-ink-600) !important; font-weight: 600; }
+.gm-app .gm-an-report-last { color: var(--gm-leaf-600) !important; font-weight: 700; }
+.gm-app .gm-an-report-foot { grid-column: 2; display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.gm-app .gm-an-report-foot .gm-btn { flex: 1; justify-content: center; min-width: 80px; }
+
+/* ---------- 10. KV, callouts, check lists, options ---------- */
+.gm-app .gm-an-kv { display: flex; flex-direction: column; gap: 0.35rem; }
+.gm-app .gm-an-kv.is-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1.2rem; }
+.gm-app .gm-an-kv-row { display: flex; justify-content: space-between; gap: 0.6rem; padding: 0.45rem 0; border-bottom: 1px dashed var(--gm-line); font-size: 0.85rem; }
+.gm-app .gm-an-kv-row:last-child { border-bottom: none; }
+.gm-app .gm-an-kv-k { color: var(--gm-ink-400); font-weight: 700; }
+.gm-app .gm-an-kv-v { font-weight: 600; text-align: right; }
+.gm-app .gm-an-callout { display: flex; gap: 0.6rem; padding: 0.75rem 0.9rem; border-radius: var(--gm-r-md); font-size: 0.85rem; font-weight: 500; margin: 0.6rem 0; }
+.gm-app .gm-an-callout.tone-info { background: var(--gm-ocean-50); color: var(--gm-ocean-800); border-left: 3px solid var(--gm-ocean-400); }
+.gm-app .gm-an-callout.tone-warn { background: var(--gm-clay-50); color: var(--gm-clay-800); border-left: 3px solid var(--gm-clay-400); }
+.gm-app .gm-an-callout.tone-good { background: var(--gm-mint-100); color: var(--gm-leaf-800); border-left: 3px solid var(--gm-leaf-400); }
+.gm-app .gm-an-check-list { display: flex; flex-direction: column; gap: 0.3rem; }
+.gm-app .gm-an-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.6rem; margin: 0.4rem 0; }
+.gm-app .gm-an-worker-bars { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.5rem; }
+.gm-app .gm-an-worker-bars small { font-size: 0.75rem; color: var(--gm-ink-400); font-weight: 700; }
+
+/* ---------- 11. modal wizard bits ---------- */
+.gm-app .gm-an-stack, .gm-modal-overlay .gm-an-stack { display: flex; flex-direction: column; gap: 0.2rem; min-height: 220px; }
+.gm-app .gm-an-processing, .gm-modal-overlay .gm-an-processing { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.8rem; padding: 2rem; color: var(--gm-ink-500); }
+.gm-app .gm-an-processing .spin, .gm-modal-overlay .gm-an-processing .spin { animation: gm-spin 1s linear infinite; color: var(--gm-leaf-500); }
+.gm-app .gm-an-success, .gm-modal-overlay .gm-an-success { text-align: center; padding: 1.5rem 1rem; }
+.gm-app .gm-an-success-mark, .gm-modal-overlay .gm-an-success-mark { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 1rem; background: var(--gm-lime-400); color: var(--gm-leaf-800); display: flex; align-items: center; justify-content: center; font-size: 2rem; animation: gm-mk-pop 0.5s var(--gm-ease); }
+.gm-app .gm-an-success h3, .gm-modal-overlay .gm-an-success h3 { color: var(--gm-leaf-700); }
+.gm-app .gm-an-receipt { margin-top: 0.7rem; font-family: var(--gm-font-mono); font-size: 0.95rem; font-weight: 700; background: var(--gm-ink-50); padding: 0.5rem 0.9rem; border-radius: var(--gm-r-sm); display: inline-block; border: 1px dashed var(--gm-line); }
+.gm-app .gm-an-receipt strong { color: var(--gm-leaf-700); letter-spacing: 0.08em; }
+.gm-app .gm-an-receipt-lg { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; margin: 1rem 0; }
+.gm-app .gm-an-receipt-lg code { font-size: 1.4rem; letter-spacing: 0.18em; color: var(--gm-leaf-700); background: var(--gm-mint-100); padding: 0.7rem 1.3rem; border-radius: var(--gm-r-md); font-weight: 900; }
+.gm-app .gm-an-share-btns { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+.gm-app .gm-an-faq, .gm-modal-overlay .gm-an-faq { display: flex; flex-direction: column; gap: 0.25rem; }
+.gm-app .gm-an-faq-row, .gm-modal-overlay .gm-an-faq-row { border: 1px solid var(--gm-line); border-radius: var(--gm-r-sm); overflow: hidden; }
+.gm-app .gm-an-faq-row button { width: 100%; text-align: left; padding: 0.7rem 0.9rem; background: transparent; border: none; cursor: pointer; font-size: 0.88rem; font-weight: 600; }
+.gm-app .gm-an-faq-row.is-on button { background: var(--gm-mint-50); color: var(--gm-leaf-700); }
+.gm-app .gm-an-faq-row p { padding: 0 0.9rem 0.8rem 2rem; margin: 0; font-size: 0.82rem; color: var(--gm-ink-500); }
+.gm-app .gm-an-glossary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem; margin-top: 0.5rem; }
+.gm-app .gm-an-glossary-row { padding: 0.6rem 0.8rem; background: var(--gm-ink-50); border-radius: var(--gm-r-sm); }
+.gm-app .gm-an-glossary-row strong { display: block; color: var(--gm-leaf-700); font-size: 0.82rem; margin-bottom: 0.15rem; }
+.gm-app .gm-an-glossary-row span { font-size: 0.78rem; color: var(--gm-ink-500); }
+.gm-app .gm-an-score-break { display: flex; flex-direction: column; gap: 0.8rem; }
+
+/* ---------- 12. responsive ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-an-kpi-grid { grid-template-columns: 1fr 1fr; }
+  .gm-app .gm-an-wx-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .gm-app .gm-an-kpi-grid { grid-template-columns: 1fr; }
+  .gm-app .gm-an-report { grid-template-columns: 40px 1fr; }
+  .gm-app .gm-an-toolbar { flex-wrap: wrap; }
+  .gm-app .gm-an-rev-chart { height: 200px; }
+}
+@media (max-width: 380px) {
+  .gm-app .gm-an-hero-grid { grid-template-columns: 1fr; }
+  .gm-app .gm-an-crop-bar-meta { flex-direction: column; gap: 0.2rem; }
+  .gm-app .gm-an-roi { margin-left: 0; }
+}
+@media print {
+  .gm-app .gm-an-toolbar .gm-btn, .gm-app .gm-menu-wrap, .gm-app .gm-an-menu-wrap,
+  .gm-app .gm-an-report-foot, .gm-subtabs { display: none !important; }
+  .gm-app .gm-an-hero { background: #fff !important; color: #000 !important; border: 1px solid #ccc; }
+  .gm-app .gm-an-hero h1 { color: #000 !important; }
+}
+
+/* ---------- hero contrast (audit §23) ---------- */
+.gm-app .gm-an-hero .gm-lead { color: rgba(240, 250, 243, 0.85); }
+.gm-app .gm-an-hero-grid .gm-stat .gm-stat-value { color: var(--gm-card); }
+.gm-app .gm-an-hero-grid .gm-stat .gm-stat-label { color: var(--gm-lime-200); }
+.gm-app .gm-an-hero-grid .gm-stat .gm-stat-sub,
+.gm-app .gm-an-hero-grid .gm-stat small { color: rgba(240, 250, 243, 0.82); }
+.gm-app .gm-an-hero .gm-chip { background: rgba(255, 255, 255, 0.14); color: var(--gm-card); border-color: rgba(255, 255, 255, 0.22); }
