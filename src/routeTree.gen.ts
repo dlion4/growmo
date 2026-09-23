@@ -13,16 +13,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AppIndexRouteImport } from './routes/app/index'
-<<<<<<< HEAD
 import { Route as AppAdvisorRouteImport } from './routes/app/advisor'
-import { Route as AppCommunityRouteImport } from './routes/app/community'
-=======
 import { Route as AppAnalyticsRouteImport } from './routes/app/analytics'
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
 import { Route as AppChannelsRouteImport } from './routes/app/channels'
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+import { Route as AppCommunityRouteImport } from './routes/app/community'
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
@@ -31,16 +25,10 @@ import { Route as AppLabourRouteImport } from './routes/app/labour'
 import { Route as AppMarketRouteImport } from './routes/app/market'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { Route as AppRecordsRouteImport } from './routes/app/records'
-import { Route as AppSoilRouteImport } from './routes/app/soil'
-=======
-=======
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+import { Route as AppSoilRouteImport } from './routes/app/soil'
 import { Route as AppWalletRouteImport } from './routes/app/wallet'
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
 import { Route as AppWeatherRouteImport } from './routes/app/weather'
 import { Route as AppWeatherProRouteImport } from './routes/app/weather-pro'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
@@ -78,25 +66,24 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/app/',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
 const AppAdvisorRoute = AppAdvisorRouteImport.update({
   id: '/app/advisor',
   path: '/app/advisor',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppCommunityRoute = AppCommunityRouteImport.update({
-  id: '/app/community',
-  path: '/app/community',
-=======
 const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   id: '/app/analytics',
   path: '/app/analytics',
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppChannelsRoute = AppChannelsRouteImport.update({
   id: '/app/channels',
   path: '/app/channels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppCommunityRoute = AppCommunityRouteImport.update({
+  id: '/app/community',
+  path: '/app/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppCropsRoute = AppCropsRouteImport.update({
@@ -139,28 +126,24 @@ const AppPlannerRoute = AppPlannerRouteImport.update({
   path: '/app/planner',
   getParentRoute: () => rootRouteImport,
 } as any)
-<<<<<<< HEAD
-<<<<<<< HEAD
 const AppRecordsRoute = AppRecordsRouteImport.update({
   id: '/app/records',
   path: '/app/records',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppSoilRoute = AppSoilRouteImport.update({
-  id: '/app/soil',
-  path: '/app/soil',
-=======
-=======
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/app/settings',
   path: '/app/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+const AppSoilRoute = AppSoilRouteImport.update({
+  id: '/app/soil',
+  path: '/app/soil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/app/wallet',
   path: '/app/wallet',
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWeatherRoute = AppWeatherRouteImport.update({
@@ -248,16 +231,10 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-<<<<<<< HEAD
   '/app/advisor': typeof AppAdvisorRoute
-  '/app/community': typeof AppCommunityRoute
-=======
   '/app/analytics': typeof AppAnalyticsRoute
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
   '/app/channels': typeof AppChannelsRoute
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+  '/app/community': typeof AppCommunityRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -266,16 +243,10 @@ export interface FileRoutesByFullPath {
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
-<<<<<<< HEAD
-<<<<<<< HEAD
   '/app/records': typeof AppRecordsRoute
-  '/app/soil': typeof AppSoilRoute
-=======
-=======
   '/app/settings': typeof AppSettingsRoute
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+  '/app/soil': typeof AppSoilRoute
   '/app/wallet': typeof AppWalletRoute
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   '/app/weather': typeof AppWeatherRoute
   '/app/weather-pro': typeof AppWeatherProRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
@@ -298,16 +269,10 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-<<<<<<< HEAD
   '/app/advisor': typeof AppAdvisorRoute
-  '/app/community': typeof AppCommunityRoute
-=======
   '/app/analytics': typeof AppAnalyticsRoute
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
   '/app/channels': typeof AppChannelsRoute
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+  '/app/community': typeof AppCommunityRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -316,16 +281,10 @@ export interface FileRoutesByTo {
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
-<<<<<<< HEAD
-<<<<<<< HEAD
   '/app/records': typeof AppRecordsRoute
-  '/app/soil': typeof AppSoilRoute
-=======
-=======
   '/app/settings': typeof AppSettingsRoute
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+  '/app/soil': typeof AppSoilRoute
   '/app/wallet': typeof AppWalletRoute
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   '/app/weather': typeof AppWeatherRoute
   '/app/weather-pro': typeof AppWeatherProRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
@@ -349,16 +308,10 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-<<<<<<< HEAD
   '/app/advisor': typeof AppAdvisorRoute
-  '/app/community': typeof AppCommunityRoute
-=======
   '/app/analytics': typeof AppAnalyticsRoute
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
   '/app/channels': typeof AppChannelsRoute
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+  '/app/community': typeof AppCommunityRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -367,16 +320,10 @@ export interface FileRoutesById {
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
-<<<<<<< HEAD
-<<<<<<< HEAD
   '/app/records': typeof AppRecordsRoute
-  '/app/soil': typeof AppSoilRoute
-=======
-=======
   '/app/settings': typeof AppSettingsRoute
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+  '/app/soil': typeof AppSoilRoute
   '/app/wallet': typeof AppWalletRoute
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   '/app/weather': typeof AppWeatherRoute
   '/app/weather-pro': typeof AppWeatherProRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
@@ -401,16 +348,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-<<<<<<< HEAD
     | '/app/advisor'
-    | '/app/community'
-=======
     | '/app/analytics'
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
     | '/app/channels'
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+    | '/app/community'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -419,16 +360,10 @@ export interface FileRouteTypes {
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
-<<<<<<< HEAD
-<<<<<<< HEAD
     | '/app/records'
-    | '/app/soil'
-=======
-=======
     | '/app/settings'
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+    | '/app/soil'
     | '/app/wallet'
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
     | '/app/weather'
     | '/app/weather-pro'
     | '/auth/account-status'
@@ -451,16 +386,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-<<<<<<< HEAD
     | '/app/advisor'
-    | '/app/community'
-=======
     | '/app/analytics'
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
     | '/app/channels'
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+    | '/app/community'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -469,16 +398,10 @@ export interface FileRouteTypes {
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
-<<<<<<< HEAD
-<<<<<<< HEAD
     | '/app/records'
-    | '/app/soil'
-=======
-=======
     | '/app/settings'
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+    | '/app/soil'
     | '/app/wallet'
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
     | '/app/weather'
     | '/app/weather-pro'
     | '/auth/account-status'
@@ -501,16 +424,10 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-<<<<<<< HEAD
     | '/app/advisor'
-    | '/app/community'
-=======
     | '/app/analytics'
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
     | '/app/channels'
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+    | '/app/community'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -519,16 +436,10 @@ export interface FileRouteTypes {
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
-<<<<<<< HEAD
-<<<<<<< HEAD
     | '/app/records'
-    | '/app/soil'
-=======
-=======
     | '/app/settings'
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+    | '/app/soil'
     | '/app/wallet'
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
     | '/app/weather'
     | '/app/weather-pro'
     | '/auth/account-status'
@@ -552,16 +463,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
-<<<<<<< HEAD
   AppAdvisorRoute: typeof AppAdvisorRoute
-  AppCommunityRoute: typeof AppCommunityRoute
-=======
   AppAnalyticsRoute: typeof AppAnalyticsRoute
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
   AppChannelsRoute: typeof AppChannelsRoute
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+  AppCommunityRoute: typeof AppCommunityRoute
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
@@ -570,16 +475,10 @@ export interface RootRouteChildren {
   AppMarketRoute: typeof AppMarketRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppPlannerRoute: typeof AppPlannerRoute
-<<<<<<< HEAD
-<<<<<<< HEAD
   AppRecordsRoute: typeof AppRecordsRoute
-  AppSoilRoute: typeof AppSoilRoute
-=======
-=======
   AppSettingsRoute: typeof AppSettingsRoute
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+  AppSoilRoute: typeof AppSoilRoute
   AppWalletRoute: typeof AppWalletRoute
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   AppWeatherRoute: typeof AppWeatherRoute
   AppWeatherProRoute: typeof AppWeatherProRoute
   AuthAccountStatusRoute: typeof AuthAccountStatusRoute
@@ -629,7 +528,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
     '/app/advisor': {
       id: '/app/advisor'
       path: '/app/advisor'
@@ -637,18 +535,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdvisorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/community': {
-      id: '/app/community'
-      path: '/app/community'
-      fullPath: '/app/community'
-      preLoaderRoute: typeof AppCommunityRouteImport
-=======
     '/app/analytics': {
       id: '/app/analytics'
       path: '/app/analytics'
       fullPath: '/app/analytics'
       preLoaderRoute: typeof AppAnalyticsRouteImport
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
       parentRoute: typeof rootRouteImport
     }
     '/app/channels': {
@@ -656,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/app/channels'
       fullPath: '/app/channels'
       preLoaderRoute: typeof AppChannelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/community': {
+      id: '/app/community'
+      path: '/app/community'
+      fullPath: '/app/community'
+      preLoaderRoute: typeof AppCommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/crops': {
@@ -714,8 +612,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPlannerRouteImport
       parentRoute: typeof rootRouteImport
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
     '/app/records': {
       id: '/app/records'
       path: '/app/records'
@@ -723,13 +619,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRecordsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/app/soil': {
-      id: '/app/soil'
-      path: '/app/soil'
-      fullPath: '/app/soil'
-      preLoaderRoute: typeof AppSoilRouteImport
-=======
-=======
     '/app/settings': {
       id: '/app/settings'
       path: '/app/settings'
@@ -737,13 +626,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+    '/app/soil': {
+      id: '/app/soil'
+      path: '/app/soil'
+      fullPath: '/app/soil'
+      preLoaderRoute: typeof AppSoilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/wallet': {
       id: '/app/wallet'
       path: '/app/wallet'
       fullPath: '/app/wallet'
       preLoaderRoute: typeof AppWalletRouteImport
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
       parentRoute: typeof rootRouteImport
     }
     '/app/weather': {
@@ -865,16 +759,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
-<<<<<<< HEAD
   AppAdvisorRoute: AppAdvisorRoute,
-  AppCommunityRoute: AppCommunityRoute,
-=======
   AppAnalyticsRoute: AppAnalyticsRoute,
-<<<<<<< HEAD
->>>>>>> b4297f2 (feat(page11): Analytics & Reporting — all 8 blueprint sections, 16 modals/wizards/drawers, comprehensive tables, charts, KPIs, benchmarks)
-=======
   AppChannelsRoute: AppChannelsRoute,
->>>>>>> 3f965c3 (feat(page-16): Mobile, Offline, USSD & SMS Channels — 5 sections, 21 modals)
+  AppCommunityRoute: AppCommunityRoute,
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,
@@ -883,16 +771,10 @@ const rootRouteChildren: RootRouteChildren = {
   AppMarketRoute: AppMarketRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppPlannerRoute: AppPlannerRoute,
-<<<<<<< HEAD
-<<<<<<< HEAD
   AppRecordsRoute: AppRecordsRoute,
-  AppSoilRoute: AppSoilRoute,
-=======
-=======
   AppSettingsRoute: AppSettingsRoute,
->>>>>>> 1ecc5e7 (feat(page15): Settings, Team & Permissions — all 6 blueprint sections, 21 modals/wizards/drawers, comprehensive tables)
+  AppSoilRoute: AppSoilRoute,
   AppWalletRoute: AppWalletRoute,
->>>>>>> aff0adf (feat(page14): Payments, Wallet & Mobile Money — all 7 blueprint sections, 16 modals/wizards/drawers, M-Pesa integration)
   AppWeatherRoute: AppWeatherRoute,
   AppWeatherProRoute: AppWeatherProRoute,
   AuthAccountStatusRoute: AuthAccountStatusRoute,
