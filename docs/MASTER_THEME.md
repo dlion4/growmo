@@ -722,3 +722,141 @@ The rules that keep this fixed (all in `src/styles.css`, appended as §23):
 resolves `var()` chains, composites translucent/gradient backdrops and reports
 every text node below 3:1. Result: **0 findings on all 17 app routes at 1440px
 and 390px** (was 100+ findings, including pure 1.00 white-on-white).
+
+## 24. Security, logs, backups & account-protection layer (page 18 — `/app/logs`)
+
+Page-scoped stylesheet `src/logs.css`, linked from `__root.tsx` after
+`channelsCss` (`logsCss` → `?url` + `?v=1`). Every selector is prefixed with
+`.gm-app` (page chrome) or `.gm-modal-overlay` (dialog interiors), token-only,
+no global `.gm-*` component redefined.
+
+**New `.gm-sec-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + score | `.gm-sec-hero`(+`-grid`, `-eyebrow`, `-title`, `-sub`, `-chips`, `-actions`, `-btn`), `.gm-sec-chip`, `.gm-sec-score-wrap`, `.gm-sec-score`(+`-center`), `.gm-sec-strip` (`<ul>/<li>`) |
+| Callouts / shared | `.gm-sec-callout`(`-info/-warn/-success`), `.gm-sec-kv`, `.gm-sec-mini-title`, `.gm-sec-muted`, `.gm-sec-strength`, `.gm-sec-unfreeze`, `.gm-sec-inline-btns`, `.gm-sec-wiznote-lite` |
+| 18.1 auth | `.gm-sec-methods`, `.gm-sec-method`(+`.is-on`, `-ic`, `-body`, `-top`, `-swahili`, `-foot`, `-state`), `.gm-sec-tier`(+`.is-active`, `-top/-dl/-note`), `.gm-sec-tier-row`(+`-rec`, `.is-active`) |
+| 18.2 PIN | `.gm-sec-pin-actions`, `.gm-sec-rule-f`, `.gm-sec-txpin-row`, `.gm-sec-lockstep` |
+| 18.3 sessions | `.gm-sec-row-current`, `.gm-sec-sess-device/-ip/-actions/-current`, `.gm-sec-toggle-stack` |
+| 18.4 logs | `.gm-sec-log-tools/-search`, `.gm-sec-log-ts/-event/-sub/-type/-details`, `.gm-sec-log-foot`, `.gm-sec-empty`, `.gm-sec-all-logs`, `.gm-sec-riskbox`(`-low/-medium/-high`), `.gm-sec-related` |
+| 18.5 backup | `.gm-sec-content-row/-emoji`, `.gm-sec-backup-date/-objects/-action` |
+| 18.6 fraud | `.gm-sec-fraud`(+`-main/-name/-how/-side`), `.gm-sec-switch`(+`.is-on`, `-thumb`) |
+| 18.7 recovery | `.gm-sec-recovery`(+`-top/-method/-steps/-foot`), `.gm-sec-support-strip` |
+| 18.8 privacy | `.gm-sec-right-sw/-impl/-action` |
+| 18.9 health | `.gm-sec-health-card/-score-foot`, `.gm-sec-health`(`-pass/-warn/-fail`, `-ic`, `-body`) |
+| FAQ / glossary / quick | `.gm-sec-faq(-a)`, `.gm-sec-glossary(-item)`, `.gm-sec-quick` |
+| Modal interiors | `.gm-sec-modal-title/-actions`, `.gm-sec-wiznote`, `.gm-sec-otp`(+`-hint/-demo/-error`), `.gm-sec-pinstep`, `.gm-sec-choices/-choice`(+`.on`), `.gm-sec-step-center(-box)`, `.gm-sec-qr(-grid)`, `.gm-sec-method-detail(-top)`, `.gm-sec-tiers`, `.gm-sec-locksteps`, `.gm-sec-checkline`, `.gm-sec-field`, `.gm-sec-colpicks`, `.gm-sec-unfamiliar`, `.gm-sec-contents`, `.gm-sec-snaplist/-snap`(+`-date`, `.on`), `.gm-sec-agents/-agent`, `.gm-sec-stepslist`, `.gm-sec-support-grid/-tile`, `.gm-sec-healthlist/-healthitem`(`-name`, `.done/.pending`), `.gm-sec-health-result/-results`, `.gm-sec-processing`(+`-lines`), `.gm-sec-success`(+`-actions`), `.gm-sec-receipt`, `.gm-sec-freeze-cta`, `.gm-sec-sharing` |
+
+**Responsive:** hero grid + score strip stack at **1080px**, quick-action
+grid halves and tier rows stack at **640px**; `@media print` hides
+toolbars/quick actions and repaints the hero light for printouts.
+
+**Data — `src/data/app/logs.ts`:** `SEC_CONTEXT`, `AUTH_METHODS` (7),
+`TIER_SETUPS` (3), `PIN_RULES` (6) + `PIN_LOCKOUT_STEPS` (3), `SESSIONS` (5) +
+`AUTO_LOGOUT_OPTIONS` (5), `LOG_EVENTS` (30 rows, Sep–Oct 2026),
+`BACKUP_HISTORY` (8) + `BACKUP_CONTENTS` (6) + `RESTORE_SCOPES` (4) +
+`EXPORT_FORMATS` (4), `FRAUD_FEATURES` (9) + `VELOCITY_LIMITS`,
+`RECOVERY_SCENARIOS` (6), `PRIVACY_RIGHTS` (11, KDP Act 2019) +
+`DATA_SHARING_PREFS` (4), `HEALTH_CHECKS` (10, 2 fail + 1 warn → 7/10),
+`SEC_FAQ` (8), `SEC_GLOSSARY` (8), `riskTone()` helper.
+
+**Reusable widgets — `src/components/app/SecurityWidgets.tsx`:**
+`SecScoreRing` (dark-variant /10 ring), `SecurityHero`, `Chip`, `SecCallout`,
+`AuthMethodCard`, `TierCard`, `SessionRowView`, `LogRowView`, `BackupRowView`,
+`FraudFeatureRowView`, `RecoveryCard`, `PrivacyRowView`, `HealthCheckRowView`,
+`SecFaqList`, `SecGlossary`, `ProcessingView`, `SuccessView`, `QrGraphic`
+(deterministic 21×21 hash grid — no image asset), `PinDots`, `WizardNote`,
+`ModalSectionTitle`, `LevelChip`.
+
+**Modals — `src/components/app/SecurityModals.tsx`:** one
+`<SecurityModals/>` dispatcher driven by the route's `SecModalState`
+discriminated union — **28 dialogs/wizards**: TwoFaSetupWizard (3-step, QR +
+authenticator/SMS), AuthMethodDetailDialog, TierSetupDialog, ChangePinWizard
+(4-step PinPad, weak-PIN rules), ResetPinWizard (OTP→PinPad),
+TransactionPinDialog, PinLockoutDialog, SessionDetailDialog,
+TrustDeviceDialog, LogoutDeviceDialog (OTP-gated), AutoLogoutDialog,
+UnfamiliarDeviceDialog (Yes/No + OTP freeze), LogExportDialog (CSV/JSON,
+real blob download), BackupNowWizard (3-step), BackupDetailDialog,
+RestoreWizard (4-step: snapshot→scope→OTP→processing), ExportDataWizard
+(3-step), DataTransferDialog (48 h KDP), FraudFeatureDialog,
+VelocityLimitsDialog (validated), SecureAccountDialog (freeze/unfreeze,
+OTP), RecoveryDialog (6 scenario bodies, real tel:/maps/chat targets),
+SupportDialog, PrivacyRightDialog, DeleteAccountWizard (4-step, 30-day
+grace), DpoContactDialog, HealthCheckWizard (animated 10-check run +
+fix CTAs), SecurityReportDialog (signed link + download),
+EmergencyContactDialog, SecFaqDialog.
+
+**Route — `src/routes/app/logs.tsx`:** 10 tabs (overview, auth, pin,
+sessions, logs, backup, protection, recovery, privacy, health). Live state:
+sessions (trust/logout), backups (manual run prepends a row), fraud toggles,
+velocity limits, sharing prefs, PIN age, auto-logout, 2FA-app flag,
+emergency contact, account freeze, deletion grace — the 10-point health
+score recomputes (7 → 9 → 10) as fixes land. Log tab: search + 4 filter
+selects + `<Pagination>` (10/page) + right drawer with risk explainer and
+related events. Money-style confirmation flows are OTP-gated (`123456`) with
+`gm-spin` processing and receipts; toasts are limited to real state
+changes.
+
+**Nav:** `src/data/app/nav.ts` — `/app/logs` (`page: 18`) flipped to
+`ready: true`; no other shell edits.
+
+## 25. Team management & HR layer (page 15.3 — `/app/team`)
+
+Page-scoped stylesheet `src/team.css`, linked from `__root.tsx` after
+`logsCss` (`teamCss` → `?url` + `?v=1`). Every selector is prefixed with
+`.gm-app` (page chrome) or `.gm-modal-overlay` (dialog interiors),
+token-only, no global `.gm-*` component redefined. Reused as-is:
+`DashboardDrawer`, `Dialog`, `Stepper`, `OtpInput`, `PinPad`,
+`WizardActions`, `PlannerSubtabs`, `DashboardSectionHeader`, `StatusChip`,
+`ProgressLine`, `Stars`, `Pagination`, `Reveal`, `Toggle`-style switch
+rows, and the `.gm-deflist` / `.gm-card-inset` / `.gm-money-confirm` /
+`.gm-processing` / `.gm-receipt-done` modal primitives defined locally in
+`team.css` (mirroring the finance-page processing pattern).
+
+**Data:** `src/data/app/team.ts` — 9 workers (`W-001…W-009`, full
+35-field directory records), 3 job posts (`JOB-014…016`), 6 applicants
+(`APP-201…206`), 5 attendance methods, 8-row daily register, 8-row
+monthly summary, 8 check-in logs, 8 performance cards + 12-month trend,
+10 task ratings, 4 payroll payslips (week Oct 20–26, 2026), 6
+advance/deduction records (`ADV-001…004`, `DED-001…002`), 12 compliance
+rows, 6 PPE items, 9 analytics rows, 8 FAQ, 8 glossary terms. Batch
+receipts `QJK3L5X7YZ / PLM8NR2KQW / RTY9PV3NXM / NMP7QW3ERT`; Kiswahili
+payslip SMS via `PAYROLL_SMS()`.
+
+**New `.gm-team-*` classes:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero | `.gm-team-hero`(+`-grid`, `-actions`, `-kpis`, `-kpi`) |
+| Overview | `.gm-team-alerts`/`.gm-team-alert`(`.is-warn/.is-success`), `.gm-team-watchlist`/`-watch-item`, `.gm-team-crew`/`-crew-row`, `.gm-team-hire-row`, `.gm-team-wallet` |
+| 15.3.2 recruitment | `.gm-team-job`(+`-title`, `-facts`, `-progress`), `.gm-team-chip-row`, `.gm-team-onb` |
+| 15.3.3 attendance | `.gm-team-methods`/`.gm-team-method`(`.is-off`), `.gm-team-loglist`/`-logrow`/`-logts` |
+| 15.3.4 performance | `.gm-team-dist`(+`-row/-label/-num`), `.gm-team-chart`, `.gm-team-trend`(+`-bar/-avg/-line/-dot`, `-legend*`, `-gridtext`), `.gm-team-scale`(+`-row/-star`), `.gm-team-perf-stats`, `.gm-team-perf-cols` |
+| 15.3.5 payroll | `.gm-team-pipeline`/`.gm-team-pipe`(`.is-done/.is-now/.is-todo`, `-dot`), `-pipeline-total`, `.gm-team-ps`(`-ded`, `-net`), `.gm-team-batchlist`, `.gm-team-receipts`/`-receipt`/`-ref`, `.gm-sms`(+`-from/-bubble/-in/-out`), `.gm-team-ussd`, `.gm-team-smslist`/`-smscard` |
+| 15.3.6 advances | `.gm-team-adv-kpis`, `.gm-team-adv` |
+| 15.3.7 compliance | `.gm-team-cmp-row`, `.gm-team-ppe-row`(`.is-short`), `.gm-team-channel-list` |
+| 15.3.8 analytics | `.gm-team-cost`(+`-row`), `.gm-team-glossary`(+`-card`), `.gm-team-faq` |
+| Shared | `.gm-team-avatar`(`-lg`), `.gm-team-money`, `.gm-team-grid-2`, `.gm-team-main`, `.gm-team-filters`, `.gm-field-grow`, `.gm-team-crew-table`/`-crew-cell`, `.gm-team-clickrow`, `.gm-table-sm`, `.gm-input-sm`/`-num`, `.gm-tabs-sm`, `.num` (right-aligned tabular) |
+| Modal-only | `.gm-deflist`, `.gm-card-inset` (also page), `.gm-form-err`, `.gm-team-wd-head`/`-wd-note`/`-activity-row`, `.gm-team-onb-steps`/`-step`(`.is-done`)/`-dot`/`-text`, `.gm-team-attmark`(+`-row`), `.gm-team-skillpicks`, `.gm-team-starpick`/`.gm-team-star`/`-star-label`, `.gm-team-contract`, `.gm-team-simpair` |
+
+Responsive: hero KPIs 4→2→1, pipeline 4→2→1, `.gm-team-grid-2` collapses
+at 1080px, directory table drops the Rate/Pay columns at 640px,
+`.gm-form-grid` 2→1 in modals. Print: hero/actions/alerts hidden, cards
+avoid page breaks.
+
+**Route:** `src/routes/app/team.tsx` — 9 tabs via `PlannerSubtabs`:
+overview, directory, recruitment, attendance, performance, payroll,
+advances, compliance, analytics. One discriminated-union modal state
+(`TeamModalState`, 26 kinds — see `TeamModals.tsx`); live state:
+workers, job posts, applicants, onboarding progress, attendance methods
+(toggles), payslip lines, the 4-stage payroll pipeline
+(draft → reviewed → approved → paid), advances/deductions, PPE
+checklist, compliance statuses, wallet balance. PIN gate `123456`,
+OTP `123456`; CSV/contract exports use Blob downloads; money flows run
+the STK-style `MoneyConfirm` (spinner + receipt). Toasts only on real
+state changes.
+
+**Nav:** `src/data/app/nav.ts` — new item `/app/team` (`page: 15.3`,
+`UserPlus` icon, `ready: true`) in the Manage group after `/app/labour`;
+no other shell edits.

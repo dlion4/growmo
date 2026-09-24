@@ -182,6 +182,14 @@ export const APP_NAV: AppNavGroup[] = [
         page: 6,
       },
       {
+        to: "/app/team",
+        label: "Team & HR",
+        desc: "Directory, payroll, compliance",
+        icon: UserPlus,
+        ready: true,
+        page: 15.3,
+      },
+      {
         to: "/app/finance",
         label: "Finance",
         desc: "Budgets & P&L",
@@ -289,7 +297,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Logs",
         desc: "Activity & logs",
         icon: ShieldCheck,
-        ready: false,
+        ready: true,
         page: 18,
       },
       {

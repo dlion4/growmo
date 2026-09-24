@@ -33,6 +33,10 @@ import walletCss from '../wallet.css?url'
 import settingsCss from '../settings.css?url'
 // Page 16 channels (PWA offline, USSD, SMS, WhatsApp, agents)
 import channelsCss from '../channels.css?url'
+// Page 18 security, logs, backups & account protection
+import logsCss from '../logs.css?url'
+// Page 15.3 team management & HR
+import teamCss from '../team.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -62,6 +66,8 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${walletCss}?v=2` },
       { rel: 'stylesheet', href: `${settingsCss}?v=2` },
       { rel: 'stylesheet', href: `${channelsCss}?v=2` },
+      { rel: 'stylesheet', href: `${logsCss}?v=1` },
+      { rel: 'stylesheet', href: `${teamCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

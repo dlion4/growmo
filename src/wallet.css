@@ -11,7 +11,8 @@
    3. Auto-pay rules, budgets, security rows
    4. Ledger table, limits, key-value lists, callouts
    5. Wizard + receipt bits raised inside modals
-   6. Responsive (1080 / 640 / 380) + print
+   6. Bulk payout (14.3c) card + 7-step wizard + 5 modals
+   7. Responsive (1080 / 640 / 380) + print
    ========================================================================== */
 
 /* ---------- 1. hero ---------- */
@@ -938,7 +939,664 @@
   gap: 0.6rem;
 }
 
-/* ---------- 6. responsive + print ---------- */
+/* ---------- 6. bulk payout (14.3c) ---------- */
+/* 7.1 page card */
+.gm-app .gm-w-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--gm-r-lg);
+  border: 1px solid var(--gm-lime-400);
+  background: linear-gradient(120deg, var(--gm-lime-50), var(--gm-card) 55%);
+}
+
+.gm-app button.gm-w-bulk {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  transition: transform var(--gm-t-fast), box-shadow var(--gm-t-fast);
+}
+
+.gm-app button.gm-w-bulk:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-w-bulk-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  flex: 0 0 auto;
+  background: var(--gm-grad-deep);
+  color: var(--gm-lime-200);
+}
+
+.gm-app .gm-w-bulk-ic svg {
+  width: 26px;
+  height: 26px;
+}
+
+.gm-app .gm-w-bulk-copy {
+  flex: 1 1 320px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.gm-app .gm-w-bulk-copy > p {
+  margin: 0.35rem 0 0.6rem;
+  font-size: 0.85rem;
+  color: var(--gm-ink-600);
+  max-width: 68ch;
+}
+
+.gm-app .gm-w-bulk-headline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-w-bulk-headline strong {
+  font-size: 1.05rem;
+}
+
+.gm-app .gm-w-bulk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-w-bulk-chips span {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-600);
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+}
+
+.gm-app .gm-w-bulk-side {
+  flex: 0 1 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.gm-app .gm-w-bulk-side ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-w-bulk-side li {
+  position: relative;
+  padding-left: 1.15rem;
+  font-size: 0.78rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-w-bulk-side li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--gm-leaf-600);
+  font-weight: 800;
+}
+
+.gm-app .gm-w-bulk.is-compact {
+  padding: 0.8rem 1rem;
+}
+
+.gm-app .gm-w-bulk.is-compact .gm-w-bulk-ic {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+}
+
+.gm-app .gm-w-bulk.is-compact .gm-w-bulk-ic svg {
+  width: 20px;
+  height: 20px;
+}
+
+.gm-app .gm-w-bulk.is-compact .gm-w-bulk-copy small {
+  display: block;
+  color: var(--gm-ink-400);
+  font-size: 0.74rem;
+}
+
+.gm-app .gm-w-bulk-cta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--gm-leaf-600);
+}
+
+/* 7.2 wizard rows, chips & lists (inside the modal) */
+.gm-modal-overlay .gm-w-bulk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.gm-modal-overlay .gm-w-payee-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.gm-modal-overlay .gm-w-payee-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.7rem 0.4rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gm-ink-700);
+  cursor: pointer;
+  transition: border-color var(--gm-t-fast), background var(--gm-t-fast);
+}
+
+.gm-modal-overlay .gm-w-payee-chip:hover:not(:disabled) {
+  border-color: var(--gm-leaf-400);
+}
+
+.gm-modal-overlay .gm-w-payee-chip:disabled,
+.gm-modal-overlay .gm-w-payee-chip.is-added {
+  opacity: 0.55;
+  cursor: default;
+  background: var(--gm-mint-50);
+  border-style: dashed;
+}
+
+.gm-modal-overlay .gm-w-payee-chip .gm-ava {
+  width: 26px;
+  height: 26px;
+  font-size: 0.62rem;
+}
+
+.gm-modal-overlay .gm-w-payee-chip svg {
+  width: 14px;
+  height: 14px;
+  color: var(--gm-leaf-600);
+}
+
+.gm-modal-overlay .gm-w-payee-chip-state {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: var(--gm-leaf-700);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.gm-modal-overlay .gm-w-payout-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.gm-modal-overlay .gm-w-payout-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+}
+
+.gm-modal-overlay .gm-w-payout-row.is-edit {
+  flex-wrap: wrap;
+}
+
+.gm-modal-overlay .gm-w-payout-ava {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.gm-modal-overlay .gm-w-payout-copy {
+  flex: 1 1 150px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.gm-modal-overlay .gm-w-payout-copy strong {
+  font-size: 0.86rem;
+}
+
+.gm-modal-overlay .gm-w-payout-copy small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-payout-row > b {
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.gm-modal-overlay .gm-w-payout-memo-static {
+  font-size: 0.7rem;
+  color: var(--gm-ink-400);
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gm-modal-overlay .gm-w-payout-amt {
+  width: 96px;
+  flex: 0 0 auto;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+.gm-modal-overlay .gm-w-payout-memo {
+  flex: 1 1 150px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.gm-modal-overlay .gm-w-bulk-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1.4rem 1rem;
+  text-align: center;
+  border: 1.5px dashed var(--gm-line);
+  border-radius: var(--gm-r-md);
+  color: var(--gm-ink-400);
+  font-size: 0.82rem;
+}
+
+.gm-modal-overlay .gm-w-bulk-empty p {
+  margin: 0;
+  max-width: 46ch;
+}
+
+.gm-modal-overlay .gm-w-bulk-empty svg {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-500);
+}
+
+/* channel chips on the rows */
+.gm-modal-overlay .gm-w-channel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--gm-line);
+  background: var(--gm-ink-50);
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-w-channel.is-mpesa {
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-800);
+  border-color: transparent;
+}
+
+.gm-modal-overlay .gm-w-channel.is-bank {
+  background: var(--gm-ocean-50);
+  color: var(--gm-ocean-800);
+  border-color: transparent;
+}
+
+.gm-modal-overlay .gm-w-channel.is-growmo {
+  background: var(--gm-lime-50);
+  color: var(--gm-leaf-700);
+  border-color: transparent;
+}
+
+.gm-modal-overlay .gm-w-channel.is-cash {
+  background: var(--gm-clay-50);
+  color: var(--gm-clay-800);
+  border-color: transparent;
+}
+
+/* 7.3 timing cards + sub panels */
+.gm-modal-overlay .gm-w-timing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 0.6rem;
+}
+
+.gm-modal-overlay .gm-w-timing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.9rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  cursor: pointer;
+  transition: transform var(--gm-t-fast), border-color var(--gm-t-fast), background var(--gm-t-fast);
+}
+
+.gm-modal-overlay .gm-w-timing:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-leaf-400);
+}
+
+.gm-modal-overlay .gm-w-timing.is-on {
+  border-color: var(--gm-lime-500);
+  background: var(--gm-lime-50);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-modal-overlay .gm-w-timing .gm-w-method-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 0;
+}
+
+.gm-modal-overlay .gm-w-timing .gm-w-method-ic svg {
+  width: 18px;
+  height: 18px;
+}
+
+.gm-modal-overlay .gm-w-timing strong {
+  font-size: 0.92rem;
+}
+
+.gm-modal-overlay .gm-w-timing small {
+  color: var(--gm-ink-500);
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+
+.gm-modal-overlay .gm-w-bulk-sub {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px dashed var(--gm-line);
+  border-radius: var(--gm-r-md);
+}
+
+.gm-modal-overlay .gm-w-bulk-sub-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-w-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* 7.4 totals, checklist, split */
+.gm-modal-overlay .gm-w-batch-total {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-modal-overlay .gm-w-batch-total small {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.gm-modal-overlay .gm-w-batch-total b {
+  font-size: 0.95rem;
+  color: var(--gm-lime-200);
+}
+
+.gm-modal-overlay .gm-w-checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gm-modal-overlay .gm-w-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-w-checklist svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin-top: 0.12rem;
+}
+
+.gm-modal-overlay .gm-w-checklist li.is-ok svg {
+  color: var(--gm-leaf-600);
+}
+
+.gm-modal-overlay .gm-w-checklist li.is-warn {
+  color: var(--gm-clay-800);
+  background: var(--gm-clay-50);
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--gm-r-sm);
+}
+
+.gm-modal-overlay .gm-w-checklist li.is-warn svg {
+  color: var(--gm-clay-700);
+}
+
+.gm-modal-overlay .gm-w-split-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+}
+
+.gm-modal-overlay .gm-w-split-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.gm-modal-overlay .gm-w-split-copy strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.gm-modal-overlay .gm-w-split-copy small {
+  font-size: 0.7rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-split-amt {
+  width: 110px;
+  flex: 0 0 auto;
+}
+
+/* 7.5 cash invoice preview + receipt lines */
+.gm-modal-overlay .gm-w-invoice {
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  overflow: hidden;
+}
+
+.gm-modal-overlay .gm-w-invoice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 0.9rem;
+  background: var(--gm-ink-50);
+}
+
+.gm-modal-overlay .gm-w-invoice-head strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-modal-overlay .gm-w-invoice-head small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-invoice-total {
+  text-align: right;
+}
+
+.gm-modal-overlay .gm-w-invoice-total small {
+  display: block;
+  font-size: 0.66rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-invoice-total b {
+  font-size: 1.05rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-modal-overlay .gm-w-invoice-lines {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.gm-modal-overlay .gm-w-invoice-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.45rem 0.9rem;
+  border-top: 1px dashed var(--gm-line);
+  font-size: 0.8rem;
+}
+
+.gm-modal-overlay .gm-w-invoice-line span {
+  font-weight: 700;
+}
+
+.gm-modal-overlay .gm-w-invoice-line small {
+  flex: 1;
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-invoice-line b {
+  font-variant-numeric: tabular-nums;
+}
+
+.gm-modal-overlay .gm-w-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-w-confirm input {
+  margin-top: 0.15rem;
+  accent-color: var(--gm-leaf-600);
+}
+
+.gm-modal-overlay .gm-w-batch-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-top: 0.6rem;
+}
+
+.gm-modal-overlay .gm-w-batch-line {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-modal-overlay .gm-w-batch-line-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.gm-modal-overlay .gm-w-batch-line-copy strong {
+  display: block;
+  font-size: 0.82rem;
+}
+
+.gm-modal-overlay .gm-w-batch-line-copy small {
+  font-size: 0.7rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-w-batch-line-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+}
+
+.gm-modal-overlay .gm-w-batch-line-right b {
+  font-size: 0.84rem;
+}
+
+.gm-modal-overlay .gm-code-chip.is-sm {
+  font-size: 0.66rem;
+  padding: 0.1rem 0.4rem;
+}
+
+/* ---------- 7. responsive + print ---------- */
 @media (max-width: 1080px) {
   .gm-app .gm-w-hero-head {
     flex-direction: column;
@@ -960,6 +1618,22 @@
   .gm-app .gm-w-paytype-grid,
   .gm-app .gm-w-budget-grid,
   .gm-app .gm-w-recipient-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-w-bulk-side {
+    flex-basis: 100%;
+  }
+
+  .gm-app .gm-w-bulk-cta {
+    margin-left: 0;
+  }
+
+  .gm-modal-overlay .gm-w-payout-memo {
+    flex-basis: 100%;
+  }
+
+  .gm-modal-overlay .gm-w-timing-grid {
     grid-template-columns: 1fr;
   }
 }

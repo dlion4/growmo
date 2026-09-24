@@ -3,13 +3,39 @@
    Every wizard follows the GrowMO money flow:
    amount → review → M-Pesa OTP 123456 / wallet PIN → processing → receipt.
    ========================================================================== */
-import { CheckCircle2, Loader2, Share2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Banknote,
+  CalendarClock,
+  Check,
+  CheckCircle2,
+  Download,
+  FileCheck,
+  Loader2,
+  Plus,
+  Share2,
+  Users,
+  Zap,
+} from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import type { AutoPayRule, DepositMethod, PayType, Recipient, Txn, WalletBudget } from "../../data/app/wallet";
+import type {
+  AutoPayRule,
+  DepositMethod,
+  PayoutChannelId,
+  PayoutLine,
+  PayType,
+  Recipient,
+  Txn,
+  WalletBudget,
+} from "../../data/app/wallet";
 import {
   BANK_OPTIONS,
   BILLERS,
+  CASH_RECEIPT_MODES,
+  PAYOUT_CHANNELS,
+  PAYOUT_PURPOSES,
+  SCHEDULE_PRESETS,
   WALLET_CONTEXT,
   WALLET_FAQ,
   WALLET_GLOSSARY,
@@ -18,7 +44,7 @@ import {
 import { kes } from "../../data/site";
 import { Dialog, OtpInput, PinPad, Stepper } from "../auth/controls";
 import { StatusChip, WizardActions } from "./DashboardWidgets";
-import { WalletFaqList, WalletGlossary, WalletKv } from "./WalletWidgets";
+import { PayeeChip, PayoutLineRow, PayoutTotalBar, payoutInitials, WalletCallout, WalletFaqList, WalletGlossary, WalletKv } from "./WalletWidgets";
 
 function code(prefix: string) {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -958,6 +984,953 @@ export function ConfirmWalletDialog({
           {confirmLabel}
         </button>
       </div>
+    </Dialog>
+  );
+}
+
+/* ============================================================================
+   14.3c BULK PAYOUT — one card, seven wizard steps, five modals in the flow:
+   [1] BulkPayoutWizard      (main, 7 steps: Purpose → Payees → Amounts →
+                             Timing → Review → Authorise → Receipt)
+   [2] BulkAddPayeeDialog    (manual payee: M-Pesa / bank / GrowMO / cash)
+   [3] BulkScheduleDialog    (hold & release on a date & time)
+   [4] BulkCashRecordDialog  (invoice preview + receipt mode + confirmation)
+   [5] BulkBudgetSplitDialog (split the batch across budget envelopes)
+   ========================================================================== */
+
+export type BulkTiming =
+  | { mode: "now" }
+  | { mode: "scheduled"; label: string }
+  | { mode: "cash"; invoiceNo: string; receiptMode: string };
+
+export interface BulkPayoutResult {
+  mode: "now" | "scheduled" | "cash";
+  purpose: string;
+  memo: string;
+  lines: PayoutLine[];
+  lineRefs: string[];
+  total: number;
+  fee: number;
+  batchRef: string;
+  scheduleLabel?: string;
+  invoiceNo?: string;
+  budgetSplit: { id: string; name: string; amount: number }[];
+}
+
+function lineFeeOf(line: PayoutLine): number {
+  if (line.channel === "mpesa") return Math.round(line.amount * 0.007) + 15;
+  if (line.channel === "bank") return 50;
+  return 0;
+}
+
+function channelLabel(id: PayoutChannelId): string {
+  return PAYOUT_CHANNELS.find((c) => c.id === id)?.label ?? id;
+}
+
+function normIdentifier(value: string): string {
+  return value.replace(/\s+/g, "").toLowerCase();
+}
+
+function downloadBatchCsv(filename: string, rows: (string | number)[][]) {
+  const body = rows
+    .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+    .join("\n");
+  const blob = new Blob([body], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ---------------- [2] add a payee manually ---------------- */
+export function BulkAddPayeeDialog({
+  open,
+  onClose,
+  onAdd,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onAdd: (candidate: Omit<PayoutLine, "id">) => boolean;
+}) {
+  const [channel, setChannel] = useState<PayoutChannelId>("mpesa");
+  const [name, setName] = useState("");
+  const [identifier, setIdentifier] = useState("");
+  const [amount, setAmount] = useState(500);
+  const [memo, setMemo] = useState("");
+  const [dupWarn, setDupWarn] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setChannel("mpesa");
+    setName("");
+    setIdentifier("");
+    setAmount(500);
+    setMemo("");
+    setDupWarn("");
+  }, [open]);
+
+  const active = PAYOUT_CHANNELS.find((c) => c.id === channel) ?? PAYOUT_CHANNELS[0];
+  const identifierRequired = channel !== "cash" && identifier.trim().length < 4;
+  const valid = name.trim().length >= 2 && !identifierRequired && amount >= 100;
+
+  function submit(keepOpen: boolean) {
+    const ok = onAdd({ name: name.trim(), channel, identifier: identifier.trim(), amount, memo: memo.trim() });
+    if (!ok) {
+      setDupWarn(`${name.trim() || "This payee"} is already in the batch — remove them first to re-add.`);
+      return;
+    }
+    setDupWarn("");
+    setName("");
+    setIdentifier("");
+    setMemo("");
+    setAmount(500);
+    if (!keepOpen) onClose();
+  }
+
+  return (
+    <Dialog open={open} onClose={onClose} title="Add a payee to the batch" desc="Pick how this person gets paid, then keep adding">
+      <div className="gm-w-paytype-grid">
+        {PAYOUT_CHANNELS.map((c) => (
+          <button key={c.id} type="button" className={`gm-w-radio ${channel === c.id ? "is-on" : ""}`} onClick={() => setChannel(c.id)}>
+            <strong>
+              {c.icon} {c.label}
+            </strong>
+            <small>{c.hint}</small>
+          </button>
+        ))}
+      </div>
+      <div className="gm-w-wizard">
+        <label className="gm-field">
+          <span>{channel === "cash" ? "Who you paid in cash" : "Full name"}</span>
+          <input className="gm-input" value={name} onChange={(event) => setName(event.target.value)} placeholder={channel === "cash" ? "e.g. Njeri Wafula" : "e.g. Njeri Wafula"} />
+        </label>
+        <label className="gm-field">
+          <span>
+            {active.idLabel}
+            {channel === "cash" ? "" : " *"}
+          </span>
+          <input className="gm-input" value={identifier} onChange={(event) => setIdentifier(event.target.value)} placeholder={active.idPlaceholder} />
+        </label>
+        <div className="d-flex gap-2">
+          <label className="gm-field" style={{ flex: 1 }}>
+            <span>Amount (KES) *</span>
+            <input className="gm-input" type="number" min={100} value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
+          </label>
+          <label className="gm-field" style={{ flex: 1.4 }}>
+            <span>Note for the receipt</span>
+            <input className="gm-input" value={memo} onChange={(event) => setMemo(event.target.value)} placeholder="e.g. 3 days weeding, Plot 1" />
+          </label>
+        </div>
+        {dupWarn ? (
+          <p className="gm-w-note" style={{ color: "var(--gm-clay-700)" }}>
+            <AlertTriangle style={{ width: 14, height: 14, verticalAlign: "-2px" }} /> {dupWarn}
+          </p>
+        ) : (
+          <p className="gm-w-note is-small">{active.feeNote}. Amounts of {kes(100)} minimum per payee.</p>
+        )}
+      </div>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button type="button" className="gm-btn gm-btn-soft" disabled={!valid} onClick={() => submit(true)}>
+          <Plus /> Add & add another
+        </button>
+        <button type="button" className="gm-btn gm-btn-lime" disabled={!valid} onClick={() => submit(false)}>
+          Add to batch
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/* ---------------- [3] schedule the batch ---------------- */
+export function BulkScheduleDialog({
+  open,
+  initial,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  initial: string;
+  onClose: () => void;
+  onSave: (label: string) => void;
+}) {
+  const [label, setLabel] = useState(initial);
+  const [customDate, setCustomDate] = useState("");
+  const [customTime, setCustomTime] = useState("17:00");
+
+  useEffect(() => {
+    if (!open) return;
+    setLabel(initial);
+    setCustomDate("");
+    setCustomTime("17:00");
+  }, [open, initial]);
+
+  const minDate = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+  const customLabel =
+    customDate && customTime
+      ? `${new Date(`${customDate}T${customTime}`).toLocaleDateString("en-KE", { weekday: "short", day: "numeric", month: "short" })} · ${customTime}`
+      : "";
+
+  return (
+    <Dialog open={open} onClose={onClose} title="Schedule the batch" desc="Money is held and released automatically — nothing is sent early">
+      <span className="gm-field-label">Quick picks</span>
+      <div className="gm-w-schedule-list">
+        {SCHEDULE_PRESETS.map((p) => (
+          <button key={p.id} type="button" className={`gm-w-radio ${label === p.label ? "is-on" : ""}`} onClick={() => setLabel(p.label)}>
+            <strong>{p.label}</strong>
+            <small>{p.detail}</small>
+          </button>
+        ))}
+      </div>
+      <span className="gm-field-label" style={{ marginTop: ".6rem" }}>
+        Or pick an exact date & time
+      </span>
+      <div className="d-flex gap-2">
+        <label className="gm-field" style={{ flex: 1 }}>
+          <span>Date</span>
+          <input className="gm-input" type="date" min={minDate} value={customDate} onChange={(event) => setCustomDate(event.target.value)} />
+        </label>
+        <label className="gm-field" style={{ flex: 1 }}>
+          <span>Time</span>
+          <input className="gm-input" type="time" value={customTime} onChange={(event) => setCustomTime(event.target.value)} />
+        </label>
+      </div>
+      {customLabel ? (
+        <div className="gm-w-quick-amounts">
+          <button
+            type="button"
+            className={`gm-filter-chip ${label === customLabel ? "is-on" : ""}`}
+            onClick={() => setLabel(customLabel)}
+          >
+            Use {customLabel} ✓
+          </button>
+        </div>
+      ) : null}
+      <WalletCallout tone="info" title="Before the run">
+        You get an SMS 24 hours ahead. Until release you can still edit amounts or cancel from History — the money
+        stays reserved, not sent.
+      </WalletCallout>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button type="button" className="gm-btn gm-btn-lime" disabled={!label} onClick={() => onSave(label)}>
+          Save schedule
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/* ---------------- [4] record cash with an invoice ---------------- */
+export function BulkCashRecordDialog({
+  open,
+  lines,
+  purpose,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  lines: PayoutLine[];
+  purpose: string;
+  onClose: () => void;
+  onSave: (invoiceNo: string, receiptMode: string) => void;
+}) {
+  const [receiptMode, setReceiptMode] = useState(CASH_RECEIPT_MODES[0]);
+  const [confirmed, setConfirmed] = useState(false);
+  const [invoiceNo, setInvoiceNo] = useState("INV-2026-0000");
+
+  useEffect(() => {
+    if (!open) return;
+    setReceiptMode(CASH_RECEIPT_MODES[0]);
+    setConfirmed(false);
+    setInvoiceNo(`INV-2026-${String(1000 + Math.floor(Math.random() * 9000))}`);
+  }, [open]);
+
+  const total = lines.reduce((sum, l) => sum + (l.amount > 0 ? l.amount : 0), 0);
+  const today = new Date().toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" });
+
+  return (
+    <Dialog open={open} onClose={onClose} title="Record the cash payment" desc="No money leaves the wallet — this writes the invoice & payslips">
+      <div className="gm-w-invoice">
+        <div className="gm-w-invoice-head">
+          <div>
+            <strong>{invoiceNo}</strong>
+            <small>
+              {WALLET_CONTEXT.farm} · {WALLET_CONTEXT.accountNo} · {today}
+            </small>
+          </div>
+          <div className="gm-w-invoice-total">
+            <small>Total cash paid</small>
+            <b>{kes(total)}</b>
+          </div>
+        </div>
+        <div className="gm-w-invoice-lines">
+          {lines.map((l) => (
+            <div key={l.id} className="gm-w-invoice-line">
+              <span>{l.name}</span>
+              <small>{l.memo || purpose}</small>
+              <b>{kes(l.amount)}</b>
+            </div>
+          ))}
+        </div>
+      </div>
+      <span className="gm-field-label" style={{ marginTop: ".7rem" }}>
+        Deliver receipts by
+      </span>
+      <div className="gm-w-quick-amounts">
+        {CASH_RECEIPT_MODES.map((m) => (
+          <button key={m} type="button" className={`gm-filter-chip ${receiptMode === m ? "is-on" : ""}`} onClick={() => setReceiptMode(m)}>
+            {m}
+          </button>
+        ))}
+      </div>
+      <label className="gm-w-confirm">
+        <input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />
+        <span>
+          I confirm I handed over <strong>{kes(total)}</strong> in cash, counted and verified, on {today}.
+        </span>
+      </label>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button type="button" className="gm-btn gm-btn-lime" disabled={!confirmed} onClick={() => onSave(invoiceNo, receiptMode)}>
+          <FileCheck /> Issue invoice
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/* ---------------- [5] split the batch across budgets ---------------- */
+export function BulkBudgetSplitDialog({
+  open,
+  total,
+  budgets,
+  initial,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  total: number;
+  budgets: WalletBudget[];
+  initial: { id: string; name: string; amount: number }[];
+  onClose: () => void;
+  onSave: (split: { id: string; name: string; amount: number }[]) => void;
+}) {
+  const [alloc, setAlloc] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!open) return;
+    const start: Record<string, number> = {};
+    initial.forEach((s) => {
+      start[s.id] = s.amount;
+    });
+    setAlloc(start);
+  }, [open, initial]);
+
+  const used = budgets.reduce((sum, b) => sum + (alloc[b.id] || 0), 0);
+  const remaining = Math.max(0, total - used);
+  const over = used > total;
+
+  return (
+    <Dialog open={open} onClose={onClose} title="Split the batch across budgets" desc={`Keep each crop's spending inside its envelope — batch total ${kes(total)}`}>
+      <div className="gm-w-wizard">
+        {budgets.map((b) => (
+          <div key={b.id} className="gm-w-split-row">
+            <span className="gm-w-budget-emoji">{b.emoji}</span>
+            <div className="gm-w-split-copy">
+              <strong>{b.name}</strong>
+              <small>{b.crop ? `${b.crop} budget` : "Unallocated envelope"}</small>
+            </div>
+            <input
+              className="gm-input gm-w-split-amt"
+              type="number"
+              min={0}
+              max={total}
+              placeholder="0"
+              value={alloc[b.id] || ""}
+              aria-label={`Amount into ${b.name}`}
+              onChange={(event) => setAlloc((current) => ({ ...current, [b.id]: Number(event.target.value) }))}
+            />
+          </div>
+        ))}
+      </div>
+      <WalletKv
+        items={[
+          { k: "Assigned to envelopes", v: kes(used) },
+          { k: "Stays in free balance", v: <strong>{kes(remaining)}</strong> },
+          { k: "Batch total", v: kes(total) },
+        ]}
+      />
+      {over ? (
+        <WalletCallout tone="warn" title="Over-allocated">
+          The split is {kes(used - total)} more than the batch total — reduce an envelope before saving.
+        </WalletCallout>
+      ) : null}
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          disabled={over}
+          onClick={() =>
+            onSave(
+              budgets
+                .filter((b) => (alloc[b.id] || 0) > 0)
+                .map((b) => ({ id: b.id, name: b.name, amount: alloc[b.id] })),
+            )
+          }
+        >
+          Save split
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/* ---------------- [1] the 7-step wizard ---------------- */
+export function BulkPayoutWizard({
+  open,
+  saved,
+  budgets,
+  balance,
+  dailyLimit,
+  todaySpent,
+  onClose,
+  onCompleted,
+}: {
+  open: boolean;
+  saved: Recipient[];
+  budgets: WalletBudget[];
+  balance: number;
+  dailyLimit: number;
+  todaySpent: number;
+  onClose: () => void;
+  onCompleted: (result: BulkPayoutResult) => void;
+}) {
+  const [step, setStep] = useState(0);
+  const [purpose, setPurpose] = useState(PAYOUT_PURPOSES[0].id);
+  const [batchMemo, setBatchMemo] = useState("");
+  const [lines, setLines] = useState<PayoutLine[]>([]);
+  const [timing, setTiming] = useState<BulkTiming>({ mode: "now" });
+  const [budgetSplit, setBudgetSplit] = useState<{ id: string; name: string; amount: number }[]>([]);
+  const [payeeOpen, setPayeeOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [cashOpen, setCashOpen] = useState(false);
+  const [budgetOpen, setBudgetOpen] = useState(false);
+  const [dupNote, setDupNote] = useState("");
+  const [otp, setOtp] = useState("");
+  const [pinPhase, setPinPhase] = useState(0);
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [batchRef, setBatchRef] = useState("");
+  const [lineRefs, setLineRefs] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    setStep(0);
+    setPurpose(PAYOUT_PURPOSES[0].id);
+    setBatchMemo("");
+    setLines([]);
+    setTiming({ mode: "now" });
+    setBudgetSplit([]);
+    setPayeeOpen(false);
+    setScheduleOpen(false);
+    setCashOpen(false);
+    setBudgetOpen(false);
+    setDupNote("");
+    setOtp("");
+    setPinPhase(0);
+    setBusy(false);
+    setDone(false);
+    setBatchRef("");
+    setLineRefs([]);
+  }, [open]);
+
+  const total = lines.reduce((sum, l) => sum + (l.amount > 0 ? l.amount : 0), 0);
+  const fee = lines.reduce((sum, l) => sum + lineFeeOf(l), 0);
+  const needsSecondPin = total > 5000;
+  const dailyLeft = dailyLimit - todaySpent;
+  const overDaily = timing.mode !== "cash" && total > dailyLeft;
+  const overBalance = timing.mode === "now" && total > balance;
+  const splitTotal = budgetSplit.reduce((sum, s) => sum + s.amount, 0);
+  const splitOver = splitTotal > total;
+  const steps = ["Purpose", "Payees", "Amounts", "Timing", "Review", "Authorise", "Receipt"];
+
+  function upsertLine(candidate: Omit<PayoutLine, "id">): boolean {
+    const duplicate = lines.some(
+      (l) =>
+        l.channel === candidate.channel &&
+        (candidate.identifier
+          ? normIdentifier(l.identifier) === normIdentifier(candidate.identifier)
+          : l.name.trim().toLowerCase() === candidate.name.trim().toLowerCase()),
+    );
+    if (duplicate) {
+      setDupNote(`${candidate.name || "This payee"} is already in the batch — remove them first to re-add.`);
+      return false;
+    }
+    setDupNote("");
+    setLines((current) => [
+      ...current,
+      { ...candidate, id: `pl-${Date.now()}-${Math.floor(Math.random() * 100000)}` },
+    ]);
+    return true;
+  }
+
+  function addSaved(r: Recipient) {
+    upsertLine({ name: r.name, channel: "mpesa", identifier: r.phone, amount: 500, memo: "", savedId: r.id });
+  }
+
+  function removeLine(id: string) {
+    setLines((current) => current.filter((l) => l.id !== id));
+  }
+
+  function setLineAmount(id: string, value: number) {
+    setLines((current) => current.map((l) => (l.id === id ? { ...l, amount: value } : l)));
+  }
+
+  function setLineMemo(id: string, value: string) {
+    setLines((current) => current.map((l) => (l.id === id ? { ...l, memo: value } : l)));
+  }
+
+  function applyAllAmount(value: number) {
+    setLines((current) => current.map((l) => ({ ...l, amount: value })));
+  }
+
+  function release() {
+    const refs = lines.map(() => code("PL"));
+    const ref = code("BATCH");
+    setBusy(true);
+    setTimeout(() => {
+      setBusy(false);
+      setLineRefs(refs);
+      setBatchRef(ref);
+      setDone(true);
+      setStep(6);
+      onCompleted({
+        mode: timing.mode,
+        purpose,
+        memo: batchMemo,
+        lines,
+        lineRefs: refs,
+        total,
+        fee,
+        batchRef: ref,
+        scheduleLabel: timing.mode === "scheduled" ? timing.label : undefined,
+        invoiceNo: timing.mode === "cash" ? timing.invoiceNo : undefined,
+        budgetSplit,
+      });
+    }, 1400);
+  }
+
+  function exportBatchCsv() {
+    downloadBatchCsv(
+      `growmo-bulk-${batchRef.toLowerCase() || "batch"}.csv`,
+      [
+        ["Receipt", "Payee", "Channel", "Identifier", "Amount (KES)", "Note"],
+        ...lines.map((l, i) => [lineRefs[i] ?? "", l.name, channelLabel(l.channel), l.identifier, l.amount, l.memo]),
+        [],
+        ["", "Total", "", "", total, timing.mode === "cash" ? `Invoice ${timing.invoiceNo}` : batchRef],
+      ],
+    );
+  }
+
+  const receiptNote =
+    timing.mode === "cash"
+      ? `Invoice ${timing.invoiceNo} · ${lines.length} payslips · ${timing.receiptMode}`
+      : timing.mode === "scheduled"
+        ? `Held until ${timing.label} · SMS reminder 24h before · ${lines.length} receipts queued`
+        : budgetSplit.length > 0
+          ? `${lines.length} payees paid · split ${budgetSplit.map((s) => `${s.name} ${kes(s.amount)}`).join(" + ")}${total - splitTotal > 0 ? ` + free ${kes(total - splitTotal)}` : ""}`
+          : `${lines.length} payees paid · free balance · SMS receipt to each`;
+
+  return (
+    <Dialog open={open} onClose={onClose} title="Bulk payout" desc="Many payees · one run · pay now, schedule or record cash" wide>
+      <Stepper steps={steps} current={step} onStep={(index) => index <= step && setStep(index)} />
+
+      {done ? (
+        <>
+          <ReceiptBlock
+            title={timing.mode === "cash" ? "Invoice issued" : timing.mode === "scheduled" ? "Batch scheduled" : "Batch released"}
+            amount={total}
+            receipt={batchRef}
+            note={receiptNote}
+          />
+          <div className="gm-w-batch-lines">
+            {lines.map((l, i) => (
+              <div key={l.id} className="gm-w-batch-line">
+                <span className="gm-w-payout-ava">{payoutInitials(l.name)}</span>
+                <div className="gm-w-batch-line-copy">
+                  <strong>{l.name}</strong>
+                  <small>
+                    {channelLabel(l.channel)} · {l.identifier}
+                    {l.memo ? ` · ${l.memo}` : ""}
+                  </small>
+                </div>
+                <div className="gm-w-batch-line-right">
+                  <b>{kes(l.amount)}</b>
+                  <span className="gm-code-chip is-sm">{lineRefs[i]}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          {timing.mode === "cash" ? (
+            <WalletCallout tone="good" title="Records created">
+              Every payee has an individual payslip against invoice {timing.invoiceNo}. Find the lines in History by
+              filtering “Cash record”.
+            </WalletCallout>
+          ) : timing.mode === "scheduled" ? (
+            <WalletCallout tone="info" title="Held safely">
+              The money is reserved until the run. Edit amounts or cancel from History any time before release.
+            </WalletCallout>
+          ) : (
+            <WalletCallout tone="good" title="Done">
+              Every payee received a confirmation SMS. Open any line from History to raise a reversal within 2 hours.
+            </WalletCallout>
+          )}
+          <div className="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" className="gm-btn gm-btn-outline" onClick={exportBatchCsv}>
+              <Download /> Export CSV
+            </button>
+            <button type="button" className="gm-btn gm-btn-lime" onClick={onClose}>
+              Done
+            </button>
+          </div>
+        </>
+      ) : busy ? (
+        <Processing label={timing.mode === "cash" ? "Writing the invoice & payslips…" : "Talking to M-Pesa Daraja for each payee…"} />
+      ) : (
+        <>
+          {step === 0 ? (
+            <div className="gm-w-wizard">
+              <div className="gm-w-paytype-grid">
+                {PAYOUT_PURPOSES.map((p) => (
+                  <button key={p.id} type="button" className={`gm-w-radio ${purpose === p.id ? "is-on" : ""}`} onClick={() => setPurpose(p.id)}>
+                    <strong>
+                      {p.icon} {p.id}
+                    </strong>
+                    <small>{p.sub}</small>
+                  </button>
+                ))}
+              </div>
+              <label className="gm-field">
+                <span>Batch note (printed on every receipt)</span>
+                <input className="gm-input" value={batchMemo} onChange={(event) => setBatchMemo(event.target.value)} placeholder="e.g. Week 5 wages — weeding & transplanting" />
+              </label>
+              <WalletCallout tone="info" title="How the bulk wizard works">
+                Add as many payees as you like — M-Pesa phones, bank accounts, GrowMO wallet IDs or cash. Then set each
+                amount, pay now, schedule the run for a later date, or record cash you already handed over with a
+                proper invoice and payslip per person.
+              </WalletCallout>
+            </div>
+          ) : null}
+
+          {step === 1 ? (
+            <div className="gm-w-wizard">
+              <div className="gm-w-bulk-head">
+                <span className="gm-chip gm-chip-lime">
+                  {lines.length} {lines.length === 1 ? "payee" : "payees"} in this batch
+                </span>
+                <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => setPayeeOpen(true)}>
+                  <Plus /> Add manually
+                </button>
+              </div>
+              <span className="gm-field-label">Saved payees — tap to add</span>
+              <div className="gm-w-payee-chips">
+                {saved.map((r) => (
+                  <PayeeChip key={r.id} r={r} added={lines.some((l) => l.savedId === r.id)} onPick={addSaved} />
+                ))}
+              </div>
+              <span className="gm-field-label">The batch</span>
+              {lines.length === 0 ? (
+                <div className="gm-w-bulk-empty">
+                  <Users />
+                  <p>
+                    No payees yet. Tap a saved payee above or use <strong>Add manually</strong> to type a phone number,
+                    bank account or GrowMO wallet ID. Keep adding as many as you need.
+                  </p>
+                </div>
+              ) : (
+                <div className="gm-w-payout-list">
+                  {lines.map((l) => (
+                    <PayoutLineRow key={l.id} line={l} onRemove={removeLine} />
+                  ))}
+                </div>
+              )}
+              {dupNote ? <WalletCallout tone="warn" title="Duplicate payee">{dupNote}</WalletCallout> : null}
+            </div>
+          ) : null}
+
+          {step === 2 ? (
+            <div className="gm-w-wizard">
+              <span className="gm-field-label">Set an amount for each payee</span>
+              <div className="gm-w-payout-list">
+                {lines.map((l) => (
+                  <PayoutLineRow key={l.id} line={l} editable onRemove={removeLine} onAmount={setLineAmount} onMemo={setLineMemo} />
+                ))}
+              </div>
+              <span className="gm-field-label">Apply to every payee</span>
+              <div className="gm-w-quick-amounts">
+                {[500, 1000, 2500, 5000, 10000].map((value) => (
+                  <button key={value} type="button" className="gm-filter-chip" onClick={() => applyAllAmount(value)}>
+                    {kes(value)}
+                  </button>
+                ))}
+              </div>
+              <PayoutTotalBar lines={lines} fee={fee} funding={timing.mode === "cash" ? "Cash (no wallet)" : "Wallet balance"} />
+              <p className="gm-w-note is-small">Minimum {kes(100)} per payee · M-Pesa per-recipient ceiling {kes(150000)}.</p>
+            </div>
+          ) : null}
+
+          {step === 3 ? (
+            <div className="gm-w-wizard">
+              <div className="gm-w-timing-grid">
+                <button type="button" className={`gm-w-timing ${timing.mode === "now" ? "is-on" : ""}`} onClick={() => setTiming({ mode: "now" })}>
+                  <span className="gm-w-method-ic">
+                    <Zap />
+                  </span>
+                  <strong>Pay now</strong>
+                  <small>Instant release to M-Pesa & bank. Each payee gets an SMS receipt right away.</small>
+                </button>
+                <button
+                  type="button"
+                  className={`gm-w-timing ${timing.mode === "scheduled" ? "is-on" : ""}`}
+                  onClick={() => setTiming({ mode: "scheduled", label: SCHEDULE_PRESETS[0].label })}
+                >
+                  <span className="gm-w-method-ic">
+                    <CalendarClock />
+                  </span>
+                  <strong>Schedule</strong>
+                  <small>
+                    {timing.mode === "scheduled" && timing.label ? `Release ${timing.label}` : "Hold the batch, release on a date & time"}
+                  </small>
+                </button>
+                <button type="button" className={`gm-w-timing ${timing.mode === "cash" ? "is-on" : ""}`} onClick={() => setCashOpen(true)}>
+                  <span className="gm-w-method-ic">
+                    <Banknote />
+                  </span>
+                  <strong>Record cash</strong>
+                  <small>I already paid them cash — create the invoice & payslips, no money leaves the wallet.</small>
+                </button>
+              </div>
+              {timing.mode === "scheduled" ? (
+                <div className="gm-w-bulk-sub">
+                  <div className="gm-w-bulk-sub-head">
+                    <span>When should the run fire?</span>
+                    <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => setScheduleOpen(true)}>
+                      Pick exact date & time
+                    </button>
+                  </div>
+                  <div className="gm-w-quick-amounts">
+                    {SCHEDULE_PRESETS.map((p) => (
+                      <button key={p.id} type="button" className={`gm-filter-chip ${timing.mode === "scheduled" && timing.label === p.label ? "is-on" : ""}`} onClick={() => setTiming({ mode: "scheduled", label: p.label })}>
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="gm-w-note is-small">
+                    {timing.mode === "scheduled" ? timing.label : ""} · SMS reminder 24h before · edit or cancel from History until release.
+                  </p>
+                </div>
+              ) : null}
+              {timing.mode === "cash" ? (
+                <div className="gm-w-bulk-sub">
+                  <div className="gm-w-bulk-sub-head">
+                    <span>
+                      Invoice {timing.invoiceNo} · {timing.receiptMode}
+                    </span>
+                    <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => setCashOpen(true)}>
+                      Review invoice
+                    </button>
+                  </div>
+                  <p className="gm-w-note is-small">
+                    Wallet impact: none. {lines.length} payslips are written against the invoice so cash stays auditable.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+
+          {step === 4 ? (
+            <div className="gm-w-wizard">
+              <span className="gm-field-label">Every line, one last time</span>
+              <div className="gm-w-payout-list">
+                {lines.map((l) => (
+                  <PayoutLineRow key={l.id} line={l} onRemove={removeLine} />
+                ))}
+              </div>
+              <WalletKv
+                items={[
+                  { k: "Purpose", v: purpose },
+                  { k: "Batch note", v: batchMemo || "—" },
+                  { k: "Payees", v: `${lines.length}` },
+                  { k: "Batch total", v: <strong>{kes(total)}</strong> },
+                  { k: "Fee estimate", v: fee === 0 ? "Free" : kes(fee) },
+                  { k: "Timing", v: timing.mode === "now" ? "Pay now" : timing.mode === "scheduled" ? `Scheduled · ${timing.label}` : `Cash · invoice ${timing.invoiceNo}` },
+                  { k: timing.mode === "cash" ? "Wallet impact" : "Net outflow", v: timing.mode === "cash" ? "None — invoice record only" : <strong>{kes(total + fee)}</strong> },
+                ]}
+              />
+              {timing.mode !== "cash" ? (
+                <div className="gm-w-bulk-sub">
+                  <div className="gm-w-bulk-sub-head">
+                    <span>Split across budget envelopes</span>
+                    <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => setBudgetOpen(true)}>
+                      {budgetSplit.length ? "Edit split" : "Add split"}
+                    </button>
+                  </div>
+                  {budgetSplit.length ? (
+                    <div className="gm-w-quick-amounts">
+                      {budgetSplit.map((s) => (
+                        <span key={s.id} className="gm-filter-chip is-on">
+                          {s.name} · {kes(s.amount)}
+                        </span>
+                      ))}
+                      {total - splitTotal > 0 ? <span className="gm-filter-chip">Free balance · {kes(total - splitTotal)}</span> : null}
+                    </div>
+                  ) : (
+                    <p className="gm-w-note is-small">The whole batch stays in your free balance.</p>
+                  )}
+                </div>
+              ) : null}
+              {splitOver ? (
+                <WalletCallout tone="warn" title="Split no longer fits">
+                  Lines changed since the split was saved — the split is {kes(splitTotal - total)} over. Open “Edit
+                  split” to fix it.
+                </WalletCallout>
+              ) : null}
+              <ul className="gm-w-checklist">
+                {timing.mode !== "cash" ? (
+                  <li className={overDaily ? "is-warn" : "is-ok"}>
+                    {overDaily ? <AlertTriangle /> : <Check />}
+                    <span>
+                      Daily limit {kes(dailyLimit)} — {kes(dailyLeft)} left today.{" "}
+                      {overDaily ? `This batch needs ${kes(total)} and would be held or split.` : "The batch fits within today's limit."}
+                    </span>
+                  </li>
+                ) : null}
+                {overBalance ? (
+                  <li className="is-warn">
+                    <AlertTriangle />
+                    <span>
+                      Batch needs {kes(total)} but only {kes(balance)} is available — top up first or split the batch.
+                    </span>
+                  </li>
+                ) : null}
+                <li className="is-ok">
+                  <Check />
+                  <span>
+                    {lines.length} receipts — one SMS per payee, stored against the task, invoice or payslip.
+                  </span>
+                </li>
+                <li className={needsSecondPin ? "is-warn" : "is-ok"}>
+                  {needsSecondPin ? <AlertTriangle /> : <Check />}
+                  <span>
+                    {needsSecondPin
+                      ? `Total ${kes(total)} is above KES 5,000 — a second PIN is required at authorisation.`
+                      : "Below the KES 5,000 second-PIN threshold — one OTP is enough."}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          ) : null}
+
+          {step === 5 ? (
+            <div className="gm-w-wizard">
+              <WalletKv
+                items={[
+                  { k: "Batch", v: `${lines.length} payees · ${purpose}` },
+                  { k: "Total", v: <strong>{kes(total)}</strong> },
+                  { k: "Fee estimate", v: fee === 0 ? "Free" : kes(fee) },
+                  { k: "Timing", v: timing.mode === "now" ? "Pay now" : timing.mode === "scheduled" ? `Scheduled · ${timing.label}` : `Cash · ${timing.invoiceNo}` },
+                ]}
+              />
+              {pinPhase === 0 ? (
+                <>
+                  <OtpInput value={otp} onChange={setOtp} label="Wallet OTP (123456)" />
+                  <p className="gm-w-note is-small">In production this is the Daraja confirmation; GrowMO never sees your M-Pesa PIN.</p>
+                  <button
+                    type="button"
+                    className="gm-btn gm-btn-lime gm-btn-block"
+                    disabled={otp.length < 6}
+                    onClick={() => (needsSecondPin ? setPinPhase(1) : release())}
+                  >
+                    {needsSecondPin ? "Continue to second PIN" : "Release batch"}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <WalletCallout tone="warn" title="Second approval required">
+                    This batch totals {kes(total)} — above the KES 5,000 threshold set in Wallet security. Confirm with
+                    your 4-digit wallet PIN.
+                  </WalletCallout>
+                  <PinPad onComplete={() => release()} />
+                  <p className="gm-w-note is-small">Any 4 digits work in this demo.</p>
+                </>
+              )}
+              <div className="d-flex justify-content-between gap-2 mt-1">
+                <button type="button" className="gm-btn gm-btn-outline" onClick={() => (pinPhase === 1 ? setPinPhase(0) : setStep(4))}>
+                  {pinPhase === 1 ? "Back to OTP" : "Back to review"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {step <= 4 ? (
+            <WizardActions
+              step={step}
+              last={4}
+              onBack={() => setStep((current) => Math.max(0, current - 1))}
+              nextLabel="Continue"
+              finishLabel="Authorise"
+              nextDisabled={
+                step === 1 ? lines.length === 0 : step === 2 ? lines.some((l) => l.amount < 100) : false
+              }
+              onNext={() => setStep((current) => Math.min(5, current + 1))}
+            />
+          ) : null}
+        </>
+      )}
+
+      {/* sub-modals raised from inside the wizard */}
+      <BulkAddPayeeDialog open={payeeOpen} onClose={() => setPayeeOpen(false)} onAdd={upsertLine} />
+      <BulkScheduleDialog
+        open={scheduleOpen}
+        initial={timing.mode === "scheduled" ? timing.label : ""}
+        onClose={() => setScheduleOpen(false)}
+        onSave={(label) => {
+          setTiming({ mode: "scheduled", label });
+          setScheduleOpen(false);
+        }}
+      />
+      <BulkCashRecordDialog
+        open={cashOpen}
+        lines={lines}
+        purpose={purpose}
+        onClose={() => setCashOpen(false)}
+        onSave={(invoiceNo, receiptMode) => {
+          setTiming({ mode: "cash", invoiceNo, receiptMode });
+          setCashOpen(false);
+        }}
+      />
+      <BulkBudgetSplitDialog
+        open={budgetOpen}
+        total={total}
+        budgets={budgets}
+        initial={budgetSplit}
+        onClose={() => setBudgetOpen(false)}
+        onSave={(split) => {
+          setBudgetSplit(split);
+          setBudgetOpen(false);
+        }}
+      />
     </Dialog>
   );
 }

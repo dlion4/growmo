@@ -7,22 +7,29 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Banknote,
+  HandCoins,
   Lock,
   MoreHorizontal,
+  Plus,
   ShieldCheck,
   Snowflake,
+  Users,
   Wallet,
+  X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import type {
   AutoPayRule,
   DepositMethod,
+  PayoutChannelId,
+  PayoutLine,
   PayType,
   Recipient,
   SecurityControl,
   Txn,WALLET_CONTEXT, 
   WalletBudget
 } from "../../data/app/wallet";
+import { PAYOUT_CHANNELS } from "../../data/app/wallet";
 import { kes } from "../../data/site";
 import { ProgressLine, StatusChip } from "./DashboardWidgets";
 
@@ -408,5 +415,176 @@ export function WalletGlossary({ items }: { items: { term: string; def: string }
         </div>
       ))}
     </div>
+  );
+}
+
+/* ---------------- 14.3c bulk payout ---------------- */
+export function payoutInitials(name: string) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length === 0) return "?";
+  const out = parts.length >= 2 ? parts[0].charAt(0) + parts[parts.length - 1].charAt(0) : parts[0].charAt(0);
+  return out.toUpperCase() || "?";
+}
+
+export function ChannelChip({ channel }: { channel: PayoutChannelId }) {
+  const c = PAYOUT_CHANNELS.find((x) => x.id === channel) ?? PAYOUT_CHANNELS[0];
+  return <span className={`gm-w-channel is-${channel}`}>{c.icon} {c.label}</span>;
+}
+
+/**
+ * The page card that opens the 7-step bulk payout wizard.
+ * `compact` renders a slim horizontal variant for side columns.
+ */
+export function BulkPayoutCard({ onOpen, compact = false }: { onOpen: () => void; compact?: boolean }) {
+  if (compact) {
+    return (
+      <button type="button" className="gm-w-bulk is-compact" onClick={onOpen}>
+        <span className="gm-w-bulk-ic">
+          <HandCoins />
+        </span>
+        <span className="gm-w-bulk-copy">
+          <strong>Bulk payout</strong>
+          <small>Many payees, one run — pay, schedule or record cash</small>
+        </span>
+        <span className="gm-w-bulk-cta">
+          Open <ArrowUpRight />
+        </span>
+      </button>
+    );
+  }
+  return (
+    <section className="gm-w-bulk">
+      <span className="gm-w-bulk-ic">
+        <HandCoins />
+      </span>
+      <div className="gm-w-bulk-copy">
+        <div className="gm-w-bulk-headline">
+          <strong className="font-display">Bulk payout wizard</strong>
+          <span className="gm-chip gm-chip-lime">7 steps</span>
+          <span className="gm-chip gm-chip-ghost">
+            <Users /> keep adding payees
+          </span>
+        </div>
+        <p>
+          Pay many payees in one run. Add them one by one — M-Pesa phones, bank accounts, GrowMO wallet IDs or cash —
+          set each amount, then pay now, schedule the release, or record cash you already handed over with a proper
+          invoice & payslip.
+        </p>
+        <div className="gm-w-bulk-chips">
+          {PAYOUT_CHANNELS.map((c) => (
+            <span key={c.id}>
+              {c.icon} {c.label}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="gm-w-bulk-side">
+        <ul>
+          <li>Unlimited payees — add as many as you like</li>
+          <li>Schedule for payday, Monday or the 1st</li>
+          <li>Invoice + payslip when you paid cash</li>
+          <li>Split the batch across budget envelopes</li>
+        </ul>
+        <button type="button" className="gm-btn gm-btn-lime" onClick={onOpen}>
+          Open the wizard <ArrowUpRight />
+        </button>
+      </div>
+    </section>
+  );
+}
+
+export function PayoutLineRow({
+  line,
+  editable = false,
+  onRemove,
+  onAmount,
+  onMemo,
+}: {
+  line: PayoutLine;
+  editable?: boolean;
+  onRemove: (id: string) => void;
+  onAmount?: (id: string, value: number) => void;
+  onMemo?: (id: string, value: string) => void;
+}) {
+  return (
+    <div className={`gm-w-payout-row ${editable ? "is-edit" : ""}`}>
+      <span className="gm-w-payout-ava">{payoutInitials(line.name)}</span>
+      <div className="gm-w-payout-copy">
+        <strong>{line.name}</strong>
+        <small>{line.identifier || "—"}</small>
+        <ChannelChip channel={line.channel} />
+      </div>
+      {editable ? (
+        <>
+          <input
+            className="gm-input gm-w-payout-amt"
+            type="number"
+            min={100}
+            value={line.amount}
+            aria-label={`Amount for ${line.name}`}
+            onChange={(event) => onAmount?.(line.id, Number(event.target.value))}
+          />
+          <input
+            className="gm-input gm-w-payout-memo"
+            type="text"
+            placeholder="Note (e.g. 3 days weeding)"
+            value={line.memo}
+            aria-label={`Note for ${line.name}`}
+            onChange={(event) => onMemo?.(line.id, event.target.value)}
+          />
+        </>
+      ) : (
+        <>
+          {line.memo ? <small className="gm-w-payout-memo-static">{line.memo}</small> : null}
+          <b>{kes(line.amount)}</b>
+        </>
+      )}
+      <button type="button" className="gm-iconbtn" aria-label={`Remove ${line.name} from the batch`} onClick={() => onRemove(line.id)}>
+        <X />
+      </button>
+    </div>
+  );
+}
+
+export function PayoutTotalBar({ lines, fee, funding }: { lines: PayoutLine[]; fee: number; funding: string }) {
+  const total = lines.reduce((sum, l) => sum + (l.amount > 0 ? l.amount : 0), 0);
+  return (
+    <div className="gm-w-batch-total">
+      <div>
+        <small>Payees</small>
+        <b>{lines.length}</b>
+      </div>
+      <div>
+        <small>Batch total</small>
+        <b>{kes(total)}</b>
+      </div>
+      <div>
+        <small>Fee estimate</small>
+        <b>{fee === 0 ? "Free" : kes(fee)}</b>
+      </div>
+      <div>
+        <small>Funding</small>
+        <b>{funding}</b>
+      </div>
+    </div>
+  );
+}
+
+/** Quick-add chip for a saved payee inside the wizard. */
+export function PayeeChip({
+  r,
+  added,
+  onPick,
+}: {
+  r: Recipient;
+  added: boolean;
+  onPick: (r: Recipient) => void;
+}) {
+  return (
+    <button type="button" className={`gm-w-payee-chip ${added ? "is-added" : ""}`} disabled={added} onClick={() => onPick(r)}>
+      <span className="gm-ava">{r.avatar}</span>
+      <span>{r.name}</span>
+      {added ? <span className="gm-w-payee-chip-state">Added</span> : <Plus />}
+    </button>
   );
 }
