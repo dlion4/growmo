@@ -1,0 +1,1023 @@
+/* ============================================================================
+   PAGE 16 — MOBILE, OFFLINE, USSD & SMS CHANNELS  (channels.css)
+
+   Additive, token-only layer, scoped to the authenticated shell (.gm-app) and
+   the modals it raises (.gm-modal-overlay). Documented in MASTER_THEME.md §22.
+
+   1. Hero + offline banner + KPI strip
+   2. Sync queue, tips, data savers
+   3. USSD phone mock
+   4. SMS console
+   5. WhatsApp chat mock
+   6. Agents
+   7. Key-value lists, FAQ, glossary, modal bits
+   8. Responsive (1080 / 640 / 380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-ch-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: linear-gradient(120deg, var(--gm-ink-900) 0%, var(--gm-leaf-800) 55%, var(--gm-ocean-800) 100%);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-ch-hero::after {
+  content: "";
+  position: absolute;
+  right: -6rem;
+  top: -8rem;
+  width: 20rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 0 0 3rem rgba(255, 255, 255, 0.04),
+    0 0 0 6.5rem rgba(255, 255, 255, 0.02);
+  pointer-events: none;
+}
+
+.gm-app .gm-ch-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-ch-hero h1 {
+  color: var(--gm-card);
+  margin: 0.6rem 0 0.4rem;
+}
+
+.gm-app .gm-ch-hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+.gm-app .gm-ch-hero-copy {
+  flex: 1 1 380px;
+  min-width: 0;
+}
+
+.gm-app .gm-ch-hero-copy p {
+  max-width: 64ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.gm-app .gm-ch-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-ch-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.gm-app .gm-ch-stat small {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gm-app .gm-ch-stat strong {
+  font-size: 1.1rem;
+  color: var(--gm-lime-200);
+}
+
+/* ---------- 2. banner / queue / tips ---------- */
+.gm-app .gm-ch-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  border-left-width: 3px;
+  background: var(--gm-sand-50);
+}
+
+.gm-app .gm-ch-banner.is-offline {
+  background: var(--gm-gold-50);
+  border-left-color: var(--gm-gold-600);
+}
+
+.gm-app .gm-ch-banner.is-syncing {
+  background: var(--gm-ocean-50);
+  border-left-color: var(--gm-ocean-500);
+}
+
+.gm-app .gm-ch-banner-ic {
+  font-size: 1.4rem;
+}
+
+.gm-app .gm-ch-banner div {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.gm-app .gm-ch-banner strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-ch-banner small {
+  font-size: 0.76rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-ch-queue {
+  padding: 1rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+}
+
+.gm-app .gm-ch-queue-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.gm-app .gm-ch-queue-head strong {
+  display: block;
+  font-size: 0.92rem;
+}
+
+.gm-app .gm-ch-queue-head small {
+  font-size: 0.76rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-ch-queue ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gm-app .gm-ch-queue li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-app .gm-ch-queue li strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-ch-queue li small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-ch-queue-meta {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+  font-family: var(--gm-font-mono);
+}
+
+.gm-app .gm-ch-tips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.gm-app .gm-ch-tip {
+  padding: 0.85rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-100);
+  border-left: 3px solid var(--gm-leaf-500);
+}
+
+.gm-app .gm-ch-tip strong {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gm-leaf-800);
+  margin-bottom: 0.2rem;
+}
+
+.gm-app .gm-ch-tip p {
+  margin: 0;
+  font-size: 0.79rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-ch-savers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.gm-app .gm-ch-savers li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+}
+
+.gm-app .gm-ch-savers strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-ch-savers small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 3. USSD phone ---------- */
+.gm-app .gm-ch-phone-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.gm-app .gm-ch-phone {
+  background: var(--gm-ink-900);
+  border-radius: 34px;
+  padding: 0.9rem 0.8rem 1rem;
+  box-shadow: 0 22px 44px rgba(10, 30, 20, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gm-app .gm-ch-phone-notch {
+  width: 74px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  margin: 0 auto 0.6rem;
+}
+
+.gm-app .gm-ch-phone-screen {
+  background: #04120c;
+  border-radius: 22px;
+  padding: 0.9rem 0.85rem 1rem;
+  font-family: var(--gm-font-mono);
+  color: #b9fbc0;
+  min-height: 430px;
+  display: flex;
+  flex-direction: column;
+}
+
+.gm-app .gm-ch-phone-status {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: rgba(185, 251, 192, 0.6);
+  margin-bottom: 0.6rem;
+}
+
+.gm-app .gm-ch-phone-code {
+  margin: 0 0 0.6rem;
+  font-size: 0.78rem;
+  color: var(--gm-lime-200);
+  letter-spacing: 0.04em;
+}
+
+.gm-app .gm-ch-phone-log {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.gm-app .gm-ch-phone-line.user {
+  color: #fde68a;
+}
+
+.gm-app .gm-ch-phone-line.ussd {
+  color: #b9fbc0;
+  white-space: pre-wrap;
+}
+
+.gm-app .gm-ch-phone-menu {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.7rem;
+}
+
+.gm-app .gm-ch-phone-key {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 10px;
+  border: 1px solid rgba(185, 251, 192, 0.22);
+  background: rgba(185, 251, 192, 0.06);
+  color: #d7ffe0;
+  font-family: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--gm-t-fast);
+}
+
+.gm-app .gm-ch-phone-key:hover {
+  background: rgba(185, 251, 192, 0.16);
+}
+
+.gm-app .gm-ch-phone-key b {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  background: var(--gm-lime-400);
+  color: #04120c;
+  font-size: 0.72rem;
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-ch-phone-foot {
+  margin: 0.7rem 0 0;
+  font-size: 0.68rem;
+  color: rgba(185, 251, 192, 0.55);
+  text-align: center;
+}
+
+.gm-app .gm-ch-phone-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.gm-app .gm-ch-phone-input {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.gm-app .gm-ch-phone-input input {
+  flex: 1 1 160px;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-ink-900);
+  color: var(--gm-lime-200);
+  font-family: var(--gm-font-mono);
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-ch-ussd-notes {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.84rem;
+  color: var(--gm-ink-600);
+  display: grid;
+  gap: 0.35rem;
+}
+
+/* ---------- 4. SMS console ---------- */
+.gm-app .gm-ch-sms-console {
+  display: grid;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.gm-app .gm-ch-sms-phone {
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-ink-900);
+  overflow: hidden;
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-ch-sms-phone-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--gm-card);
+  font-size: 0.8rem;
+}
+
+.gm-app .gm-ch-sms-thread {
+  padding: 0.9rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 300px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.gm-app .gm-ch-sms-out,
+.gm-app .gm-ch-sms-in {
+  font-family: var(--gm-font-mono);
+  font-size: 0.76rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  max-width: 92%;
+  white-space: pre-wrap;
+}
+
+.gm-app .gm-ch-sms-out {
+  background: rgba(185, 251, 192, 0.14);
+  color: #b9fbc0;
+  align-self: flex-end;
+  border-bottom-right-radius: 3px;
+}
+
+.gm-app .gm-ch-sms-in {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2f7e6;
+  align-self: flex-start;
+  border-bottom-left-radius: 3px;
+}
+
+.gm-app .gm-ch-sms-compose {
+  display: flex;
+  gap: 0.4rem;
+  padding: 0.7rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.gm-app .gm-ch-sms-compose input {
+  flex: 1;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--gm-lime-200);
+  font-family: var(--gm-font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.gm-app .gm-ch-sms-commands {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.5rem;
+}
+
+.gm-app .gm-ch-sms-command {
+  padding: 0.75rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast);
+}
+
+.gm-app .gm-ch-sms-command:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-leaf-400);
+}
+
+.gm-app .gm-ch-sms-command code {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: var(--gm-ocean-50);
+  color: var(--gm-ocean-800);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.gm-app .gm-ch-sms-command strong {
+  display: block;
+  font-size: 0.86rem;
+}
+
+.gm-app .gm-ch-sms-command small {
+  font-size: 0.74rem;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 5. WhatsApp ---------- */
+.gm-app .gm-ch-wa {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.gm-app .gm-ch-wa-chat {
+  border-radius: var(--gm-r-md);
+  overflow: hidden;
+  border: 1px solid var(--gm-line);
+  background: var(--gm-earth-50);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-ch-wa-head {
+  padding: 0.6rem 0.8rem;
+  background: #075e54;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.gm-app .gm-ch-wa-body {
+  padding: 0.9rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 460px;
+  overflow-y: auto;
+}
+
+.gm-app .gm-ch-wa-msg {
+  max-width: 88%;
+  padding: 0.55rem 0.7rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  background: var(--gm-card);
+  color: var(--gm-ink-800);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.gm-app .gm-ch-wa-msg.bot {
+  align-self: flex-start;
+  border-bottom-left-radius: 3px;
+}
+
+.gm-app .gm-ch-wa-msg.me {
+  align-self: flex-end;
+  background: #d9fdd3;
+  border-bottom-right-radius: 3px;
+}
+
+.gm-app .gm-ch-wa-msg small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.66rem;
+  color: #5b6b62;
+  text-align: right;
+}
+
+.gm-app .gm-ch-wa-msg.photo {
+  padding: 0.4rem;
+}
+
+.gm-app .gm-ch-wa-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  background: linear-gradient(140deg, var(--gm-leaf-500), var(--gm-ink-900));
+  color: #fff;
+  font-size: 2rem;
+}
+
+.gm-app .gm-ch-wa-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.7rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.gm-app .gm-ch-wa-btn {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gm-leaf-700);
+  cursor: pointer;
+}
+
+.gm-app .gm-ch-wa-btn.is-on,
+.gm-app .gm-ch-wa-btn:hover {
+  background: #075e54;
+  border-color: #075e54;
+  color: #fff;
+}
+
+.gm-app .gm-ch-wa-side {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.gm-app .gm-ch-wa-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gm-app .gm-ch-wa-features li {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-card);
+  border: 1px solid var(--gm-line);
+}
+
+.gm-app .gm-ch-wa-features svg {
+  width: 14px;
+  height: 14px;
+  margin-top: 0.2rem;
+  color: var(--gm-leaf-500);
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-ch-wa-features strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-ch-wa-features small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 6. agents ---------- */
+.gm-app .gm-ch-agents {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.9rem;
+}
+
+.gm-app .gm-ch-agent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast);
+}
+
+.gm-app .gm-ch-agent:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-leaf-400);
+}
+
+.gm-app .gm-ch-agent-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-ch-agent-ava {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--gm-gold-100);
+  color: var(--gm-gold-800);
+  font-weight: 900;
+  font-size: 1.1rem;
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-ch-agent-head strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-ch-agent-head small {
+  font-size: 0.74rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-ch-agent-addr {
+  margin: 0;
+  font-size: 0.79rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-ch-agent-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-ch-agent-services {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-ch-agent-services span {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-ch-agent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: auto;
+}
+
+/* ---------- 7. kv / faq / glossary / modals ---------- */
+.gm-app .gm-ch-kv {
+  margin: 0;
+}
+
+.gm-app .gm-ch-kv-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-ch-kv-row:last-child {
+  border-bottom: none;
+}
+
+.gm-app .gm-ch-kv-row dt {
+  margin: 0;
+  font-size: 0.79rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-ch-kv-row dd {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--gm-ink-700);
+}
+
+.gm-app .gm-ch-faq {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-ch-faq-row {
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  overflow: hidden;
+}
+
+.gm-app .gm-ch-faq-row button {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gm-app .gm-ch-faq-row.is-open button {
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-ch-faq-row p {
+  margin: 0;
+  padding: 0 0.9rem 0.85rem 2rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-ch-glossary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.gm-app .gm-ch-glossary > div {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-app .gm-ch-glossary strong {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-ch-glossary span {
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-ch-footer-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-ink-50);
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-ch-form {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.gm-modal-overlay .gm-ch-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.gm-modal-overlay .gm-ch-note {
+  margin: 0;
+  font-size: 0.83rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-modal-overlay .gm-ch-note.is-small {
+  font-size: 0.77rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-modal-overlay .gm-ch-install {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+
+.gm-modal-overlay .gm-ch-processing,
+.gm-modal-overlay .gm-ch-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1.6rem 1rem;
+}
+
+.gm-modal-overlay .gm-ch-processing p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-modal-overlay .gm-ch-processing .spin {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-600);
+  animation: gm-ch-spin 1s linear infinite;
+}
+
+@keyframes gm-ch-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gm-modal-overlay .gm-ch-done-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: var(--gm-lime-400);
+  color: var(--gm-leaf-800);
+  animation: gm-ch-pop 0.45s ease;
+}
+
+.gm-modal-overlay .gm-ch-done-mark svg {
+  width: 32px;
+  height: 32px;
+}
+
+@keyframes gm-ch-pop {
+  from {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gm-modal-overlay .gm-ch-done h3 {
+  margin: 0;
+  color: var(--gm-leaf-700);
+}
+
+.gm-modal-overlay .gm-ch-done p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-500);
+}
+
+/* ---------- 8. responsive + print ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-ch-phone-wrap,
+  .gm-app .gm-ch-sms-console,
+  .gm-app .gm-ch-wa {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-ch-phone {
+    max-width: 340px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-ch-hero-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gm-app .gm-ch-agents,
+  .gm-app .gm-ch-sms-commands {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-ch-sms-thread,
+  .gm-app .gm-ch-wa-body {
+    max-height: 340px;
+  }
+}
+
+@media (max-width: 380px) {
+  .gm-app .gm-ch-hero-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .gm-app .gm-ch-hero-actions,
+  .gm-app .gm-menu-wrap,
+  .gm-app .gm-tabs {
+    display: none !important;
+  }
+
+  .gm-app .gm-ch-hero {
+    background: none;
+    color: var(--gm-ink-800);
+    padding: 0 0 0.6rem;
+  }
+
+  .gm-app .gm-ch-phone,
+  .gm-app .gm-ch-sms-phone,
+  .gm-app .gm-ch-wa-chat {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

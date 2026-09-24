@@ -1,191 +1,470 @@
 /* ============================================================================
-   PAGE 15 — SETTINGS, TEAM & PERMISSIONS MODALS
-   20+ modals, wizards, drawers, and dialogs.
+   PAGE 15 — SETTINGS / TEAM modals & wizards
+   Invitations, role edits, plan switches, data actions and the payroll run all
+   follow the GrowMO pattern: review → OTP/PIN 123456 → processing → receipt.
    ========================================================================== */
-import {
-  ArrowRight,
-  BarChart3,
-  Check,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  CreditCard,
-  Download,
-  Edit3,
-  Eye,
-  FileText,
-  Globe,
-  Grid3X3,
-  Key,
-  Layers,
-  Lock,
-  Mail,
-  MapPin,
-  MessageCircle,
-  MoreHorizontal,
-  Pencil,
-  Phone,
-  Plus,
-  RefreshCw,
-  Search,
-  Send,
-  Settings2,
-  ShieldCheck,
-  Smartphone,
-  Star,
-  Table,
-  Trash2,
-  TrendingUp,
-  Upload,
-  UserPlus,
-  Users,
-  X,
-} from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { Dialog, Stepper, Toggle } from "../../components/auth/controls";
-import {
-  DashboardDrawer,
-  StatusChip,
-} from "../../components/app/DashboardWidgets";
+import type { FarmPlot, TeamMember, Worker } from "../../data/app/settings";
+import { DATA_SHARING_DETAIL, JOB_POST, ONBOARDING_CHECKLIST, PAYSLIPS, PLANS, ROLES } from "../../data/app/settings";
 import { kes } from "../../data/site";
-import type {
-  ActivityLog,
-  FarmPlot,
-  FarmSettings,
-  NotificationPref,
-  PrivacySetting,
-  TeamMember,
-  UserProfile,
-} from "../../data/app/settings";
+import { Dialog, OtpInput, PinPad, Stepper } from "../auth/controls";
+import { WizardActions } from "./DashboardWidgets";
 
-/* ── Confirm dialog (reusable) ───────────────────────────────────────────── */
-export function ConfirmSettingsDialog({
-  open,
-  title,
-  body,
-  confirmLabel,
-  destructive,
-  onClose,
-  onConfirm,
-}: {
-  open: boolean;
-  title: string;
-  body: string;
-  confirmLabel: string;
-  destructive?: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-}) {
+function code(prefix: string) {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = `${prefix}-`;
+  for (let i = 0; i < 6; i += 1) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return out;
+}
+
+function Spinner({ label }: { label: string }) {
   return (
-    <Dialog open={open} onClose={onClose} title={title} desc={body}>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className={`gm-btn gm-btn-sm ${destructive ? "gm-btn-danger" : "gm-btn-lime"}`} onClick={() => { onConfirm(); onClose(); }}>{confirmLabel}</button>
-      </div>
-    </Dialog>
+    <div className="gm-st-processing">
+      <Loader2 className="spin" />
+      <p>{label}</p>
+    </div>
   );
 }
 
-/* ── 1. Profile Edit Wizard (3-step) ─────────────────────────────────────── */
-export function ProfileEditWizard({
+function Receipt({ title, note, receipt }: { title: string; note: string; receipt: string }) {
+  return (
+    <div className="gm-st-receipt">
+      <span className="gm-st-receipt-mark">
+        <CheckCircle2 />
+      </span>
+      <h3 className="font-display">{title}</h3>
+      <p>{note}</p>
+      <div className="gm-code-chip">{receipt}</div>
+    </div>
+  );
+}
+
+/* ---------------- invite ---------------- */
+export function InviteMemberDialog({
   open,
-  profile,
   onClose,
-  onSave,
+  onSent,
 }: {
   open: boolean;
-  profile: UserProfile;
   onClose: () => void;
-  onSave: (p: UserProfile) => void;
+  onSent: (member: TeamMember) => void;
 }) {
   const [step, setStep] = useState(0);
-  const [form, setForm] = useState(profile);
-  useEffect(() => { if (open) { setStep(0); setForm(profile); } }, [open, profile]);
-  const steps = ["Personal info", "Location", "Preferences"];
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("07");
+  const [email, setEmail] = useState("");
+  const [role, setRole] = useState("manager");
+  const [plots, setPlots] = useState("All plots");
+  const [financial, setFinancial] = useState("View only");
+  const [authority, setAuthority] = useState("Initiate");
+  const [validUntil, setValidUntil] = useState("Indefinite");
+  const [otp, setOtp] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [receipt, setReceipt] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setStep(0);
+    setName("");
+    setPhone("07");
+    setEmail("");
+    setRole("manager");
+    setOtp("");
+    setBusy(false);
+    setReceipt(null);
+  }, [open]);
+
+  const steps = ["Who they are", "What they can do", "Confirm"];
 
   return (
-    <Dialog open={open} onClose={onClose} title="Edit Profile" wide>
-      <Stepper steps={steps} current={step} />
-      <div className="gm-wizard-stack mt-3">
-        {step === 0 ? (
-          <>
-            <div className="row g-3">
-              <div className="col-md-6"><div className="gm-field"><label>First name</label><input className="gm-input w-100" value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Last name</label><input className="gm-input w-100" value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Phone</label><input className="gm-input w-100" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Email</label><input className="gm-input w-100" type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>National ID</label><input className="gm-input w-100" value={form.nationalId} onChange={e => setForm(f => ({ ...f, nationalId: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Gender</label><select className="gm-select w-100" value={form.gender} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}><option>Female</option><option>Male</option><option>Other</option></select></div></div>
+    <Dialog open={open} onClose={onClose} title="Invite a team member" desc="They get an SMS with a one-time code to set their own PIN" wide>
+      <Stepper steps={steps} current={step} onStep={(index) => index <= step && setStep(index)} />
+      {receipt ? (
+        <>
+          <Receipt
+            title="Invitation sent"
+            note={`${name} (${phone}) can now join Mary's Farm as ${ROLES.find((r) => r.key === role)?.label}. The invite expires in 48 hours.`}
+            receipt={receipt}
+          />
+          <div className="d-flex justify-content-end mt-3">
+            <button type="button" className="gm-btn gm-btn-lime" onClick={onClose}>
+              Done
+            </button>
+          </div>
+        </>
+      ) : busy ? (
+        <Spinner label="Sending the invite SMS…" />
+      ) : (
+        <>
+          {step === 0 ? (
+            <div className="gm-st-form">
+              <label className="gm-field">
+                <span>Full name</span>
+                <input className="gm-input" value={name} onChange={(event) => setName(event.target.value)} placeholder="e.g. Agnes Nekesa" />
+              </label>
+              <label className="gm-field">
+                <span>Phone (Safaricom or Airtel)</span>
+                <input className="gm-input" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="07XX XXX XXX" />
+              </label>
+              <label className="gm-field">
+                <span>Email (optional)</span>
+                <input className="gm-input" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="name@example.co.ke" />
+              </label>
+              <label className="gm-field">
+                <span>Role</span>
+                <select className="gm-select" value={role} onChange={(event) => setRole(event.target.value)}>
+                  {ROLES.filter((option) => option.key !== "owner").map((option) => (
+                    <option key={option.key} value={option.key}>
+                      {option.label} — {option.desc}
+                    </option>
+                  ))}
+                </select>
+              </label>
             </div>
-          </>
-        ) : step === 1 ? (
-          <>
-            <div className="row g-3">
-              <div className="col-md-6"><div className="gm-field"><label>County</label><select className="gm-select w-100" value={form.county} onChange={e => setForm(f => ({ ...f, county: e.target.value }))}>{["Kiambu","Nakuru","Meru","Uasin Gishu","Kakamega","Kisumu","Makueni","Kilifi","Nyeri","Murang'a"].map(c => <option key={c}>{c}</option>)}</select></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Sub-county</label><input className="gm-input w-100" value={form.subCounty} onChange={e => setForm(f => ({ ...f, subCounty: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Ward</label><input className="gm-input w-100" value={form.ward} onChange={e => setForm(f => ({ ...f, ward: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Village</label><input className="gm-input w-100" value={form.village} onChange={e => setForm(f => ({ ...f, village: e.target.value }))} /></div></div>
+          ) : null}
+
+          {step === 1 ? (
+            <div className="gm-st-form">
+              <label className="gm-field">
+                <span>Plots accessible</span>
+                <select className="gm-select" value={plots} onChange={(event) => setPlots(event.target.value)}>
+                  {["All plots", "Selected plots", "Assigned plots only"].map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="gm-field">
+                <span>Financial access</span>
+                <select className="gm-select" value={financial} onChange={(event) => setFinancial(event.target.value)}>
+                  {["Full", "View only", "None"].map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="gm-field">
+                <span>Payment authority</span>
+                <select className="gm-select" value={authority} onChange={(event) => setAuthority(event.target.value)}>
+                  {["Can initiate payments", "Can approve payments", "None"].map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="gm-field">
+                <span>Valid until</span>
+                <select className="gm-select" value={validUntil} onChange={(event) => setValidUntil(event.target.value)}>
+                  {["Indefinite", "28 Feb 2027", "31 Dec 2026", "31 Jan 2027"].map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </label>
+              <p className="gm-st-note">
+                Only the owner can change roles later. Suspending a member stops their access instantly and reallocates any
+                pending payments.
+              </p>
             </div>
-          </>
-        ) : (
-          <>
-            <div className="gm-field"><label>Language</label><select className="gm-select w-100" value={form.language} onChange={e => setForm(f => ({ ...f, language: e.target.value }))}>{["English / Kiswahili","English","Kiswahili","Kikuyu","Luo","Kalenjin"].map(l => <option key={l}>{l}</option>)}</select></div>
-            <div className="gm-review-card mt-2">
-              <div className="gm-review-row"><span>Name</span><strong>{form.firstName} {form.lastName}</strong></div>
-              <div className="gm-review-row"><span>Phone</span><strong>{form.phone}</strong></div>
-              <div className="gm-review-row"><span>Email</span><strong>{form.email}</strong></div>
-              <div className="gm-review-row"><span>Location</span><strong>{form.ward}, {form.subCounty}, {form.county}</strong></div>
-              <div className="gm-review-row"><span>Language</span><strong>{form.language}</strong></div>
+          ) : null}
+
+          {step === 2 ? (
+            <div className="gm-st-form">
+              <dl className="gm-st-kv">
+                <div className="gm-st-kv-row">
+                  <dt>Name</dt>
+                  <dd>{name}</dd>
+                </div>
+                <div className="gm-st-kv-row">
+                  <dt>Phone</dt>
+                  <dd>{phone}</dd>
+                </div>
+                <div className="gm-st-kv-row">
+                  <dt>Role</dt>
+                  <dd>{ROLES.find((r) => r.key === role)?.label}</dd>
+                </div>
+                <div className="gm-st-kv-row">
+                  <dt>Plots</dt>
+                  <dd>{plots}</dd>
+                </div>
+                <div className="gm-st-kv-row">
+                  <dt>Financial</dt>
+                  <dd>{financial}</dd>
+                </div>
+                <div className="gm-st-kv-row">
+                  <dt>Payments</dt>
+                  <dd>{authority}</dd>
+                </div>
+                <div className="gm-st-kv-row">
+                  <dt>Valid until</dt>
+                  <dd>{validUntil}</dd>
+                </div>
+              </dl>
+              <OtpInput value={otp} onChange={setOtp} label="Owner OTP to authorise the invite (123456)" />
             </div>
-          </>
-        )}
+          ) : null}
+
+          <WizardActions
+            step={step}
+            last={2}
+            onBack={() => setStep((current) => Math.max(0, current - 1))}
+            nextLabel="Continue"
+            finishLabel="Send invite"
+            nextDisabled={(step === 0 && (!name || phone.length < 9)) || (step === 2 && otp.length < 6)}
+            onNext={() => {
+              if (step < 2) {
+                setStep((current) => current + 1);
+                return;
+              }
+              setBusy(true);
+              setTimeout(() => {
+                const ref = code("INV");
+                setBusy(false);
+                setReceipt(ref);
+                onSent({
+                  id: ref,
+                  name,
+                  phone,
+                  email: email || "—",
+                  role: role as TeamMember["role"],
+                  avatar: name
+                    .split(" ")
+                    .map((part) => part.charAt(0))
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase(),
+                  status: "Invited",
+                  joined: "Pending",
+                  lastLogin: "—",
+                  mfa: false,
+                  plots,
+                  crops: "All crops",
+                  financial: financial as TeamMember["financial"],
+                  paymentAuthority: authority === "Can approve payments" ? "Approve" : authority === "Can initiate payments" ? "Initiate" : "None",
+                  validFrom: "22 Sep 2026",
+                  validUntil,
+                  tasksThisMonth: 0,
+                });
+              }, 1100);
+            }}
+          />
+        </>
+      )}
+    </Dialog>
+  );
+}
+
+/* ---------------- member detail ---------------- */
+export function MemberDialog({
+  open,
+  member,
+  onClose,
+  onSave,
+  onRemove,
+}: {
+  open: boolean;
+  member: TeamMember | null;
+  onClose: () => void;
+  onSave: (member: TeamMember) => void;
+  onRemove: (member: TeamMember) => void;
+}) {
+  const [draft, setDraft] = useState<TeamMember | null>(member);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    setDraft(member);
+    setBusy(false);
+  }, [member]);
+  if (!draft) return null;
+  const isOwner = draft.role === "owner";
+  return (
+    <Dialog open={open} onClose={onClose} title={draft.name} desc={`${ROLES.find((r) => r.key === draft.role)?.label} · ${draft.status}`} wide>
+      <dl className="gm-st-kv is-two">
+        <div className="gm-st-kv-row">
+          <dt>Phone</dt>
+          <dd>{draft.phone}</dd>
+        </div>
+        <div className="gm-st-kv-row">
+          <dt>Email</dt>
+          <dd>{draft.email}</dd>
+        </div>
+        <div className="gm-st-kv-row">
+          <dt>Joined</dt>
+          <dd>{draft.joined}</dd>
+        </div>
+        <div className="gm-st-kv-row">
+          <dt>Last login</dt>
+          <dd>{draft.lastLogin}</dd>
+        </div>
+        <div className="gm-st-kv-row">
+          <dt>MFA</dt>
+          <dd>{draft.mfa ? "Enabled" : "Not set"}</dd>
+        </div>
+        <div className="gm-st-kv-row">
+          <dt>Tasks this month</dt>
+          <dd>{draft.tasksThisMonth}</dd>
+        </div>
+      </dl>
+
+      <div className="gm-st-form">
+        <label className="gm-field">
+          <span>Role</span>
+          <select
+            className="gm-select"
+            value={draft.role}
+            disabled={isOwner}
+            onChange={(event) => setDraft({ ...draft, role: event.target.value as TeamMember["role"] })}
+          >
+            {ROLES.map((role) => (
+              <option key={role.key} value={role.key}>
+                {role.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="gm-field">
+          <span>Plots accessible</span>
+          <select className="gm-select" value={draft.plots} onChange={(event) => setDraft({ ...draft, plots: event.target.value })}>
+            {["All", "Plots 1, 2", "Assigned only"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
+        <label className="gm-field">
+          <span>Financial access</span>
+          <select className="gm-select" value={draft.financial} onChange={(event) => setDraft({ ...draft, financial: event.target.value as TeamMember["financial"] })}>
+            {["Full", "View only", "None"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
+        <label className="gm-field">
+          <span>Payment authority</span>
+          <select className="gm-select" value={draft.paymentAuthority} onChange={(event) => setDraft({ ...draft, paymentAuthority: event.target.value as TeamMember["paymentAuthority"] })}>
+            {["Initiate", "Approve", "None"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
+        <label className="gm-field">
+          <span>Status</span>
+          <select className="gm-select" value={draft.status} disabled={isOwner} onChange={(event) => setDraft({ ...draft, status: event.target.value as TeamMember["status"] })}>
+            {["Active", "Invited", "Suspended"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
+        <label className="gm-field">
+          <span>Valid until</span>
+          <select className="gm-select" value={draft.validUntil} onChange={(event) => setDraft({ ...draft, validUntil: event.target.value })}>
+            {["Indefinite", "28 Feb 2027", "31 Dec 2026", "31 Jan 2027"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
       </div>
-      <div className="d-flex justify-content-between mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => step > 0 ? setStep(step - 1) : onClose()}>{step > 0 ? "Back" : "Cancel"}</button>
-        {step < steps.length - 1 ? (
-          <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => setStep(step + 1)}>Next <ArrowRight /></button>
-        ) : (
-          <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> Save profile</button>
-        )}
+      {busy ? <Spinner label="Saving permissions…" /> : null}
+      <div className="d-flex flex-wrap justify-content-end gap-2 mt-3">
+        {!isOwner ? (
+          <button type="button" className="gm-btn gm-btn-danger-soft" onClick={() => onRemove(draft)}>
+            Remove member
+          </button>
+        ) : null}
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Close
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          disabled={busy}
+          onClick={() => {
+            setBusy(true);
+            setTimeout(() => {
+              setBusy(false);
+              onSave(draft);
+              onClose();
+            }, 800);
+          }}
+        >
+          Save changes
+        </button>
       </div>
     </Dialog>
   );
 }
 
-/* ── 2. Farm Settings Edit Dialog ────────────────────────────────────────── */
-export function FarmSettingsDialog({
+/* ---------------- profile ---------------- */
+export function ProfileEditDialog({
   open,
-  farm,
+  ctx,
   onClose,
   onSave,
 }: {
   open: boolean;
-  farm: FarmSettings;
+  ctx: { farmer: string; phone: string; email: string; farmName: string; county: string; subCounty: string; ward: string; language: string };
   onClose: () => void;
-  onSave: (f: FarmSettings) => void;
+  onSave: (next: typeof ctx) => void;
 }) {
-  const [form, setForm] = useState(farm);
-  useEffect(() => { if (open) setForm(farm); }, [open, farm]);
+  const [draft, setDraft] = useState(ctx);
+  useEffect(() => setDraft(ctx), [ctx]);
   return (
-    <Dialog open={open} onClose={onClose} title="Farm Settings" wide>
-      <div className="gm-wizard-stack">
-        <div className="row g-3">
-          <div className="col-md-6"><div className="gm-field"><label>Farm name</label><input className="gm-input w-100" value={form.farmName} onChange={e => setForm(f => ({ ...f, farmName: e.target.value }))} /></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Farm type</label><select className="gm-select w-100" value={form.farmType} onChange={e => setForm(f => ({ ...f, farmType: e.target.value }))}>{["Mixed (crops + dairy)","Crops only","Dairy only","Poultry","Horticulture"].map(t => <option key={t}>{t}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Total acreage</label><input className="gm-input w-100" value={form.totalAcreage} onChange={e => setForm(f => ({ ...f, totalAcreage: e.target.value }))} /></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Registration number</label><input className="gm-input w-100" value={form.registrationNumber} onChange={e => setForm(f => ({ ...f, registrationNumber: e.target.value }))} /></div></div>
-        </div>
+    <Dialog open={open} onClose={onClose} title="Edit profile" desc="Everything captured during onboarding stays editable" wide>
+      <div className="gm-st-form is-two">
+        <label className="gm-field">
+          <span>Full name</span>
+          <input className="gm-input" value={draft.farmer} onChange={(event) => setDraft({ ...draft, farmer: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Phone</span>
+          <input className="gm-input" value={draft.phone} onChange={(event) => setDraft({ ...draft, phone: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Email</span>
+          <input className="gm-input" value={draft.email} onChange={(event) => setDraft({ ...draft, email: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Farm name</span>
+          <input className="gm-input" value={draft.farmName} onChange={(event) => setDraft({ ...draft, farmName: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>County</span>
+          <input className="gm-input" value={draft.county} onChange={(event) => setDraft({ ...draft, county: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Sub-county</span>
+          <input className="gm-input" value={draft.subCounty} onChange={(event) => setDraft({ ...draft, subCounty: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Ward</span>
+          <input className="gm-input" value={draft.ward} onChange={(event) => setDraft({ ...draft, ward: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Language</span>
+          <select className="gm-select" value={draft.language} onChange={(event) => setDraft({ ...draft, language: event.target.value })}>
+            {["English + Kiswahili", "English only", "Kiswahili only", "Kikuyu"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
       </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> Save farm settings</button>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          onClick={() => {
+            onSave(draft);
+            onClose();
+          }}
+        >
+          Save profile
+        </button>
       </div>
     </Dialog>
   );
 }
 
-/* ── 3. Plot Edit Dialog ─────────────────────────────────────────────────── */
-export function PlotEditDialog({
+/* ---------------- farm plot ---------------- */
+export function FarmPlotDialog({
   open,
   plot,
   onClose,
@@ -194,678 +473,671 @@ export function PlotEditDialog({
   open: boolean;
   plot: FarmPlot | null;
   onClose: () => void;
-  onSave: (p: FarmPlot) => void;
+  onSave: (plot: FarmPlot) => void;
 }) {
-  const [form, setForm] = useState<FarmPlot>({
-    id: "", name: "", size: "", soilType: "", waterSource: "", gps: "", lastSoilTest: "", crops: [], status: "Active",
-  });
-  useEffect(() => { if (open) setForm(plot ?? { id: `plot-${Date.now()}`, name: "", size: "", soilType: "", waterSource: "", gps: "", lastSoilTest: "", crops: [], status: "Active" }); }, [open, plot]);
+  const [draft, setDraft] = useState<FarmPlot | null>(plot);
+  useEffect(() => setDraft(plot), [plot]);
+  if (!draft) return null;
   return (
-    <Dialog open={open} onClose={onClose} title={plot ? "Edit Plot" : "Add Plot"} wide>
-      <div className="gm-wizard-stack">
-        <div className="row g-3">
-          <div className="col-md-6"><div className="gm-field"><label>Plot name</label><input className="gm-input w-100" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Plot 1" /></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Size</label><input className="gm-input w-100" value={form.size} onChange={e => setForm(f => ({ ...f, size: e.target.value }))} placeholder="e.g. 0.5 acre" /></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Soil type</label><select className="gm-select w-100" value={form.soilType} onChange={e => setForm(f => ({ ...f, soilType: e.target.value }))}>{["Clay loam","Red volcanic","Sandy loam","Enriched media","Black cotton","Loam"].map(s => <option key={s}>{s}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Water source</label><select className="gm-select w-100" value={form.waterSource} onChange={e => setForm(f => ({ ...f, waterSource: e.target.value }))}>{["Rain-fed","Rain + drip irrigation","Drip + fertigation","River pump","Borehole","Dam/pond"].map(w => <option key={w}>{w}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>GPS coordinates</label><input className="gm-input w-100" value={form.gps} onChange={e => setForm(f => ({ ...f, gps: e.target.value }))} placeholder="-1.0534, 36.8712" /></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Last soil test</label><input className="gm-input w-100" value={form.lastSoilTest} onChange={e => setForm(f => ({ ...f, lastSoilTest: e.target.value }))} placeholder="Sep 2026" /></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Status</label><select className="gm-select w-100" value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as any }))}>{["Active","Fallow","Planned"].map(s => <option key={s}>{s}</option>)}</select></div></div>
-        </div>
+    <Dialog open={open} onClose={onClose} title={draft.name} desc="Plot details feed the plan, the soil model and records" wide>
+      <div className="gm-st-form is-two">
+        <label className="gm-field">
+          <span>Plot name</span>
+          <input className="gm-input" value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Size</span>
+          <input className="gm-input" value={draft.size} onChange={(event) => setDraft({ ...draft, size: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Location</span>
+          <input className="gm-input" value={draft.location} onChange={(event) => setDraft({ ...draft, location: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Crop</span>
+          <input className="gm-input" value={draft.crop} onChange={(event) => setDraft({ ...draft, crop: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>Soil type</span>
+          <input className="gm-input" value={draft.soil} onChange={(event) => setDraft({ ...draft, soil: event.target.value })} />
+        </label>
+        <label className="gm-field">
+          <span>pH</span>
+          <input className="gm-input" type="number" step="0.1" value={draft.ph} onChange={(event) => setDraft({ ...draft, ph: Number(event.target.value) })} />
+        </label>
+        <label className="gm-field">
+          <span>Status</span>
+          <select className="gm-select" value={draft.status} onChange={(event) => setDraft({ ...draft, status: event.target.value as FarmPlot["status"] })}>
+            {["Active", "Fallow", "Preparing"].map((option) => (
+              <option key={option}>{option}</option>
+            ))}
+          </select>
+        </label>
+        <label className="gm-field">
+          <span>Harvest window</span>
+          <input className="gm-input" value={draft.harvest} onChange={(event) => setDraft({ ...draft, harvest: event.target.value })} />
+        </label>
       </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> {plot ? "Save plot" : "Add plot"}</button>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          onClick={() => {
+            onSave(draft);
+            onClose();
+          }}
+        >
+          Save plot
+        </button>
       </div>
     </Dialog>
   );
 }
 
-/* ── 4. Add Team Member Wizard (4-step) ──────────────────────────────────── */
-export function AddTeamMemberWizard({
+/* ---------------- plans ---------------- */
+export function PlanDialog({
   open,
+  current,
   onClose,
-  onSave,
+  onPick,
 }: {
   open: boolean;
+  current: string;
   onClose: () => void;
-  onSave: (m: TeamMember) => void;
+  onPick: (id: string, note: string) => void;
 }) {
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState<TeamMember>({
-    id: "", name: "", phone: "", email: null, role: "Worker",
-    plotsAccessible: "All", cropsAccessible: "All", financialAccess: "None",
-    paymentAuthority: "None", validFrom: "", validUntil: "Indefinite",
-    status: "Invited", lastActive: "Never", avatar: "",
-  });
-  useEffect(() => { if (open) { setStep(0); setForm({ id: `tm-${Date.now()}`, name: "", phone: "", email: null, role: "Worker", plotsAccessible: "All", cropsAccessible: "All", financialAccess: "None", paymentAuthority: "None", validFrom: "", validUntil: "Indefinite", status: "Invited", lastActive: "Never", avatar: "" }); } }, [open]);
-  const steps = ["Contact", "Role", "Permissions", "Review"];
-
-  const getDefaults = (role: string) => {
-    const map: Record<string, { fin: string; pay: string }> = {
-      "Farm Manager": { fin: "View only", pay: "Can initiate" },
-      Agronomist: { fin: "None", pay: "None" },
-      Accountant: { fin: "Full", pay: "Can initiate" },
-      Worker: { fin: "None", pay: "None" },
-      Viewer: { fin: "View only", pay: "None" },
-    };
-    return map[role] ?? { fin: "None", pay: "None" };
-  };
-
+  const [selected, setSelected] = useState(current);
+  useEffect(() => setSelected(current), [current, open]);
   return (
-    <Dialog open={open} onClose={onClose} title="Add Team Member" wide>
-      <Stepper steps={steps} current={step} />
-      <div className="gm-wizard-stack mt-3">
-        {step === 0 ? (
-          <>
-            <div className="row g-3">
-              <div className="col-md-6"><div className="gm-field"><label>Full name</label><input className="gm-input w-100" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Peter Kamau" /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Phone number</label><input className="gm-input w-100" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="07XX XXX XXX" /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Email (optional)</label><input className="gm-input w-100" type="email" value={form.email ?? ""} onChange={e => setForm(f => ({ ...f, email: e.target.value || null }))} placeholder="name@email.com" /></div></div>
-            </div>
-          </>
-        ) : step === 1 ? (
-          <>
-            <div className="gm-field"><label>Role</label>
-              <div className="d-flex flex-wrap gap-2 mt-1">
-                {["Farm Manager", "Agronomist", "Accountant", "Worker", "Viewer"].map(r => (
-                  <button key={r} type="button" className={`gm-btn gm-btn-sm ${form.role === r ? "gm-btn-dark" : "gm-btn-outline"}`} onClick={() => { const d = getDefaults(r); setForm(f => ({ ...f, role: r as any, financialAccess: d.fin as any, paymentAuthority: d.pay as any })); }}>{r}</button>
-                ))}
+    <Dialog open={open} onClose={onClose} title="Plans & billing" desc="Pay by M-Pesa from the GrowMO wallet" wide>
+      <div className="gm-st-plan-grid">
+        {PLANS.map((plan) => (
+          <button
+            key={plan.id}
+            type="button"
+            className={`gm-st-plan ${selected === plan.id ? "is-current" : ""} ${plan.id === "premium" ? "is-featured" : ""}`}
+            onClick={() => setSelected(plan.id)}
+          >
+            <div className="gm-st-plan-head">
+              <span className="gm-st-plan-icon">{plan.icon}</span>
+              <div>
+                <strong className="font-display">{plan.name}</strong>
+                <small>{plan.desc}</small>
               </div>
             </div>
-            <div className="row g-3 mt-1">
-              <div className="col-md-6"><div className="gm-field"><label>Valid from</label><input className="gm-input w-100" type="date" value={form.validFrom} onChange={e => setForm(f => ({ ...f, validFrom: e.target.value }))} /></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Valid until</label><select className="gm-select w-100" value={form.validUntil} onChange={e => setForm(f => ({ ...f, validUntil: e.target.value }))}><option>Indefinite</option><option>31 Mar 2027</option><option>30 Jun 2027</option><option>31 Dec 2027</option></select></div></div>
+            <div className="gm-st-plan-price">
+              <strong className="font-display">{plan.price === 0 ? "Free" : kes(plan.price)}</strong>
+              <small>{plan.billing}</small>
             </div>
-          </>
-        ) : step === 2 ? (
-          <>
-            <div className="row g-3">
-              <div className="col-md-6"><div className="gm-field"><label>Plots accessible</label><select className="gm-select w-100" value={form.plotsAccessible} onChange={e => setForm(f => ({ ...f, plotsAccessible: e.target.value }))}>{["All","Plot 1","Plot 2","Plot 3","Greenhouse 1","Plot 1, Plot 2","Plot 1, Greenhouse 1"].map(p => <option key={p}>{p}</option>)}</select></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Crops accessible</label><select className="gm-select w-100" value={form.cropsAccessible} onChange={e => setForm(f => ({ ...f, cropsAccessible: e.target.value }))}>{["All","Cabbage, Tomato","Cabbage, Maize","Maize","Cabbage, Maize, Tomato"].map(c => <option key={c}>{c}</option>)}</select></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Financial access</label><select className="gm-select w-100" value={form.financialAccess} onChange={e => setForm(f => ({ ...f, financialAccess: e.target.value as any }))}>{["Full","View only","None"].map(f => <option key={f}>{f}</option>)}</select></div></div>
-              <div className="col-md-6"><div className="gm-field"><label>Payment authority</label><select className="gm-select w-100" value={form.paymentAuthority} onChange={e => setForm(f => ({ ...f, paymentAuthority: e.target.value as any }))}>{["Can initiate","Can approve","None"].map(p => <option key={p}>{p}</option>)}</select></div></div>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="gm-review-card">
-              <div className="gm-review-row"><span>Name</span><strong>{form.name || "—"}</strong></div>
-              <div className="gm-review-row"><span>Phone</span><strong>{form.phone || "—"}</strong></div>
-              <div className="gm-review-row"><span>Email</span><strong>{form.email || "—"}</strong></div>
-              <div className="gm-review-row"><span>Role</span><strong>{form.role}</strong></div>
-              <div className="gm-review-row"><span>Plots</span><strong>{form.plotsAccessible}</strong></div>
-              <div className="gm-review-row"><span>Crops</span><strong>{form.cropsAccessible}</strong></div>
-              <div className="gm-review-row"><span>Financial access</span><strong>{form.financialAccess}</strong></div>
-              <div className="gm-review-row"><span>Payment authority</span><strong>{form.paymentAuthority}</strong></div>
-              <div className="gm-review-row"><span>Valid from</span><strong>{form.validFrom || "Today"}</strong></div>
-              <div className="gm-review-row"><span>Valid until</span><strong>{form.validUntil}</strong></div>
-            </div>
-            <div className="gm-check-row"><ShieldCheck /><span><strong>Invite will be sent via SMS</strong><small>The team member will receive an SMS with a link to join your farm on GrowMO.</small></span></div>
-          </>
-        )}
-      </div>
-      <div className="d-flex justify-content-between mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => step > 0 ? setStep(step - 1) : onClose()}>{step > 0 ? "Back" : "Cancel"}</button>
-        {step < steps.length - 1 ? (
-          <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => setStep(step + 1)}>Next <ArrowRight /></button>
-        ) : (
-          <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> Send invite</button>
-        )}
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 5. Edit Team Member Dialog ──────────────────────────────────────────── */
-export function EditTeamMemberDialog({
-  open,
-  member,
-  onClose,
-  onSave,
-}: {
-  open: boolean;
-  member: TeamMember | null;
-  onClose: () => void;
-  onSave: (m: TeamMember) => void;
-}) {
-  const [form, setForm] = useState<TeamMember | null>(null);
-  useEffect(() => { if (open) setForm(member ? { ...member } : null); }, [open, member]);
-  if (!form) return null;
-  return (
-    <Dialog open={open} onClose={onClose} title={`Edit: ${form.name}`} wide>
-      <div className="gm-wizard-stack">
-        <div className="row g-3">
-          <div className="col-md-6"><div className="gm-field"><label>Role</label><select className="gm-select w-100" value={form.role} onChange={e => setForm(f => f ? { ...f, role: e.target.value as any } : null)}>{["Farm Manager","Agronomist","Accountant","Worker","Viewer"].map(r => <option key={r}>{r}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Status</label><select className="gm-select w-100" value={form.status} onChange={e => setForm(f => f ? { ...f, status: e.target.value as any } : null)}>{["Active","Invited","Inactive"].map(s => <option key={s}>{s}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Plots accessible</label><select className="gm-select w-100" value={form.plotsAccessible} onChange={e => setForm(f => f ? { ...f, plotsAccessible: e.target.value } : null)}>{["All","Plot 1","Plot 2","Plot 1, Plot 2","Plot 1, Greenhouse 1"].map(p => <option key={p}>{p}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Financial access</label><select className="gm-select w-100" value={form.financialAccess} onChange={e => setForm(f => f ? { ...f, financialAccess: e.target.value as any } : null)}>{["Full","View only","None"].map(f => <option key={f}>{f}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Payment authority</label><select className="gm-select w-100" value={form.paymentAuthority} onChange={e => setForm(f => f ? { ...f, paymentAuthority: e.target.value as any } : null)}>{["Can initiate","Can approve","None"].map(p => <option key={p}>{p}</option>)}</select></div></div>
-          <div className="col-md-6"><div className="gm-field"><label>Valid until</label><select className="gm-select w-100" value={form.validUntil} onChange={e => setForm(f => f ? { ...f, validUntil: e.target.value } : null)}>{["Indefinite","31 Mar 2027","30 Jun 2027","31 Dec 2027"].map(d => <option key={d}>{d}</option>)}</select></div></div>
-        </div>
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> Save changes</button>
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 6. Team Member Detail Drawer ────────────────────────────────────────── */
-export function TeamMemberDrawer({
-  open,
-  member,
-  onClose,
-  onEdit,
-  onRemove,
-}: {
-  open: boolean;
-  member: TeamMember | null;
-  onClose: () => void;
-  onEdit: () => void;
-  onRemove: () => void;
-}) {
-  if (!member) return null;
-  return (
-    <DashboardDrawer open={open} title={member.name} onClose={onClose} footer={
-      <div className="d-flex flex-wrap gap-2">
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={onEdit}><Pencil /> Edit</button>
-        {member.role !== "Owner" && <button type="button" className="gm-btn gm-btn-danger-soft gm-btn-sm" onClick={onRemove}><Trash2 /> Remove</button>}
-      </div>
-    }>
-      <div className="gm-wizard-stack">
-        <div className="text-center mb-2">
-          <span className="gm-avatar-lg">{member.avatar}</span>
-          <h3 className="font-display mt-2 mb-0">{member.name}</h3>
-          <StatusChip label={member.role} tone={member.role === "Owner" ? "low" : member.status === "Active" ? "low" : "neutral"} />
-        </div>
-        <div className="gm-review-card">
-          <div className="gm-review-row"><span>Phone</span><strong>{member.phone}</strong></div>
-          <div className="gm-review-row"><span>Email</span><strong>{member.email ?? "—"}</strong></div>
-          <div className="gm-review-row"><span>Status</span><strong>{member.status}</strong></div>
-          <div className="gm-review-row"><span>Plots</span><strong>{member.plotsAccessible}</strong></div>
-          <div className="gm-review-row"><span>Crops</span><strong>{member.cropsAccessible}</strong></div>
-          <div className="gm-review-row"><span>Financial access</span><strong>{member.financialAccess}</strong></div>
-          <div className="gm-review-row"><span>Payment authority</span><strong>{member.paymentAuthority}</strong></div>
-          <div className="gm-review-row"><span>Valid from</span><strong>{member.validFrom}</strong></div>
-          <div className="gm-review-row"><span>Valid until</span><strong>{member.validUntil}</strong></div>
-          <div className="gm-review-row"><span>Last active</span><strong>{member.lastActive}</strong></div>
-        </div>
-      </div>
-    </DashboardDrawer>
-  );
-}
-
-/* ── 7. Permission Matrix Dialog ─────────────────────────────────────────── */
-export function PermissionMatrixDialog({
-  open,
-  matrix,
-  features,
-  onClose,
-}: {
-  open: boolean;
-  matrix: Record<string, Record<string, string>>;
-  features: readonly string[];
-  onClose: () => void;
-}) {
-  const roles = Object.keys(matrix);
-  return (
-    <Dialog open={open} onClose={onClose} title="Role Permission Matrix" wide>
-      <div className="gm-table-wrap">
-        <table className="gm-table">
-          <thead><tr><th>Feature</th>{roles.map(r => <th key={r}>{r}</th>)}</tr></thead>
-          <tbody>
-            {features.map(f => (
-              <tr key={f}>
-                <td><strong>{f}</strong></td>
-                {roles.map(r => {
-                  const val = matrix[r]?.[f] ?? "—";
-                  const tone = val === "Full" ? "low" : val === "—" ? "neutral" : "medium";
-                  return <td key={r}><StatusChip label={val} tone={tone as any} /></td>;
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 8. Notification Preferences Dialog ──────────────────────────────────── */
-export function NotificationPrefsDialog({
-  open,
-  prefs,
-  onClose,
-  onSave,
-}: {
-  open: boolean;
-  prefs: NotificationPref[];
-  onClose: () => void;
-  onSave: (prefs: NotificationPref[]) => void;
-}) {
-  const [form, setForm] = useState(prefs);
-  useEffect(() => { if (open) setForm(prefs); }, [open, prefs]);
-  const toggle = (id: string) => setForm(f => f.map(p => p.id === id ? { ...p, enabled: !p.enabled } : p));
-  const channels = ["Push", "SMS", "WhatsApp", "Email"] as const;
-  return (
-    <Dialog open={open} onClose={onClose} title="Notification Preferences" wide>
-      <div className="gm-wizard-stack">
-        {channels.map(ch => (
-          <div key={ch}>
-            <h4 className="font-display mb-2">{ch}</h4>
-            {form.filter(p => p.channel === ch).map(p => (
-              <Toggle key={p.id} checked={p.enabled} onChange={() => toggle(p.id)} label={p.type} desc={p.note} />
-            ))}
-          </div>
+            <ul className="gm-st-plan-features">
+              {plan.features.slice(0, 6).map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+          </button>
         ))}
       </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> Save preferences</button>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Close
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          disabled={selected === current}
+          onClick={() => {
+            onPick(selected, selected === current ? "Plan unchanged" : `Switched to ${PLANS.find((p) => p.id === selected)?.name}`);
+            onClose();
+          }}
+        >
+          {selected === current ? "This is your plan" : `Switch to ${PLANS.find((p) => p.id === selected)?.name}`}
+        </button>
       </div>
     </Dialog>
   );
 }
 
-/* ── 9. Privacy Settings Dialog ──────────────────────────────────────────── */
-export function PrivacySettingsDialog({
+/* ---------------- data actions ---------------- */
+export function DataActionDialog({
   open,
-  settings,
+  action,
   onClose,
-  onSave,
+  onDone,
 }: {
   open: boolean;
-  settings: PrivacySetting[];
+  action: string | null;
   onClose: () => void;
-  onSave: (s: PrivacySetting[]) => void;
+  onDone: (id: string, receipt: string, note: string) => void;
 }) {
-  const [form, setForm] = useState(settings);
-  useEffect(() => { if (open) setForm(settings); }, [open, settings]);
-  const toggle = (id: string) => setForm(f => f.map(s => s.id === id ? { ...s, enabled: !s.enabled } : s));
-  return (
-    <Dialog open={open} onClose={onClose} title="Data & Privacy" wide>
-      <div className="gm-wizard-stack">
-        {form.filter(s => s.setting !== "Export all data" && s.setting !== "Delete account").map(s => (
-          <Toggle key={s.id} checked={s.enabled} onChange={() => toggle(s.id)} label={s.setting} desc={s.description} />
-        ))}
-        <div className="gm-field">
-          <label>Data retention</label>
-          <select className="gm-select w-100" value={form.find(s => s.setting === "Data retention")?.value ?? "Keep all"} onChange={e => setForm(f => f.map(s => s.setting === "Data retention" ? { ...s, value: e.target.value } : s))}>
-            {["Keep all", "Auto-delete after 3 years", "Custom"].map(o => <option key={o}>{o}</option>)}
-          </select>
-        </div>
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(form); onClose(); }}><Check /> Save privacy settings</button>
-      </div>
-    </Dialog>
-  );
-}
+  const [otp, setOtp] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [receipt, setReceipt] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    setOtp("");
+    setBusy(false);
+    setReceipt(null);
+  }, [open]);
 
-/* ── 10. Export Data Dialog ──────────────────────────────────────────────── */
-export function ExportDataDialog({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  const [format, setFormat] = useState<"csv" | "json">("csv");
-  const [sections, setSections] = useState<string[]>(["Profile", "Farm data", "Transactions", "Crop records"]);
-  const allSections = ["Profile", "Farm data", "Transactions", "Crop records", "Team data", "Weather history", "Market prices", "Photos"];
-  const toggle = (s: string) => setSections(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s]);
+  const labels: Record<string, { title: string; desc: string; cta: string; danger?: boolean }> = {
+    d1: { title: "Extension sharing", desc: "Kiambu extension officers can read soil tests and spray records.", cta: "Save sharing settings" },
+    d2: { title: "Benchmark pool", desc: "Your yields join the de-identified county comparison pool.", cta: "Update benchmark sharing" },
+    d3: { title: "Buyer traceability", desc: "Pick which buyers can scan batch QRs — Naivas, Twiga and Karen Greens are available.", cta: "Save buyer list" },
+    d4: { title: "Data retention", desc: "Keep everything, auto-delete after three years, or set a custom window.", cta: "Change retention" },
+    d5: { title: "Export all data", desc: "A ZIP with CSVs plus photos is prepared and a download link is SMSed to you.", cta: "Prepare export" },
+    d6: { title: "Delete account", desc: "Deletion runs after a 30-day grace period. Withdraw wallet funds first.", cta: "Start 30-day deletion", danger: true },
+  };
+  const meta = labels[action ?? "d1"] ?? labels.d1;
+
   return (
-    <Dialog open={open} onClose={onClose} title="Export All Data">
-      <div className="gm-wizard-stack">
-        <p className="text-muted">Download a ZIP file containing all your GrowMO data.</p>
-        <div className="gm-field"><label>Format</label>
-          <div className="d-flex gap-2 mt-1">
-            <button type="button" className={`gm-btn gm-btn-sm ${format === "csv" ? "gm-btn-dark" : "gm-btn-outline"}`} onClick={() => setFormat("csv")}>CSV</button>
-            <button type="button" className={`gm-btn gm-btn-sm ${format === "json" ? "gm-btn-dark" : "gm-btn-outline"}`} onClick={() => setFormat("json")}>JSON</button>
+    <Dialog open={open} onClose={onClose} title={meta.title} desc="OTP authorisation required">
+      {receipt ? (
+        <>
+          <Receipt title={meta.danger ? "Deletion scheduled" : "Saved"} note={meta.desc} receipt={receipt} />
+          <div className="d-flex justify-content-end mt-3">
+            <button type="button" className="gm-btn gm-btn-lime" onClick={onClose}>
+              Done
+            </button>
           </div>
-        </div>
-        <div className="gm-field"><label>Sections to include</label>
-          <div className="d-flex flex-wrap gap-2 mt-1">
-            {allSections.map(s => <button key={s} type="button" className={`gm-btn gm-btn-sm ${sections.includes(s) ? "gm-btn-dark" : "gm-btn-outline"}`} onClick={() => toggle(s)}>{s}</button>)}
+        </>
+      ) : busy ? (
+        <Spinner label="Applying your choice…" />
+      ) : (
+        <>
+          <p className="gm-st-note">{meta.desc}</p>
+          <dl className="gm-st-kv">
+            {DATA_SHARING_DETAIL.map((row) => (
+              <div key={row.k} className="gm-st-kv-row">
+                <dt>{row.k}</dt>
+                <dd>{row.v}</dd>
+              </div>
+            ))}
+          </dl>
+          <OtpInput value={otp} onChange={setOtp} label="Owner OTP (123456)" />
+          <div className="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className={`gm-btn ${meta.danger ? "gm-btn-danger-soft" : "gm-btn-lime"}`}
+              disabled={otp.length < 6}
+              onClick={() => {
+                setBusy(true);
+                setTimeout(() => {
+                  const ref = code(meta.danger ? "DEL" : "SET");
+                  setBusy(false);
+                  setReceipt(ref);
+                  onDone(action ?? "", ref, meta.title);
+                }, 1100);
+              }}
+            >
+              {meta.cta}
+            </button>
           </div>
+        </>
+      )}
+    </Dialog>
+  );
+}
+
+/* ---------------- worker detail ---------------- */
+export function WorkerDialog({
+  open,
+  worker,
+  onClose,
+  onPay,
+}: {
+  open: boolean;
+  worker: Worker | null;
+  onClose: () => void;
+  onPay: (worker: Worker, amount: number, memo: string) => void;
+}) {
+  if (!worker) return null;
+  return (
+    <Dialog open={open} onClose={onClose} title={worker.name} desc={`${worker.id} · ${worker.role} · ${worker.employment}`} wide>
+      <div className="row g-3">
+        <div className="col-lg-6">
+          <h3 className="gm-h-section">Identity & contact</h3>
+          <dl className="gm-st-kv">
+            <div className="gm-st-kv-row">
+              <dt>Phone</dt>
+              <dd>{worker.phone}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>M-Pesa name</dt>
+              <dd>{worker.mpesaName}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>National ID</dt>
+              <dd>{worker.nin}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Village</dt>
+              <dd>
+                {worker.village} · {worker.distance}
+              </dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Next of kin</dt>
+              <dd>{worker.nextOfKin}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Status</dt>
+              <dd>{worker.status}</dd>
+            </div>
+          </dl>
+        </div>
+        <div className="col-lg-6">
+          <h3 className="gm-h-section">Contract & skills</h3>
+          <dl className="gm-st-kv">
+            <div className="gm-st-kv-row">
+              <dt>Employment</dt>
+              <dd>
+                {worker.employment} · joined {worker.joined}
+              </dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Contract ends</dt>
+              <dd>{worker.contractEnd}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Skills</dt>
+              <dd>{worker.skills.join(", ")}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Daily rate</dt>
+              <dd>{kes(worker.dailyRate)}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Piece rate</dt>
+              <dd>{worker.pieceRate}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Paid by</dt>
+              <dd>{worker.payment}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>NSSF / NHIF</dt>
+              <dd>
+                {worker.nssf} · {worker.nhif}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div className="col-lg-6">
+          <h3 className="gm-h-section">Performance</h3>
+          <dl className="gm-st-kv">
+            <div className="gm-st-kv-row">
+              <dt>Rating</dt>
+              <dd>{worker.rating.toFixed(1)}★</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Tasks completed</dt>
+              <dd>{worker.tasks}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Attendance</dt>
+              <dd>{worker.attendance}%</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Earned all time</dt>
+              <dd>{kes(worker.earnedAllTime)}</dd>
+            </div>
+            <div className="gm-st-kv-row">
+              <dt>Earned this season</dt>
+              <dd>{kes(worker.earnedSeason)}</dd>
+            </div>
+          </dl>
+          <p className="gm-st-note">{worker.note}</p>
+        </div>
+        <div className="col-lg-6">
+          <h3 className="gm-h-section">Pay this worker</h3>
+          <PayWorkerInline worker={worker} onPay={onPay} />
         </div>
       </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={onClose}><Download /> Export data</button>
+      <div className="d-flex justify-content-end mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Close
+        </button>
       </div>
     </Dialog>
   );
 }
 
-/* ── 11. Delete Account Dialog ───────────────────────────────────────────── */
-export function DeleteAccountDialog({
+function PayWorkerInline({ worker, onPay }: { worker: Worker; onPay: (worker: Worker, amount: number, memo: string) => void }) {
+  const [amount, setAmount] = useState(worker.dailyRate * 5);
+  const [memo, setMemo] = useState("Weekly pay");
+  const [pin, setPin] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState<string | null>(null);
+
+  if (done) return <Receipt title="Payment sent" note={`${kes(amount)} to ${worker.name} · ${worker.phone}`} receipt={done} />;
+  if (busy) return <Spinner label={`Paying ${worker.name}…`} />;
+
+  return (
+    <div className="gm-st-form">
+      <label className="gm-field">
+        <span>Amount (KES)</span>
+        <input className="gm-input" type="number" value={amount} onChange={(event) => setAmount(Number(event.target.value))} />
+      </label>
+      <label className="gm-field">
+        <span>Note on the receipt</span>
+        <input className="gm-input" value={memo} onChange={(event) => setMemo(event.target.value)} />
+      </label>
+      <p className="gm-st-note">Funds come from the labour budget. Enter the wallet PIN — any 4 digits in this demo.</p>
+      <PinPad
+        onComplete={(value) => {
+          setPin(value);
+          setBusy(true);
+          setTimeout(() => {
+            const ref = code("PL");
+            setBusy(false);
+            setDone(ref);
+            onPay(worker, amount, memo);
+          }, 1100);
+        }}
+      />
+      {pin ? <p className="gm-st-note">PIN captured.</p> : null}
+    </div>
+  );
+}
+
+/* ---------------- payroll run ---------------- */
+export function PayrollDialog({
   open,
   onClose,
+  onPaid,
 }: {
   open: boolean;
   onClose: () => void;
-}) {
-  const [confirm, setConfirm] = useState("");
-  useEffect(() => { if (open) setConfirm(""); }, [open]);
-  return (
-    <Dialog open={open} onClose={onClose} title="Delete Account">
-      <div className="gm-wizard-stack">
-        <div className="gm-alert-box is-danger"><Trash2 /><p><strong>This action cannot be undone</strong><br />All your farm data, records, team connections and payment history will be permanently deleted after a 30-day grace period.</p></div>
-        <div className="gm-field"><label>Type DELETE to confirm</label><input className="gm-input w-100" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="DELETE" /></div>
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-danger gm-btn-sm" disabled={confirm !== "DELETE"} onClick={onClose}><Trash2 /> Delete account</button>
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 12. Subscription Plan Dialog ────────────────────────────────────────── */
-export function SubscriptionPlanDialog({
-  open,
-  current,
-  onClose,
-  onUpgrade,
-}: {
-  open: string | null;
-  current: string;
-  onClose: () => void;
-  onUpgrade: (plan: string) => void;
-}) {
-  if (!open) return null;
-  const isCurrent = open.toLowerCase() === current.toLowerCase();
-  return (
-    <Dialog open={!!open} onClose={onClose} title={`${open} Plan`}>
-      <div className="gm-wizard-stack">
-        <h3 className="font-display">{open === "Free" ? "Mbegu (Seed)" : open === "Premium" ? "Mavuno (Harvest)" : "Chama / Cooperative"}</h3>
-        <p className="text-muted">{open === "Free" ? "Everything a starting farmer needs." : open === "Premium" ? "For serious commercial farmers who want predictions, not surprises." : "Run your whole group — bulk buying, collective sales, one dashboard."}</p>
-        <div className="gm-review-card">
-          <div className="gm-review-row"><span>Price</span><strong className="font-display">{open === "Free" ? "Free forever" : open === "Premium" ? "KES 299/month" : "KES 2,499/month"}</strong></div>
-          <div className="gm-review-row"><span>Crops</span><strong>{open === "Free" ? "2" : open === "Premium" ? "Unlimited" : "Unlimited"}</strong></div>
-          <div className="gm-review-row"><span>Team</span><strong>{open === "Free" ? "1 (self)" : open === "Premium" ? "3" : "200"}</strong></div>
-          <div className="gm-review-row"><span>AI chats</span><strong>{open === "Free" ? "5/month" : open === "Premium" ? "50/month" : "Unlimited"}</strong></div>
-        </div>
-        {isCurrent && <div className="gm-check-row"><CheckCircle2 /><span><strong>This is your current plan</strong><small>You are subscribed to the {open} plan.</small></span></div>}
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Close</button>
-        {!isCurrent && <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onUpgrade(open); onClose(); }}>Upgrade to {open}</button>}
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 13. Upgrade Wizard (3-step) ─────────────────────────────────────────── */
-export function UpgradeWizard({
-  open,
-  targetPlan,
-  onClose,
-  onComplete,
-}: {
-  open: boolean;
-  targetPlan: string;
-  onClose: () => void;
-  onComplete: () => void;
+  onPaid: (total: number, receipts: Record<string, string>) => void;
 }) {
   const [step, setStep] = useState(0);
-  const [processing, setProcessing] = useState(false);
-  useEffect(() => { if (open) { setStep(0); setProcessing(false); } }, [open]);
-  const steps = ["Select plan", "Payment", "Confirm"];
-  const price = targetPlan === "Premium" ? 299 : 999;
+  const [otp, setOtp] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [receipts, setReceipts] = useState<Record<string, string> | null>(null);
+  const total = PAYSLIPS.reduce((sum, slip) => sum + slip.net, 0);
+
+  useEffect(() => {
+    if (!open) return;
+    setStep(0);
+    setOtp("");
+    setBusy(false);
+    setReceipts(null);
+  }, [open]);
+
   return (
-    <Dialog open={open} onClose={onClose} title={`Upgrade to ${targetPlan}`} wide>
-      <Stepper steps={steps} current={step} />
-      <div className="gm-wizard-stack mt-3">
-        {step === 0 ? (
-          <div className="gm-review-card">
-            <div className="gm-review-row"><span>Plan</span><strong>{targetPlan}</strong></div>
-            <div className="gm-review-row"><span>Price</span><strong className="font-display">{kes(price)}/month</strong></div>
-            <div className="gm-review-row"><span>Billing</span><strong>Monthly via M-Pesa</strong></div>
+    <Dialog open={open} onClose={onClose} title="Weekly payroll run" desc={`${PAYSLIPS.length} workers · ${kes(total)} · Friday 5 PM run`} wide>
+      <Stepper steps={["Review payslips", "Authorise", "Receipts"]} current={step} onStep={(index) => index <= step && setStep(index)} />
+      {receipts ? (
+        <div>
+          <Receipt title="Payroll processed" note={`${PAYSLIPS.length} workers paid from the labour budget; each one gets an SMS payslip.`} receipt={`BATCH ${code("PAY")}`} />
+          <div className="gm-table-wrap mt-3">
+            <table className="gm-table">
+              <thead>
+                <tr>
+                  <th>Worker</th>
+                  <th>Net pay</th>
+                  <th>M-Pesa number</th>
+                  <th>Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {PAYSLIPS.map((slip) => (
+                  <tr key={slip.worker}>
+                    <td>{slip.worker}</td>
+                    <td>{kes(slip.net)}</td>
+                    <td>{slip.phone}</td>
+                    <td>
+                      <code>{receipts[slip.worker]}</code>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ) : step === 1 ? (
-          <>
-            <p className="text-muted">Pay via M-Pesa. An STK push will be sent to your phone.</p>
-            <div className="gm-review-card">
-              <div className="gm-review-row"><span>Amount</span><strong className="font-display">{kes(price)}</strong></div>
-              <div className="gm-review-row"><span>To</span><strong>GrowMO (Paybill 174379)</strong></div>
-              <div className="gm-review-row"><span>Phone</span><strong>0712 345 678</strong></div>
+        </div>
+      ) : busy ? (
+        <Spinner label="Paying workers over M-Pesa B2C…" />
+      ) : (
+        <>
+          {step === 0 ? (
+            <div className="gm-table-wrap">
+              <table className="gm-table">
+                <thead>
+                  <tr>
+                    <th>Worker</th>
+                    <th>Days</th>
+                    <th>Basic</th>
+                    <th>Overtime</th>
+                    <th>Piece</th>
+                    <th>Deductions</th>
+                    <th>Net</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {PAYSLIPS.map((slip) => (
+                    <tr key={slip.worker}>
+                      <td>{slip.worker}</td>
+                      <td>{slip.days}</td>
+                      <td>{kes(slip.basic)}</td>
+                      <td>{kes(slip.otPay)}</td>
+                      <td>{slip.piece ? kes(slip.piece) : "—"}</td>
+                      <td>{slip.absence + slip.advance === 0 ? "—" : kes(slip.absence + slip.advance)}</td>
+                      <td>
+                        <strong>{kes(slip.net)}</strong>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </>
-        ) : (
-          processing ? (
-            <div className="text-center py-4"><div className="gm-spinner mb-3" /><p className="text-muted">Processing your payment...</p></div>
-          ) : (
-            <div className="text-center py-3"><CheckCircle2 width={48} height={48} style={{ color: "var(--gm-leaf-500)" }} /><h3 className="font-display mt-2">Upgrade successful!</h3><p className="text-muted">Your {targetPlan} plan is now active.</p></div>
-          )
-        )}
-      </div>
-      <div className="d-flex justify-content-between mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => step > 0 ? setStep(step - 1) : onClose()}>{step > 0 ? "Back" : "Cancel"}</button>
-        {step < steps.length - 1 ? (
-          <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => setStep(step + 1)}>Next <ArrowRight /></button>
-        ) : (
-          <button type="button" className="gm-btn gm-btn-mpesa gm-btn-sm" disabled={processing} onClick={() => { setProcessing(true); setTimeout(() => { setProcessing(false); onComplete(); }, 2000); }}>Pay {kes(price)}</button>
-        )}
-      </div>
+          ) : null}
+          {step === 1 ? (
+            <div className="gm-st-form">
+              <p className="gm-st-note">
+                Total to release <strong>{kes(total)}</strong> from the labour budget. Workers also receive a written payslip
+                by SMS and WhatsApp.
+              </p>
+              <OtpInput value={otp} onChange={setOtp} label="Owner OTP to authorise payroll (123456)" />
+            </div>
+          ) : null}
+        </>
+      )}
+      {!receipts && !busy ? (
+        <WizardActions
+          step={step}
+          last={1}
+          onBack={() => setStep((current) => Math.max(0, current - 1))}
+          nextLabel="Authorise"
+          finishLabel="Pay all workers"
+          nextDisabled={step === 1 && otp.length < 6}
+          onNext={() => {
+            if (step === 0) {
+              setStep(1);
+              return;
+            }
+            setBusy(true);
+            setTimeout(() => {
+              const issued: Record<string, string> = {};
+              for (const slip of PAYSLIPS) issued[slip.worker] = code("SHK");
+              setBusy(false);
+              setStep(2);
+              setReceipts(issued);
+              onPaid(total, issued);
+            }, 1600);
+          }}
+        />
+      ) : null}
+      {receipts ? (
+        <div className="d-flex justify-content-end mt-3">
+          <button type="button" className="gm-btn gm-btn-lime" onClick={onClose}>
+            Done
+          </button>
+        </div>
+      ) : null}
     </Dialog>
   );
 }
 
-/* ── 14. Change Password Dialog ──────────────────────────────────────────── */
-export function ChangePasswordDialog({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  const [current, setCurrent] = useState("");
-  const [newPw, setNewPw] = useState("");
-  const [confirm, setConfirm] = useState("");
-  useEffect(() => { if (open) { setCurrent(""); setNewPw(""); setConfirm(""); } }, [open]);
-  return (
-    <Dialog open={open} onClose={onClose} title="Change Password">
-      <div className="gm-wizard-stack">
-        <div className="gm-field"><label>Current password</label><input className="gm-input w-100" type="password" value={current} onChange={e => setCurrent(e.target.value)} /></div>
-        <div className="gm-field"><label>New password</label><input className="gm-input w-100" type="password" value={newPw} onChange={e => setNewPw(e.target.value)} /><small className="text-muted">Minimum 8 characters with uppercase, number and symbol</small></div>
-        <div className="gm-field"><label>Confirm new password</label><input className="gm-input w-100" type="password" value={confirm} onChange={e => setConfirm(e.target.value)} />{confirm && newPw !== confirm && <small className="text-danger">Passwords do not match</small>}</div>
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" disabled={!current || !newPw || newPw !== confirm || newPw.length < 8} onClick={onClose}><Check /> Change password</button>
-      </div>
-    </Dialog>
-  );
-}
 
-/* ── 15. Two-Factor Auth Dialog ──────────────────────────────────────────── */
-export function TwoFactorDialog({
-  open,
-  enabled,
-  onClose,
-  onToggle,
-}: {
-  open: boolean;
-  enabled: boolean;
-  onClose: () => void;
-  onToggle: () => void;
-}) {
+/* ---------------- job post & onboarding ---------------- */
+export function JobPostDialog({ open, onClose, onPosted }: { open: boolean; onClose: () => void; onPosted: (receipt: string) => void }) {
+  const [draft, setDraft] = useState({ ...JOB_POST });
+  const [busy, setBusy] = useState(false);
+  const [receipt, setReceipt] = useState<string | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    setDraft({ ...JOB_POST });
+    setBusy(false);
+    setReceipt(null);
+  }, [open]);
   return (
-    <Dialog open={open} onClose={onClose} title={enabled ? "Disable 2FA" : "Enable 2FA"}>
-      <div className="gm-wizard-stack">
-        <div className="text-center"><ShieldCheck width={48} height={48} style={{ color: enabled ? "var(--gm-clay-500)" : "var(--gm-leaf-500)" }} /></div>
-        <p className="text-muted text-center">{enabled ? "Two-factor authentication adds an extra layer of security. Disabling it makes your account less secure." : "Two-factor authentication requires a code from your phone in addition to your password when logging in."}</p>
-        {!enabled && <div className="gm-check-row"><Smartphone /><span><strong>Authenticator app</strong><small>Use Google Authenticator or Authy to generate codes</small></span></div>}
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className={`gm-btn gm-btn-sm ${enabled ? "gm-btn-danger" : "gm-btn-lime"}`} onClick={() => { onToggle(); onClose(); }}>{enabled ? "Disable 2FA" : "Enable 2FA"}</button>
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 16. Activity Log Drawer ─────────────────────────────────────────────── */
-export function ActivityLogDrawer({
-  open,
-  logs,
-  onClose,
-}: {
-  open: boolean;
-  logs: ActivityLog[];
-  onClose: () => void;
-}) {
-  const [query, setQuery] = useState("");
-  const filtered = logs.filter(l => `${l.user} ${l.action} ${l.details}`.toLowerCase().includes(query.toLowerCase()));
-  return (
-    <DashboardDrawer open={open} title="Activity Log" onClose={onClose}>
-      <div className="gm-wizard-stack">
-        <div className="gm-search-wrap"><Search /><input className="gm-input" value={query} onChange={e => setQuery(e.target.value)} placeholder="Search activity" /></div>
-        {filtered.map(log => (
-          <div key={log.id} className="gm-check-row">
-            <Clock />
-            <span><strong>{log.action}</strong><small>{log.user} · {log.date} · {log.ip}</small></span>
+    <Dialog open={open} onClose={onClose} title="Post a farm job" desc="Community board, WhatsApp, SMS to nearby workers and the chief's notice board" wide>
+      {receipt ? (
+        <>
+          <Receipt title="Job posted" note="47 workers were messaged and the post is live on the community board for 14 days." receipt={receipt} />
+          <div className="d-flex justify-content-end mt-3">
+            <button type="button" className="gm-btn gm-btn-lime" onClick={onClose}>
+              Done
+            </button>
           </div>
+        </>
+      ) : busy ? (
+        <Spinner label="Posting to the community board and SMS…" />
+      ) : (
+        <>
+          <div className="gm-st-form is-two">
+            <label className="gm-field">
+              <span>Job title</span>
+              <input className="gm-input" value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} />
+            </label>
+            <label className="gm-field">
+              <span>Skills required</span>
+              <input className="gm-input" value={draft.skills} onChange={(event) => setDraft({ ...draft, skills: event.target.value })} />
+            </label>
+            <label className="gm-field">
+              <span>Duration</span>
+              <input className="gm-input" value={draft.duration} onChange={(event) => setDraft({ ...draft, duration: event.target.value })} />
+            </label>
+            <label className="gm-field">
+              <span>Rate</span>
+              <input className="gm-input" value={draft.rate} onChange={(event) => setDraft({ ...draft, rate: event.target.value })} />
+            </label>
+            <label className="gm-field">
+              <span>Workers needed</span>
+              <input className="gm-input" type="number" value={draft.workers} onChange={(event) => setDraft({ ...draft, workers: Number(event.target.value) })} />
+            </label>
+            <label className="gm-field">
+              <span>Meals</span>
+              <input className="gm-input" value={draft.meals} onChange={(event) => setDraft({ ...draft, meals: event.target.value })} />
+            </label>
+          </div>
+          <div className="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="gm-btn gm-btn-lime"
+              onClick={() => {
+                setBusy(true);
+                setTimeout(() => {
+                  const ref = code("JOB");
+                  setBusy(false);
+                  setReceipt(ref);
+                  onPosted(ref);
+                }, 1200);
+              }}
+            >
+              Post job
+            </button>
+          </div>
+        </>
+      )}
+    </Dialog>
+  );
+}
+
+export function OnboardingDialog({ open, onClose, onDone }: { open: boolean; onClose: () => void; onDone: (checked: number) => void }) {
+  const [checked, setChecked] = useState<number[]>([]);
+  useEffect(() => {
+    if (open) setChecked([]);
+  }, [open]);
+  return (
+    <Dialog open={open} onClose={onClose} title="New worker onboarding" desc="Eight steps before anyone starts on the farm">
+      <ol className="gm-st-checklist is-action">
+        {ONBOARDING_CHECKLIST.map((item, index) => (
+          <li key={item.step}>
+            <button
+              type="button"
+              className={`gm-st-check ${checked.includes(index) ? "is-on" : ""}`}
+              onClick={() => setChecked((current) => (current.includes(index) ? current.filter((id) => id !== index) : [...current, index]))}
+            >
+              <span>{checked.includes(index) ? "✓" : ""}</span>
+              <strong>{item.step}</strong>
+              <small>{item.owner}</small>
+            </button>
+          </li>
         ))}
-        {filtered.length === 0 && <p className="text-muted text-center py-3 mb-0">No activity matches.</p>}
-      </div>
-    </DashboardDrawer>
-  );
-}
-
-/* ── 17. Connected Apps Dialog ───────────────────────────────────────────── */
-export function ConnectedAppsDialog({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  return (
-    <Dialog open={open} onClose={onClose} title="Connected Apps">
-      <div className="gm-wizard-stack">
-        <p className="text-muted">Apps and services connected to your GrowMO account.</p>
-        <div className="gm-check-row"><Smartphone /><span><strong>M-Pesa (Safaricom)</strong><small>Payments and wallet · Connected Oct 2024</small></span><StatusChip label="Active" tone="low" /></div>
-        <div className="gm-check-row"><Globe /><span><strong>Google Calendar</strong><small>Task sync · Connected Aug 2026</small></span><StatusChip label="Active" tone="low" /></div>
-        <div className="gm-check-row"><Mail /><span><strong>WhatsApp Business</strong><small>Buyer communication · Connected Sep 2026</small></span><StatusChip label="Active" tone="low" /></div>
+      </ol>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Close
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          disabled={checked.length < ONBOARDING_CHECKLIST.length}
+          onClick={() => {
+            onDone(checked.length);
+            onClose();
+          }}
+        >
+          {checked.length}/{ONBOARDING_CHECKLIST.length} done — add to directory
+        </button>
       </div>
     </Dialog>
   );
 }
 
-/* ── 18. API Keys Dialog ─────────────────────────────────────────────────── */
-export function ApiKeysDialog({
+/* ---------------- confirm ---------------- */
+export function ConfirmSettingsDialog({
   open,
+  title,
+  body,
+  confirmLabel = "Confirm",
   onClose,
+  onConfirm,
 }: {
   open: boolean;
+  title: string;
+  body: ReactNode;
+  confirmLabel?: string;
   onClose: () => void;
-}) {
-  const [show, setShow] = useState(false);
-  return (
-    <Dialog open={open} onClose={onClose} title="API Keys">
-      <div className="gm-wizard-stack">
-        <p className="text-muted">Manage API keys for external integrations. Enterprise plan only.</p>
-        <div className="gm-card p-3">
-          <div className="gm-review-row"><span>Key name</span><strong>Farm Dashboard Integration</strong></div>
-          <div className="gm-review-row"><span>Key</span><strong className="font-display">{show ? "grmo_sk_live_2026_abc123xyz" : "••••••••••••••••"}</strong></div>
-          <div className="gm-review-row"><span>Created</span><strong>01 Oct 2026</strong></div>
-          <div className="gm-review-row"><span>Last used</span><strong>Today</strong></div>
-          <button type="button" className="gm-btn gm-btn-outline gm-btn-sm mt-2" onClick={() => setShow(!show)}><Eye /> {show ? "Hide" : "Reveal"} key</button>
-        </div>
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 19. Session Management Dialog ───────────────────────────────────────── */
-export function SessionsDialog({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
+  onConfirm: () => void;
 }) {
   return (
-    <Dialog open={open} onClose={onClose} title="Active Sessions" wide>
-      <div className="gm-wizard-stack">
-        <p className="text-muted">Devices where your GrowMO account is currently logged in.</p>
-        <div className="gm-check-row"><Smartphone /><span><strong>Samsung Galaxy A14 — Android</strong><small>Kiambu, Kenya · Active now · This device</small></span><StatusChip label="Current" tone="low" /></div>
-        <div className="gm-check-row"><Globe /><span><strong>Chrome on Windows</strong><small>Nairobi, Kenya · 2 hours ago</small></span><button type="button" className="gm-btn gm-btn-danger-soft gm-btn-sm">Revoke</button></div>
-        <div className="gm-check-row"><Globe /><span><strong>Safari on iPhone</strong><small>Kiambu, Kenya · Yesterday</small></span><button type="button" className="gm-btn gm-btn-danger-soft gm-btn-sm">Revoke</button></div>
-      </div>
-    </Dialog>
-  );
-}
-
-/* ── 20. Danger Zone Drawer ──────────────────────────────────────────────── */
-export function DangerZoneDrawer({
-  open,
-  onClose,
-  onExport,
-  onDelete,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onExport: () => void;
-  onDelete: () => void;
-}) {
-  return (
-    <DashboardDrawer open={open} title="Danger Zone" onClose={onClose}>
-      <div className="gm-wizard-stack">
-        <div className="gm-alert-box is-danger"><Trash2 /><p><strong>Irreversible actions</strong><br />These actions cannot be undone. Please proceed with caution.</p></div>
-        <div className="gm-card p-3">
-          <h4 className="font-display mb-1">Export all data</h4>
-          <p className="text-muted mb-2">Download a complete backup of your farm data, records and photos.</p>
-          <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onExport}><Download /> Export data</button>
-        </div>
-        <div className="gm-card p-3">
-          <h4 className="font-display mb-1">Delete account</h4>
-          <p className="text-muted mb-2">Permanently delete your GrowMO account and all associated data. 30-day grace period.</p>
-          <button type="button" className="gm-btn gm-btn-danger gm-btn-sm" onClick={onDelete}><Trash2 /> Delete account</button>
-        </div>
-      </div>
-    </DashboardDrawer>
-  );
-}
-
-/* ── 21. Language Dialog ─────────────────────────────────────────────────── */
-export function LanguageDialog({
-  open,
-  current,
-  onClose,
-  onSave,
-}: {
-  open: boolean;
-  current: string;
-  onClose: () => void;
-  onSave: (lang: string) => void;
-}) {
-  const [lang, setLang] = useState(current);
-  useEffect(() => { if (open) setLang(current); }, [open, current]);
-  return (
-    <Dialog open={open} onClose={onClose} title="Language & Region">
-      <div className="gm-wizard-stack">
-        <div className="gm-field"><label>Language</label>
-          <select className="gm-select w-100" value={lang} onChange={e => setLang(e.target.value)}>
-            {["English / Kiswahili","English","Kiswahili","Kikuyu","Luo","Kalenjin","Kamba","Meru"].map(l => <option key={l}>{l}</option>)}
-          </select>
-        </div>
-        <div className="gm-field"><label>Date format</label>
-          <select className="gm-select w-100"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select>
-        </div>
-        <div className="gm-field"><label>Currency</label>
-          <select className="gm-select w-100"><option>KES (Kenyan Shilling)</option><option>USD</option><option>UGX</option></select>
-        </div>
-      </div>
-      <div className="d-flex gap-2 justify-content-end mt-3">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onClose}>Cancel</button>
-        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => { onSave(lang); onClose(); }}><Check /> Save</button>
+    <Dialog open={open} onClose={onClose} title={title}>
+      <p className="gm-st-note">{body}</p>
+      <div className="d-flex justify-content-end gap-2 mt-3">
+        <button type="button" className="gm-btn gm-btn-outline" onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className="gm-btn gm-btn-lime"
+          onClick={() => {
+            onConfirm();
+            onClose();
+          }}
+        >
+          {confirmLabel}
+        </button>
       </div>
     </Dialog>
   );

@@ -1,0 +1,1107 @@
+/* ============================================================================
+   PAGE 15 — SETTINGS, TEAM & PERMISSIONS  (settings.css)
+
+   Additive, token-only layer, scoped to the authenticated shell (.gm-app) and
+   the modals it raises (.gm-modal-overlay). Documented in MASTER_THEME.md §21.
+
+   1. Hero + KPI strip
+   2. Profile cards, field groups, panel notes
+   3. Farm plots
+   4. Team cards, roles, permission matrix
+   5. HR blocks (workers, attendance, ratings, payroll, compliance)
+   6. Notifications, data rows, plans
+   7. Wizard + receipt bits inside modals
+   8. Responsive (1080 / 640 / 380) + print
+   ========================================================================== */
+
+/* ---------- 1. hero ---------- */
+.gm-app .gm-st-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: var(--gm-r-lg);
+  background: var(--gm-grad-deep);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-st-hero::after {
+  content: "";
+  position: absolute;
+  right: -7rem;
+  bottom: -9rem;
+  width: 22rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 3rem rgba(255, 255, 255, 0.04),
+    0 0 0 7rem rgba(255, 255, 255, 0.02);
+  pointer-events: none;
+}
+
+.gm-app .gm-st-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-st-hero h1 {
+  color: var(--gm-card);
+  margin: 0.6rem 0 0.4rem;
+}
+
+.gm-app .gm-st-hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+
+.gm-app .gm-st-hero-copy {
+  flex: 1 1 380px;
+  min-width: 0;
+}
+
+.gm-app .gm-st-hero-copy p {
+  max-width: 62ch;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.gm-app .gm-st-hero-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-st-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.gm-app .gm-st-stat small {
+  display: block;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.gm-app .gm-st-stat strong {
+  font-size: 1.15rem;
+  color: var(--gm-lime-200);
+}
+
+/* ---------- 2. profile ---------- */
+.gm-app .gm-st-profile {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  margin-bottom: 1.2rem;
+}
+
+.gm-app .gm-st-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: var(--gm-card);
+  background: linear-gradient(135deg, var(--gm-leaf-500), var(--gm-gold-500));
+}
+
+.gm-app .gm-st-profile-copy {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.gm-app .gm-st-profile-copy strong {
+  display: block;
+  font-size: 1.2rem;
+}
+
+.gm-app .gm-st-profile-copy small {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--gm-ink-400);
+  margin-top: 0.15rem;
+}
+
+.gm-app .gm-st-profile-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.gm-app .gm-st-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.gm-app .gm-st-group {
+  padding: 1rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+}
+
+.gm-app .gm-st-kv {
+  margin: 0;
+}
+
+.gm-app .gm-st-kv.is-tight .gm-st-kv-row {
+  padding: 0.25rem 0;
+}
+
+.gm-app .gm-st-kv.is-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 1.5rem;
+}
+
+.gm-app .gm-st-kv-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.42rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-st-kv-row:last-child {
+  border-bottom: none;
+}
+
+.gm-app .gm-st-kv-row dt {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+  text-transform: capitalize;
+}
+
+.gm-app .gm-st-kv-row dd {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--gm-ink-700);
+}
+
+.gm-app .gm-st-panel-note {
+  padding: 0.9rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-ocean-50);
+  border-left: 3px solid var(--gm-ocean-400);
+  margin-bottom: 0.7rem;
+}
+
+.gm-app .gm-st-panel-note strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--gm-ocean-800);
+  margin-bottom: 0.2rem;
+}
+
+.gm-app .gm-st-panel-note p {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-st-panel-note.is-good {
+  background: var(--gm-mint-100);
+  border-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-st-panel-note.is-good strong {
+  color: var(--gm-leaf-800);
+}
+
+.gm-app .gm-st-panel-note.is-warn {
+  background: var(--gm-clay-50);
+  border-color: var(--gm-clay-500);
+}
+
+.gm-app .gm-st-panel-note.is-warn strong {
+  color: var(--gm-clay-800);
+}
+
+/* ---------- 3. farm plots ---------- */
+.gm-app .gm-st-plot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.8rem;
+}
+
+.gm-app .gm-st-plot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast),
+    box-shadow var(--gm-t-fast);
+}
+
+.gm-app .gm-st-plot:hover,
+.gm-app .gm-st-member:hover,
+.gm-app .gm-st-plan:hover {
+  transform: translateY(-2px);
+  border-color: var(--gm-leaf-400);
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-st-plot-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-st-plot-icon {
+  font-size: 1.5rem;
+}
+
+.gm-app .gm-st-plot-head strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-st-plot-head small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-plot-cta {
+  margin-top: auto;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--gm-leaf-600);
+}
+
+/* ---------- 4. team ---------- */
+.gm-app .gm-st-member-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.8rem;
+}
+
+.gm-app .gm-st-member {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem;
+  text-align: left;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast);
+}
+
+.gm-app .gm-st-member-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.3rem;
+}
+
+.gm-app .gm-st-member-ava {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+  font-weight: 900;
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-st-member-ava.is-owner {
+  background: var(--gm-gold-100);
+  color: var(--gm-gold-800);
+}
+
+.gm-app .gm-st-member-head strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+.gm-app .gm-st-member-head small {
+  font-size: 0.74rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-member-line {
+  font-size: 0.76rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-member-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-st-member-tasks {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-roles {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.gm-app .gm-st-role {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-app .gm-st-role-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+  flex: 0 0 auto;
+}
+
+.gm-app .gm-st-role-ic svg {
+  width: 15px;
+  height: 15px;
+}
+
+.gm-app .gm-st-role strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-st-role small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-matrix-wrap {
+  overflow: auto;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-md);
+  background: var(--gm-card);
+}
+
+.gm-app .gm-st-matrix {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.gm-app .gm-st-matrix th,
+.gm-app .gm-st-matrix td {
+  padding: 0.5rem 0.45rem;
+  text-align: center;
+  border-bottom: 1px solid var(--gm-line);
+  border-right: 1px solid var(--gm-line);
+}
+
+.gm-app .gm-st-matrix thead th {
+  background: var(--gm-ink-50);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-matrix tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  text-align: left;
+  font-weight: 700;
+  background: var(--gm-card);
+  min-width: 155px;
+}
+
+.gm-app .gm-st-matrix td.is-y {
+  background: var(--gm-mint-100);
+  color: var(--gm-leaf-700);
+  font-weight: 900;
+}
+
+.gm-app .gm-st-matrix td.is-l {
+  background: var(--gm-gold-50);
+  color: var(--gm-gold-800);
+  font-weight: 900;
+}
+
+.gm-app .gm-st-matrix td.is-n {
+  background: var(--gm-ink-50);
+  color: var(--gm-ink-300);
+}
+
+.gm-app .gm-st-matrix.is-plans td {
+  font-size: 0.78rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-st-matrix-note {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+/* ---------- 5. HR ---------- */
+.gm-app .gm-st-hr .gm-tabs {
+  margin-bottom: 1rem;
+}
+
+.gm-app .gm-st-row-actions {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.gm-app .gm-st-good {
+  color: var(--gm-leaf-700);
+  font-weight: 800;
+}
+
+.gm-app .gm-st-warn {
+  color: var(--gm-clay-700);
+  font-weight: 800;
+}
+
+.gm-app .gm-st-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gm-app .gm-st-list.is-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.gm-app .gm-st-list li {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-app .gm-st-list strong {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.gm-app .gm-st-list small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-checklist {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-st-checklist li {
+  padding: 0.2rem 0;
+}
+
+.gm-app .gm-st-checklist li small {
+  display: block;
+  color: var(--gm-ink-400);
+  font-size: 0.72rem;
+}
+
+.gm-app .gm-st-checklist.is-action {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.gm-modal-overlay .gm-st-check {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  cursor: pointer;
+  text-align: left;
+}
+
+.gm-modal-overlay .gm-st-check span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--gm-line);
+  font-weight: 900;
+  color: var(--gm-leaf-700);
+}
+
+.gm-modal-overlay .gm-st-check.is-on {
+  border-color: var(--gm-leaf-400);
+  background: var(--gm-mint-50);
+}
+
+.gm-modal-overlay .gm-st-check.is-on span {
+  background: var(--gm-lime-400);
+  border-color: var(--gm-lime-400);
+}
+
+.gm-modal-overlay .gm-st-check small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-rating {
+  display: grid;
+  grid-template-columns: 46px 1fr 90px;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0;
+  font-size: 0.78rem;
+}
+
+.gm-app .gm-st-rating b {
+  text-align: right;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-st-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  height: 140px;
+  padding: 0.6rem 0;
+}
+
+.gm-app .gm-st-bar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 0.2rem;
+}
+
+.gm-app .gm-st-bar i {
+  width: 100%;
+  border-radius: 6px 6px 0 0;
+  background: linear-gradient(180deg, var(--gm-lime-400), var(--gm-leaf-600));
+  min-height: 6px;
+}
+
+.gm-app .gm-st-bar span {
+  font-size: 0.72rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-bar small {
+  font-size: 0.66rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-payroll-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.gm-app .gm-st-compliance {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-st-compliance-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--gm-r-sm);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+}
+
+.gm-app .gm-st-compliance-row strong {
+  display: block;
+  font-size: 0.88rem;
+}
+
+.gm-app .gm-st-compliance-row small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-compliance-track {
+  font-size: 0.78rem;
+  color: var(--gm-ink-600);
+}
+
+/* ---------- 6. notifications / data / plans ---------- */
+.gm-app .gm-st-notif {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px dashed var(--gm-line);
+}
+
+.gm-app .gm-st-notif:last-child {
+  border-bottom: none;
+}
+
+.gm-app .gm-st-notif-copy strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-st-notif-copy small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-notif-channels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.gm-app .gm-st-toggle {
+  min-width: 62px;
+  padding: 0.32rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--gm-line);
+  background: var(--gm-ink-50);
+  color: var(--gm-ink-400);
+  font-size: 0.72rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background var(--gm-t-fast),
+    color var(--gm-t-fast);
+}
+
+.gm-app .gm-st-toggle.is-on {
+  background: var(--gm-leaf-600);
+  border-color: var(--gm-leaf-600);
+  color: var(--gm-card);
+}
+
+.gm-app .gm-st-data-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.gm-app .gm-st-data {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  border-left-width: 3px;
+  background: var(--gm-card);
+}
+
+.gm-app .gm-st-data.is-info {
+  border-left-color: var(--gm-ocean-400);
+}
+
+.gm-app .gm-st-data.is-good {
+  border-left-color: var(--gm-leaf-500);
+}
+
+.gm-app .gm-st-data.is-warn {
+  border-left-color: var(--gm-clay-500);
+}
+
+.gm-app .gm-st-data strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.gm-app .gm-st-data small {
+  font-size: 0.75rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.9rem;
+}
+
+.gm-app .gm-st-plan {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  padding: 1.2rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line);
+  background: var(--gm-card);
+  transition:
+    transform var(--gm-t-fast),
+    border-color var(--gm-t-fast);
+}
+
+.gm-app .gm-st-plan.is-current,
+.gm-modal-overlay .gm-st-plan.is-current {
+  border-color: var(--gm-leaf-600);
+  background: var(--gm-mint-50);
+}
+
+.gm-app .gm-st-plan.is-featured::before,
+.gm-modal-overlay .gm-st-plan.is-featured::before {
+  content: "MOST POPULAR";
+  position: absolute;
+  top: -0.6rem;
+  left: 1rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: var(--gm-lime-400);
+  color: var(--gm-leaf-800);
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+}
+
+.gm-app .gm-st-plan-head {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+}
+
+.gm-app .gm-st-plan-icon {
+  font-size: 1.6rem;
+}
+
+.gm-app .gm-st-plan-head strong {
+  display: block;
+  font-size: 1.05rem;
+}
+
+.gm-app .gm-st-plan-head small {
+  font-size: 0.76rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-plan-price strong {
+  font-size: 1.5rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-st-plan-price small {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-st-plan-features {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.gm-app .gm-st-plan-features li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-st-plan-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--gm-leaf-500);
+  font-weight: 900;
+}
+
+.gm-app .gm-st-plan-badge {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-st-faq,
+.gm-app .gm-st-glossary {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.gm-app .gm-st-faq-row {
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-r-sm);
+  overflow: hidden;
+}
+
+.gm-app .gm-st-faq-row button {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gm-app .gm-st-faq-row.is-open button {
+  background: var(--gm-mint-50);
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-st-faq-row p {
+  margin: 0;
+  padding: 0 0.9rem 0.85rem 2rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-glossary {
+  grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+}
+
+.gm-app .gm-st-glossary > div {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-ink-50);
+}
+
+.gm-app .gm-st-glossary strong {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-st-glossary span {
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-app .gm-st-footer-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+  padding: 0.9rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-ink-50);
+  font-size: 0.8rem;
+  color: var(--gm-ink-600);
+}
+
+.gm-app .gm-st-footer-note svg {
+  width: 18px;
+  height: 18px;
+  color: var(--gm-leaf-600);
+}
+
+/* ---------- 7. modal wizard bits ---------- */
+.gm-modal-overlay .gm-st-form {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.gm-modal-overlay .gm-st-form.is-two {
+  grid-template-columns: 1fr 1fr;
+}
+
+.gm-modal-overlay .gm-st-note {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-modal-overlay .gm-st-processing,
+.gm-modal-overlay .gm-st-receipt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1.6rem 1rem;
+}
+
+.gm-modal-overlay .gm-st-processing p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-modal-overlay .gm-st-processing .spin {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-600);
+  animation: gm-st-spin 1s linear infinite;
+}
+
+@keyframes gm-st-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gm-modal-overlay .gm-st-receipt-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: var(--gm-lime-400);
+  color: var(--gm-leaf-800);
+  animation: gm-st-pop 0.45s ease;
+}
+
+.gm-modal-overlay .gm-st-receipt-mark svg {
+  width: 32px;
+  height: 32px;
+}
+
+@keyframes gm-st-pop {
+  from {
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gm-modal-overlay .gm-st-receipt h3 {
+  margin: 0;
+  color: var(--gm-leaf-700);
+}
+
+.gm-modal-overlay .gm-st-receipt p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--gm-ink-500);
+}
+
+.gm-modal-overlay .gm-st-plan-grid {
+  display: grid;
+  gap: 0.7rem;
+}
+
+/* ---------- 8. responsive + print ---------- */
+@media (max-width: 1080px) {
+  .gm-app .gm-st-matrix th,
+  .gm-app .gm-st-matrix td {
+    padding: 0.4rem 0.35rem;
+  }
+
+  .gm-app .gm-st-compliance-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  .gm-app .gm-st-kv.is-two,
+  .gm-modal-overlay .gm-st-form.is-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-st-hero-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .gm-app .gm-st-plot-grid,
+  .gm-app .gm-st-member-grid,
+  .gm-app .gm-st-plan-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-st-notif {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 380px) {
+  .gm-app .gm-st-hero-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .gm-app .gm-st-hero-actions,
+  .gm-app .gm-menu-wrap,
+  .gm-app .gm-tabs {
+    display: none !important;
+  }
+
+  .gm-app .gm-st-hero {
+    background: none;
+    color: var(--gm-ink-800);
+    padding: 0 0 0.6rem;
+  }
+}

@@ -1,228 +1,335 @@
 /* ============================================================================
-   PAGE 14 — PAYMENTS, WALLET & MOBILE MONEY
-   Financial transactions hub for Mary Wanjiku's farm, Githunguri, Kiambu.
-   All amounts in KES, all phone numbers 07XX/01XX format.
+   PAGE 14 — PAYMENTS, WALLET & MOBILE MONEY  (/app/wallet)  data layer
+
+   Blueprint sections
+   14.1 Wallet dashboard   14.2 Deposit money         14.3 Send money / pay
+   14.4 Auto-pay           14.5 Transaction history   14.6 Budget allocation
+   14.7 Security & controls
+
+   All money is Kenyan shillings. Receipts follow GrowMO conventions:
+   QK… quick share · PL… payment · DEP… deposit · WDR… withdrawal.
    ========================================================================== */
 
-export type WalletView =
-  | "dashboard"
-  | "deposit"
-  | "send"
-  | "autopay"
-  | "history"
-  | "budgets"
-  | "security";
-
-/* ── 14.1 Wallet Dashboard ───────────────────────────────────────────────── */
-export interface WalletContext {
-  availableBalance: number;
-  allocatedToBudgets: number;
-  freeBalance: number;
-  pendingOutflows: number;
-  effectiveAvailable: number;
-  monthlyDepositTotal: number;
-  monthlySpendTotal: number;
-  currency: string;
-  lastUpdated: string;
-  walletNumber: string;
-}
-
-export const WALLET_CONTEXT: WalletContext = {
+export const WALLET_CONTEXT = {
+  farm: "Mary's Farm",
+  farmer: "Mary Wanjiku",
+  phone: "0712 345 678",
+  mpesaName: "MARY WANJIKU K",
+  paybill: "247247",
+  accountNumber: "0712345678",
+  accountNo: "GM-1024-7781",
   availableBalance: 35000,
-  allocatedToBudgets: 20000,
+  inBudgets: 20000,
   freeBalance: 15000,
   pendingOutflows: 4500,
   effectiveAvailable: 10500,
-  monthlyDepositTotal: 60000,
-  monthlySpendTotal: 35500,
-  currency: "KES",
-  lastUpdated: "Today · 10:32 AM",
-  walletNumber: "0712 345 678",
+  monthlyDeposits: 60000,
+  monthlySpend: 35500,
+  dailyLimit: 50000,
+  monthlyLimit: 500000,
+  todaySpent: 3500,
+  monthSpent: 38500,
+  tier: "Premium",
+  settlement: "Safaricom Daraja · production key",
+  trustAccount: "KCB Bank Kenya · Trust A/C 1284 556 001",
 };
 
-/* ── 14.2 Deposit Methods ────────────────────────────────────────────────── */
+/* ---------- 14.2 Deposit money ---------- */
 export interface DepositMethod {
   id: string;
   name: string;
-  description: string;
+  swahili: string;
+  icon: string;
   min: number;
   max: number;
   fee: string;
+  feeRate: number; // 0.015 = 1.5%
+  flatFee: number;
   speed: string;
-  icon: string;
+  steps: string[];
+  needsOtp: boolean;
 }
 
 export const DEPOSIT_METHODS: DepositMethod[] = [
-  { id: "dm-1", name: "M-Pesa STK Push", description: "Enter amount → STK push → enter PIN → confirmed", min: 100, max: 150000, fee: "Free", speed: "Instant", icon: "Smartphone" },
-  { id: "dm-2", name: "M-Pesa Paybill", description: "Send to Paybill 174379, Acc: 0712345678", min: 100, max: 150000, fee: "Free", speed: "5–10 min", icon: "Smartphone" },
-  { id: "dm-3", name: "Bank Transfer", description: "KCB, Equity, Co-op, NCBA — enter details", min: 500, max: 1000000, fee: "KES 50", speed: "1–4 hours", icon: "Landmark" },
-  { id: "dm-4", name: "Agent Deposit", description: "Visit GrowMO agent, pay cash", min: 100, max: 50000, fee: "KES 20", speed: "Instant", icon: "Store" },
-  { id: "dm-5", name: "Card (Visa/Mastercard)", description: "Enter card details", min: 100, max: 100000, fee: "1.5%", speed: "Instant", icon: "CreditCard" },
+  {
+    id: "stk",
+    name: "M-Pesa STK Push",
+    swahili: "Omba pesa kwa simu",
+    icon: "📱",
+    min: 100,
+    max: 150000,
+    fee: "Free",
+    feeRate: 0,
+    flatFee: 0,
+    speed: "Instant",
+    needsOtp: true,
+    steps: [
+      "Enter amount",
+      "STK push lands on 0712 345 678",
+      "Enter your M-Pesa PIN on the handset",
+      "Wallet credited in under 20 seconds",
+    ],
+  },
+  {
+    id: "paybill",
+    name: "M-Pesa Paybill",
+    swahili: "Lipa kwa Paybill",
+    icon: "🏧",
+    min: 100,
+    max: 150000,
+    fee: "Free",
+    feeRate: 0,
+    flatFee: 0,
+    speed: "5–10 min",
+    needsOtp: true,
+    steps: [
+      "M-Pesa → Lipa na M-Pesa → Paybill",
+      `Business number ${247247}`,
+      "Account: 0712345678 (your phone)",
+      "Amount, then your M-Pesa PIN",
+    ],
+  },
+  {
+    id: "bank",
+    name: "Bank transfer",
+    swahili: "Benki (KCB, Equity, Co-op, NCBA)",
+    icon: "🏦",
+    min: 500,
+    max: 1000000,
+    fee: "KES 50",
+    feeRate: 0,
+    flatFee: 50,
+    speed: "1–4 hours",
+    needsOtp: true,
+    steps: [
+      "Pick your bank and pay to A/C 1284 556 001",
+      "Use account ref GM-1024-7781",
+      "Confirm on your banking app",
+    ],
+  },
+  {
+    id: "agent",
+    name: "GrowMO agent deposit",
+    swahili: "Wakala wa GrowMO",
+    icon: "🧑🏾‍🌾",
+    min: 100,
+    max: 50000,
+    fee: "KES 20",
+    feeRate: 0,
+    flatFee: 20,
+    speed: "Instant",
+    needsOtp: true,
+    steps: [
+      "Visit Githunguri Agrovet or the M-Pesa agent at Kamau shop",
+      "Hand the agent cash and your phone number",
+      "Agent credits the wallet — you get an SMS receipt",
+    ],
+  },
+  {
+    id: "card",
+    name: "Card (Visa / Mastercard)",
+    swahili: "Kadi ya benki",
+    icon: "💳",
+    min: 100,
+    max: 100000,
+    fee: "1.5%",
+    feeRate: 0.015,
+    flatFee: 0,
+    speed: "Instant",
+    needsOtp: true,
+    steps: ["Enter card details", "3-D Secure OTP from the bank", "Wallet credited"],
+  },
 ];
 
-/* ── 14.3 Send Money / Pay Methods ───────────────────────────────────────── */
-export interface SendMethod {
+/* ---------- 14.3 Send money / pay ---------- */
+export interface PayType {
   id: string;
-  type: string;
-  recipient: string;
-  flow: string;
+  label: string;
+  swahili: string;
   icon: string;
+  recipientLabel: string;
+  hint: string;
 }
 
-export const SEND_METHODS: SendMethod[] = [
-  { id: "sm-1", type: "Pay worker (M-Pesa B2C)", recipient: "Phone number", flow: "Enter number → amount → confirm PIN → M-Pesa sent", icon: "Users" },
-  { id: "sm-2", type: "Pay supplier (M-Pesa B2B)", recipient: "Paybill/Till number", flow: "Enter Till → amount → account ref → confirm PIN", icon: "Store" },
-  { id: "sm-3", type: "Transfer to bank", recipient: "Bank account", flow: "Select bank → enter details → amount → confirm", icon: "Landmark" },
-  { id: "sm-4", type: "Send to GrowMO user", recipient: "Phone number", flow: "Enter number → amount → confirm (instant, free)", icon: "Smartphone" },
-  { id: "sm-5", type: "Pay bill (utilities)", recipient: "KPLC, Water, etc.", flow: "Select biller → enter account → amount → pay", icon: "Zap" },
+export const PAY_TYPES: PayType[] = [
+  { id: "b2c", label: "Pay worker (M-Pesa B2C)", swahili: "Mfanyikazi", icon: "👷", recipientLabel: "Worker phone number", hint: "Payday, piece rate or advance — logged against the worker and the task." },
+  { id: "b2b", label: "Pay supplier (Till / Paybill)", swahili: "Muuzaji wa pembejeo", icon: "🏪", recipientLabel: "Till or Paybill number", hint: "Agrovet, seed shop, transporter. Writes itself into input records." },
+  { id: "bank", label: "Transfer to bank", swahili: "Benki", icon: "🏦", recipientLabel: "Bank account number", hint: "KCB, Equity, Co-op, NCBA. Settles by 9am next working day." },
+  { id: "p2p", label: "Send to another GrowMO user", swahili: "Mtumiaji mwingine", icon: "🔁", recipientLabel: "GrowMO phone number", hint: "Instant and free between GrowMO wallets." },
+  { id: "bill", label: "Pay a utility bill", swahili: "KPLC, maji, fibre", icon: "💡", recipientLabel: "Account number", hint: "KPLC token, Kiambu Water, Safaricom postpaid." },
 ];
 
-/* ── 14.4 Auto-Pay Rules ─────────────────────────────────────────────────── */
-export interface AutoPayRule {
-  id: string;
-  name: string;
-  trigger: string;
-  recipients: string;
-  amount: string;
-  status: "Active" | "Paused";
-  lastTriggered: string;
-  note: string;
-}
-
-export const AUTO_PAY_RULES: AutoPayRule[] = [
-  { id: "ap-1", name: "Pay on task complete", trigger: 'Task marked "Complete"', recipients: "Assigned workers", amount: "Per task rate", status: "Active", lastTriggered: "25 Oct 2026", note: "Requires attendance and quality confirmation." },
-  { id: "ap-2", name: "Weekly labour payout", trigger: "Every Friday 5 PM", recipients: "All unpaid workers", amount: "Sum of week", status: "Paused", lastTriggered: "—", note: "Paused while reviewing cash flow." },
-  { id: "ap-3", name: "Input purchase auto-pay", trigger: "Budget category + approved supplier", recipients: "Supplier Till", amount: "Invoice amount", status: "Active", lastTriggered: "18 Oct 2026", note: "Protects allocated crop funds." },
-  { id: "ap-4", name: "Subscription renewal", trigger: "Monthly, 1st", recipients: "GrowMO", amount: "KES 299", status: "Active", lastTriggered: "01 Oct 2026", note: "Premium plan auto-renewal." },
-];
-
-/* ── 14.5 Transaction History ────────────────────────────────────────────── */
-export type TxnType = "In" | "Out";
-export type TxnStatus = "Success" | "Pending" | "Failed" | "Reversed";
-export type TxnMethod = "M-Pesa B2C" | "M-Pesa B2B" | "M-Pesa C2B" | "Internal" | "Bank Transfer" | "Card" | "Agent";
-
-export interface Transaction {
-  id: string;
-  date: string;
-  time: string;
-  type: TxnType;
-  description: string;
-  amount: number;
-  balanceAfter: number;
-  method: TxnMethod;
-  refNo: string;
-  status: TxnStatus;
-  linkedCrop: string | null;
-  linkedBudget: string | null;
-  recipient: string | null;
-  phone: string | null;
-}
-
-export const TRANSACTIONS: Transaction[] = [
-  { id: "tx-001", date: "25 Oct 2026", time: "10:30 AM", type: "Out", description: "Labour: John Mwangi (weeding)", amount: 500, balanceAfter: 35000, method: "M-Pesa B2C", refNo: "QJK3L5X7YZ", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "John Mwangi", phone: "0712 345 678" },
-  { id: "tx-002", date: "25 Oct 2026", time: "10:30 AM", type: "Out", description: "Labour: Peter Kamau (weeding)", amount: 500, balanceAfter: 35500, method: "M-Pesa B2C", refNo: "PLM8NR2KQW", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "Peter Kamau", phone: "0733 901 221" },
-  { id: "tx-003", date: "25 Oct 2026", time: "10:30 AM", type: "Out", description: "Labour: Grace Wanjiku (weeding)", amount: 500, balanceAfter: 36000, method: "M-Pesa B2C", refNo: "RTY9PV3NXM", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "Grace Wanjiku", phone: "0722 111 333" },
-  { id: "tx-004", date: "25 Oct 2026", time: "9:00 AM", type: "In", description: "Deposit from M-Pesa", amount: 10000, balanceAfter: 36500, method: "M-Pesa C2B", refNo: "SHK4RT9AB", status: "Success", linkedCrop: null, linkedBudget: null, recipient: null, phone: null },
-  { id: "tx-005", date: "18 Oct 2026", time: "3:00 PM", type: "Out", description: "Input: Githunguri Agro-vet (DAP)", amount: 6500, balanceAfter: 26500, method: "M-Pesa B2B", refNo: "TLL5MN8PQR", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "Githunguri Agro-vet", phone: null },
-  { id: "tx-006", date: "18 Oct 2026", time: "2:00 PM", type: "In", description: "Deposit from M-Pesa", amount: 50000, balanceAfter: 33000, method: "M-Pesa C2B", refNo: "NMP7QW3ERT", status: "Success", linkedCrop: null, linkedBudget: null, recipient: null, phone: null },
-  { id: "tx-007", date: "01 Oct 2026", time: "12:00 AM", type: "Out", description: "Subscription: GrowMO Premium", amount: 299, balanceAfter: 33299, method: "Internal", refNo: "SUB-2026-10", status: "Success", linkedCrop: null, linkedBudget: null, recipient: "GrowMO", phone: null },
-  { id: "tx-008", date: "28 Sep 2026", time: "4:15 PM", type: "In", description: "Buyer deposit — Marikiti broker", amount: 20000, balanceAfter: 33598, method: "M-Pesa C2B", refNo: "BUY4KMT71", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: null, recipient: null, phone: null },
-  { id: "tx-009", date: "25 Sep 2026", time: "11:00 AM", type: "Out", description: "Input: Kiambu Farmers Centre (Mancozeb)", amount: 1500, balanceAfter: 13598, method: "M-Pesa B2B", refNo: "KFC8MNB22", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "Kiambu Farmers Centre", phone: null },
-  { id: "tx-010", date: "20 Sep 2026", time: "8:30 AM", type: "Out", description: "Workers: cabbage transplanting × 5", amount: 2500, balanceAfter: 15098, method: "M-Pesa B2C", refNo: "TRN5WK8LM", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "John Mwangi + 4", phone: "0712 345 678" },
-  { id: "tx-011", date: "15 Sep 2026", time: "2:45 PM", type: "Out", description: "Manure: Mary's Dairy Farm", amount: 15000, balanceAfter: 17598, method: "Cash", refNo: "CASH-MDF1", status: "Success", linkedCrop: "Cabbage Gloria F1", linkedBudget: "bud-cabbage", recipient: "Mary's Dairy Farm", phone: "0755 210 765" },
-  { id: "tx-012", date: "10 Sep 2026", time: "9:20 AM", type: "In", description: "Milk sales — Githunguri Dairy Co-op", amount: 17680, balanceAfter: 32598, method: "M-Pesa C2B", refNo: "GDC9MILK1", status: "Success", linkedCrop: null, linkedBudget: null, recipient: null, phone: null },
-];
-
-/* ── 14.6 Budget Allocations ─────────────────────────────────────────────── */
-export interface WalletBudgetAllocation {
-  id: string;
-  budget: string;
-  crop: string;
-  allocated: number;
-  spent: number;
-  remaining: number;
-  available: boolean;
-}
-
-export const WALLET_BUDGET_ALLOCATIONS: WalletBudgetAllocation[] = [
-  { id: "wa-1", budget: "Cabbage SR 2026", crop: "Cabbage Gloria F1", allocated: 20000, spent: 15000, remaining: 5000, available: true },
-  { id: "wa-2", budget: "Maize LR 2027", crop: "Maize H6213", allocated: 0, spent: 0, remaining: 0, available: false },
-  { id: "wa-3", budget: "Tomato Cycle 4", crop: "Tomato Anna F1", allocated: 0, spent: 0, remaining: 0, available: false },
-  { id: "wa-4", budget: "General farm", crop: "All crops", allocated: 0, spent: 0, remaining: 0, available: false },
-];
-
-/* ── 14.7 Security & Controls ────────────────────────────────────────────── */
-export interface SecuritySetting {
-  id: string;
-  feature: string;
-  details: string;
-  value: string;
-  enabled: boolean;
-}
-
-export const SECURITY_SETTINGS: SecuritySetting[] = [
-  { id: "ss-1", feature: "Wallet PIN", details: "4-digit, required for all transactions", value: "••••", enabled: true },
-  { id: "ss-2", feature: "Biometric login", details: "Fingerprint/face for app login (optional)", value: "Disabled", enabled: false },
-  { id: "ss-3", feature: "Daily limit", details: "Maximum daily transaction amount", value: "KES 50,000", enabled: true },
-  { id: "ss-4", feature: "Monthly limit", details: "Maximum monthly transaction amount", value: "KES 500,000", enabled: true },
-  { id: "ss-5", feature: "Approval threshold", details: "Transactions above this amount require second PIN", value: "KES 5,000", enabled: true },
-  { id: "ss-6", feature: "Recipient whitelist", details: "Only pay saved workers/suppliers", value: "Disabled", enabled: false },
-  { id: "ss-7", feature: "Freeze wallet", details: "Instant freeze via app or SMS", value: "Active", enabled: false },
-  { id: "ss-8", feature: "Fraud alerts", details: "SMS for any transaction, unusual activity detection", value: "Enabled", enabled: true },
-  { id: "ss-9", feature: "Session timeout", details: "Auto-logout after inactivity", value: "5 minutes", enabled: true },
-];
-
-/* ── Saved Recipients ────────────────────────────────────────────────────── */
-export interface SavedRecipient {
+export interface Recipient {
   id: string;
   name: string;
   phone: string;
-  type: "Worker" | "Supplier" | "Buyer" | "Other";
-  lastPaid: string;
-  totalPaid: number;
+  role: string;
+  avatar: string;
+  recent: number;
+  bank?: string;
 }
 
-export const SAVED_RECIPIENTS: SavedRecipient[] = [
-  { id: "sr-1", name: "John Mwangi Kamau", phone: "0712 345 678", type: "Worker", lastPaid: "25 Oct 2026", totalPaid: 12500 },
-  { id: "sr-2", name: "Peter Kamau Njoroge", phone: "0733 901 221", type: "Worker", lastPaid: "25 Oct 2026", totalPaid: 8000 },
-  { id: "sr-3", name: "Grace Wanjiku Muthoni", phone: "0722 111 333", type: "Worker", lastPaid: "25 Oct 2026", totalPaid: 9500 },
-  { id: "sr-4", name: "Githunguri Agro-vet", phone: "0712 880 114", type: "Supplier", lastPaid: "18 Oct 2026", totalPaid: 42000 },
-  { id: "sr-5", name: "Kiambu Farmers Centre", phone: "0722 441 600", type: "Supplier", lastPaid: "25 Sep 2026", totalPaid: 18500 },
-  { id: "sr-6", name: "Marikiti broker", phone: "0708 440 221", type: "Buyer", lastPaid: "28 Sep 2026", totalPaid: 20000 },
-  { id: "sr-7", name: "Mary's Dairy Farm", phone: "0755 210 765", type: "Supplier", lastPaid: "15 Sep 2026", totalPaid: 15000 },
-  { id: "sr-8", name: "Yara Distributor", phone: "0733 809 114", type: "Supplier", lastPaid: "12 Nov 2026", totalPaid: 8400 },
+export const QUICK_RECIPIENTS: Recipient[] = [
+  { id: "r1", name: "John Mwangi", phone: "0712 555 123", role: "Foreman", avatar: "JM", recent: 2500 },
+  { id: "r2", name: "Grace Wanjiku", phone: "0733 666 777", role: "Harvester", avatar: "GW", recent: 1800 },
+  { id: "r3", name: "Githunguri Agrovet", phone: "Till 452198", role: "Supplier", avatar: "GA", recent: 6500 },
+  { id: "r4", name: "Peter Kamau", phone: "0723 456 789", role: "Farm manager", avatar: "PK", recent: 500 },
+  { id: "r5", name: "KPLC Prepaid", phone: "Acc 22884455", role: "Utility", avatar: "KP", recent: 2000 },
+  { id: "r6", name: "Kiambu Farmers Co-op", phone: "Paybill 889922", role: "Co-op", avatar: "KC", recent: 4350 },
 ];
 
-/* ── Monthly spend breakdown ─────────────────────────────────────────────── */
-export interface SpendCategory {
+export const BANK_OPTIONS = ["KCB Bank", "Equity Bank", "Co-operative Bank", "NCBA Bank", "Absa Kenya"];
+
+export const BILLERS = [
+  { id: "kplc", name: "KPLC Prepaid", account: "22884455", icon: "⚡" },
+  { id: "water", name: "Kiambu Water & Sewerage", account: "KW-88213", icon: "🚰" },
+  { id: "saf", name: "Safaricom Postpaid", account: "0712345678", icon: "📶" },
+];
+
+/* ---------- 14.4 Auto-pay management ---------- */
+export interface AutoPayRule {
   id: string;
-  category: string;
-  amount: number;
-  percent: number;
-  color: string;
+  label: string;
+  trigger: string;
+  recipients: string;
+  amount: string;
+  amountCap: number;
+  status: "Active" | "Paused";
+  lastTriggered: string;
+  nextRun: string;
+  note: string;
 }
 
-export const SPEND_CATEGORIES: SpendCategory[] = [
-  { id: "sc-1", category: "Labour", amount: 12500, percent: 35, color: "var(--gm-leaf-500)" },
-  { id: "sc-2", category: "Inputs", amount: 13000, percent: 37, color: "var(--gm-gold-500)" },
-  { id: "sc-3", category: "Transport", amount: 4000, percent: 11, color: "var(--gm-sprout-400)" },
-  { id: "sc-4", category: "Subscriptions", amount: 299, percent: 1, color: "var(--gm-clay-500)" },
-  { id: "sc-5", category: "Other", amount: 5701, percent: 16, color: "var(--gm-ink-400)" },
+export const AUTOPAY_RULES: AutoPayRule[] = [
+  { id: "ap1", label: "Pay on task complete", trigger: "Task marked Complete", recipients: "Assigned workers", amount: "Per task rate", amountCap: 12000, status: "Active", lastTriggered: "Oct 25", nextRun: "On task close", note: "Uses the piece rate on the task card; agent verifies before release." },
+  { id: "ap2", label: "Weekly labour payout", trigger: "Every Friday 5 PM", recipients: "All unpaid workers", amount: "Sum of week", amountCap: 45000, status: "Paused", lastTriggered: "—", nextRun: "When resumed", note: "Paused on 18 Oct while NSSF deduction schedule is corrected." },
+  { id: "ap3", label: "Input purchase auto-pay", trigger: "Budget category + approved supplier", recipients: "Supplier Till", amount: "Invoice amount", amountCap: 25000, status: "Active", lastTriggered: "Oct 18", nextRun: "On approval", note: "Only suppliers on the Kiambu approved list qualify." },
+  { id: "ap4", label: "GrowMO subscription", trigger: "Monthly, 1st", recipients: "GrowMO", amount: "KES 299", amountCap: 299, status: "Active", lastTriggered: "Oct 1", nextRun: "Nov 1", note: "Premium plan renewal — cancel any time before the 28th." },
 ];
 
-/* ── Billers ─────────────────────────────────────────────────────────────── */
-export interface Biller {
+/* ---------- 14.5 Transaction history ---------- */
+export interface Txn {
+  id: string;
+  date: string;
+  iso: string;
+  type: "In" | "Out";
+  description: string;
+  amount: number;
+  balanceAfter: number;
+  method: string;
+  refNo: string;
+  status: "Success" | "Pending" | "Failed";
+  category: string;
+  crop?: string;
+  budget?: string;
+}
+
+export const TRANSACTIONS: Txn[] = [
+  { id: "t1", date: "Oct 25, 10:30", iso: "2026-10-25T10:30", type: "Out", description: "Labour: John Mwangi (weeding)", amount: -500, balanceAfter: 35000, method: "M-Pesa B2C", refNo: "QJK3L5X7YZ", status: "Success", category: "Labour", crop: "Cabbage", budget: "Cabbage SR 2026" },
+  { id: "t2", date: "Oct 25, 10:30", iso: "2026-10-25T10:30", type: "Out", description: "Labour: Peter Kamau (weeding)", amount: -500, balanceAfter: 35500, method: "M-Pesa B2C", refNo: "PLM8NR2KQW", status: "Success", category: "Labour", crop: "Cabbage", budget: "Cabbage SR 2026" },
+  { id: "t3", date: "Oct 25, 10:30", iso: "2026-10-25T10:30", type: "Out", description: "Labour: Grace Wanjiku (weeding)", amount: -500, balanceAfter: 36000, method: "M-Pesa B2C", refNo: "RTY9PV3NXM", status: "Success", category: "Labour", crop: "Cabbage", budget: "Cabbage SR 2026" },
+  { id: "t4", date: "Oct 25, 09:00", iso: "2026-10-25T09:00", type: "In", description: "Deposit from M-Pesa", amount: 10000, balanceAfter: 36500, method: "M-Pesa C2B", refNo: "SHK4RT9AB", status: "Success", category: "Deposit" },
+  { id: "t5", date: "Oct 24, 18:10", iso: "2026-10-24T18:10", type: "Out", description: "Transport: Kamau Brokers (Marikiti run)", amount: -1500, balanceAfter: 26500, method: "M-Pesa B2C", refNo: "XBR2KV9QLM", status: "Success", category: "Transport", crop: "Cabbage", budget: "Cabbage SR 2026" },
+  { id: "t6", date: "Oct 23, 14:22", iso: "2026-10-23T14:22", type: "Out", description: "KPLC prepaid token", amount: -2000, balanceAfter: 28000, method: "Bill pay", refNo: "KPLC-PT-4491", status: "Success", category: "Utilities" },
+  { id: "t7", date: "Oct 22, 07:30", iso: "2026-10-22T07:30", type: "Out", description: "Kiambu Farmers Co-op dues", amount: -500, balanceAfter: 30000, method: "M-Pesa B2B", refNo: "COP-882A", status: "Success", category: "Co-op" },
+  { id: "t8", date: "Oct 20, 16:05", iso: "2026-10-20T16:05", type: "Out", description: "Advance: John Mwangi (school fees)", amount: -1000, balanceAfter: 30500, method: "M-Pesa B2C", refNo: "ADV-001", status: "Success", category: "Advance" },
+  { id: "t9", date: "Oct 18, 15:00", iso: "2026-10-18T15:00", type: "Out", description: "Githunguri Agrovet (DAP 50kg ×2)", amount: -6500, balanceAfter: 31500, method: "M-Pesa B2B", refNo: "TLL5MN8PQR", status: "Success", category: "Inputs", crop: "Maize", budget: "Maize LR 2027" },
+  { id: "t10", date: "Oct 18, 14:00", iso: "2026-10-18T14:00", type: "In", description: "Deposit from M-Pesa", amount: 50000, balanceAfter: 38000, method: "M-Pesa C2B", refNo: "NMP7QW3ERT", status: "Success", category: "Deposit" },
+  { id: "t11", date: "Oct 15, 10:00", iso: "2026-10-15T10:00", type: "Out", description: "Advance: Grace Wanjiku (medical)", amount: -2000, balanceAfter: 38299, method: "M-Pesa B2C", refNo: "ADV-002", status: "Success", category: "Advance" },
+  { id: "t12", date: "Oct 10, 19:20", iso: "2026-10-10T19:20", type: "Out", description: "Repair: irrigation pump seal", amount: -3500, balanceAfter: 40299, method: "M-Pesa B2C", refNo: "REP-IR-02", status: "Success", category: "Equipment" },
+  { id: "t13", date: "Oct 5, 12:00", iso: "2026-10-05T12:00", type: "In", description: "Sale: Karen Greens Restaurant", amount: 2700, balanceAfter: 43799, method: "M-Pesa C2B", refNo: "QGR4MK9VX", status: "Success", category: "Sales", crop: "Kale" },
+  { id: "t14", date: "Oct 1, 06:00", iso: "2026-10-01T06:00", type: "Out", description: "GrowMO Premium (monthly)", amount: -299, balanceAfter: 41099, method: "Internal", refNo: "SUB-2026-10", status: "Success", category: "Subscription" },
+];
+
+export const TXN_TYPES = ["All", "In", "Out"] as const;
+export const TXN_METHODS = ["All", "M-Pesa B2C", "M-Pesa B2B", "M-Pesa C2B", "Bill pay", "Internal"] as const;
+export const TXN_CATEGORIES = ["All", "Deposit", "Labour", "Inputs", "Advance", "Transport", "Utilities", "Sales", "Co-op", "Equipment", "Subscription"] as const;
+export const TXN_STATUSES = ["All", "Success", "Pending", "Failed"] as const;
+
+/* ---------- 14.6 Budget allocation ---------- */
+export interface WalletBudget {
   id: string;
   name: string;
-  category: string;
-  paybill: string;
+  emoji: string;
+  allocated: number;
+  spent: number;
+  crop?: string;
 }
 
-export const BILLERS: Biller[] = [
-  { id: "bl-1", name: "Kenya Power (KPLC)", category: "Electricity", paybill: "247247" },
-  { id: "bl-2", name: "Kiambu Water", category: "Water", paybill: "868800" },
-  { id: "bl-3", name: "Safaricom Airtime", category: "Airtime", paybill: "100100" },
-  { id: "bl-4", name: "DStv", category: "Entertainment", paybill: "200200" },
-  { id: "bl-5", name: "NHIF", category: "Insurance", paybill: "200222" },
-  { id: "bl-6", name: "KRA iTax", category: "Tax", paybill: "572572" },
+export const WALLET_BUDGETS: WalletBudget[] = [
+  { id: "b1", name: "Cabbage SR 2026", emoji: "🥬", allocated: 20000, spent: 15000, crop: "Cabbage" },
+  { id: "b2", name: "Maize LR 2027", emoji: "🌽", allocated: 0, spent: 0, crop: "Maize" },
+  { id: "b3", name: "General farm", emoji: "🏡", allocated: 0, spent: 0 },
 ];
+
+/* ---------- 14.7 Security & controls ---------- */
+export interface SecurityControl {
+  id: string;
+  k: string;
+  v: string;
+  enabled: boolean;
+  lockable: boolean;
+}
+
+export const SECURITY_CONTROLS: SecurityControl[] = [
+  { id: "s1", k: "Wallet PIN", v: "4-digit, required for every transaction", enabled: true, lockable: false },
+  { id: "s2", k: "Biometric login", v: "Fingerprint / face to open the app", enabled: true, lockable: true },
+  { id: "s3", k: "Daily limit", v: "KES 50,000 per day", enabled: true, lockable: true },
+  { id: "s4", k: "Monthly limit", v: "KES 500,000 per month", enabled: true, lockable: true },
+  { id: "s5", k: "Approval above KES 5,000", v: "Second PIN entry required", enabled: true, lockable: true },
+  { id: "s6", k: "Recipient whitelist", v: "Only saved workers and suppliers", enabled: false, lockable: true },
+  { id: "s7", k: "Freeze wallet", v: "Instant lock from app or SMS FREEZE to 20550", enabled: false, lockable: true },
+  { id: "s8", k: "Fraud alerts", v: "SMS for every transaction plus unusual activity", enabled: true, lockable: true },
+  { id: "s9", k: "Session timeout", v: "Auto-logout after 5 minutes idle", enabled: true, lockable: true },
+];
+
+export const WALLET_FAQ = [
+  { q: "How long do M-Pesa deposits take to reflect?", a: "STK Push is instant. Paybill normally lands in 5–10 minutes. If nothing shows after 30 minutes, open the transaction and tap Report — GrowMO reconciles with Safaricom Daraja and threads the result to you by SMS." },
+  { q: "What is the difference between free balance and budget money?", a: "Money allocated to a crop budget (for example Cabbage SR 2026) is ring-fenced for that crop. Free balance is what you can send anywhere. Both live in the same wallet and you can re-allocate at any time." },
+  { q: "Can I reverse a payment?", a: "Within 2 hours you can raise a reversal from the transaction detail. M-Pesa B2C reversals need the recipient to accept, so pay workers only after the task is verified." },
+  { q: "What are the fees?", a: "Wallet-to-wallet sends are free. M-Pesa B2C/B2B attracts the standard Safaricom tariff, card deposits 1.5%, bank transfers KES 50, agent deposits KES 20. GrowMO adds nothing on top." },
+  { q: "Who holds my money?", a: "Wallets are held in a regulated trust account at KCB Bank Kenya (A/C 1284 556 001) and settle through Safaricom Daraja. GrowMO never lends or invests wallet float." },
+  { q: "What happens if I lose my phone?", a: "SMS FREEZE to 20550 freezes the wallet instantly, and the PIN plus the 5-minute session timeout stop anyone using the app on a new device." },
+];
+
+export const WALLET_GLOSSARY = [
+  { term: "STK Push", def: "The M-Pesa prompt that appears on your handset asking for your PIN." },
+  { term: "B2C", def: "Business-to-customer send — used for worker payouts from the GrowMO wallet." },
+  { term: "B2B", def: "Business-to-business send — used to pay Tills, Paybills and suppliers." },
+  { term: "Paybill", def: "Short code for paying a business: GrowMO is 247247, account is your phone number." },
+  { term: "Till (Buy Goods)", def: "Merchant number printed on an agrovet or shop till, e.g. 452198." },
+  { term: "Float", def: "Cash an agent holds so they can deposit or withdraw on your behalf." },
+  { term: "Reversal", def: "A request to move money back to the sender; M-Pesa requires the recipient's consent." },
+  { term: "Trust account", def: "A ring-fenced bank account where customer wallet money is held, separate from company funds." },
+];
+
+export const WALLET_ALERTS = [
+  { id: "al1", tone: "warn" as const, text: "Pending outflow of KES 4,500 — 3 labour paysheets awaiting approval for Nov 1." },
+  { id: "al2", tone: "info" as const, text: "Daily limit KES 50,000: KES 3,500 used today across 3 transactions." },
+  { id: "al3", tone: "success" as const, text: "October deposits KES 60,000 against spend KES 35,500 — net savings KES 24,500." },
+];
+
+export const WALLET_SETTINGS_ROWS = [
+  { k: "Wallet PIN", v: "4-digit · changed 12 Aug 2026" },
+  { k: "Biometric", v: "Fingerprint on Infinix Hot 40" },
+  { k: "Settlement account", v: "KCB Trust A/C 1284 556 001" },
+  { k: "Payout schedule", v: "Friday 5 PM auto-run (paused)" },
+  { k: "Receipt delivery", v: "SMS to 0712 345 678 + in-app" },
+  { k: "Statement sharing", v: "Time-limited links, read-only" },
+  { k: "Support line", v: "0700 000 000 · 24/7 toll-free" },
+];
+
+export function walletTotals() {
+  const inflow = TRANSACTIONS.filter((t) => t.type === "In").reduce((sum, t) => sum + t.amount, 0);
+  const outflow = TRANSACTIONS.filter((t) => t.type === "Out").reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  return {
+    inflow,
+    outflow,
+    net: inflow - outflow,
+    count: TRANSACTIONS.length,
+    deposits: TRANSACTIONS.filter((t) => t.category === "Deposit").length,
+    budgeted: WALLET_BUDGETS.reduce((sum, b) => sum + b.allocated, 0),
+    budgetedSpent: WALLET_BUDGETS.reduce((sum, b) => sum + b.spent, 0),
+    activeRules: AUTOPAY_RULES.filter((r) => r.status === "Active").length,
+  };
+}

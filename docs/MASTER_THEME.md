@@ -24,23 +24,41 @@
 | `--gm-leaf-700` | `#166534` | Primary text accents, headings |
 | `--gm-leaf-600` | `#1d8345` | Primary actions, links |
 | `--gm-leaf-500` | `#22a355` | Primary bright, focus rings |
+| `--gm-sprout-700/600/500` | `#1b6a49` / `#24835a` / `#2f9d6b` | Deeper highlight greens (gradient tails) |
 | `--gm-sprout-400` | `#4cc38a` | Highlights |
 | `--gm-sprout-300` | `#86ddb0` | Light highlights |
+| `--gm-mint-500` | `#6dd39d` | Mid-green borders |
 | `--gm-mint-200` | `#b9efcf` | — |
 | `--gm-mint-100` | `#dcf5e5` | Soft fills, icon tiles |
 | `--gm-mint-50` | `#f0faf3` | Card tints, hover fills |
+| `--gm-leaf-800` | `#124d28` | Deep green text on light greens |
+| `--gm-leaf-400` | `#3aa96f` | Hover borders, mid accents |
+| `--gm-leaf-300` | `#7fd0a4` | Light green accents |
+| `--gm-leaf-50` | `#eef8f1` | Pale green fills |
 
 ### Accents & neutrals
 | Token | Value | Use |
 |---|---|---|
+| `--gm-lime-50/100/200` | `#f8feec` / `#f2fcd6` / `#e6f8a8` | Pale lime fills, lime text on dark |
 | `--gm-lime-300/400/500` | `#d8f65f` / `#c4ef3c` / `#a8d92b` | CTAs on dark, success glow, active states |
-| `--gm-gold-400/500/600` | `#f2b950` / `#e8a02c` / `#c77f14` | Prices, badges, warnings, premium |
+| `--gm-gold-50/100/200/300` | `#fef8ec` / `#fdf1d9` / `#fbe6b9` / `#f8d48b` | Warning/premium tints |
+| `--gm-gold-400/500/600/800` | `#f2b950` / `#e8a02c` / `#c77f14` / `#8a5a0e` | Prices, badges, warnings, premium |
 | `--gm-cream-50/100` | `#fbf8f0` / `#f5eeda` | Warm section backgrounds |
-| `--gm-clay-500` | `#c65b3b` | Danger, destructive, errors |
-| `--gm-ink-950/800/600/400` | `#0b120d` / `#1b261f` / `#3c4d43` / `#6b7d72` | Text scale (headings → muted) |
+| `--gm-cream-500` | `#e8d7a8` | Warm alert rails |
+| `--gm-sand-50` / `--gm-earth-50` | `#fbf7ee` / `#f7f1e9` | Warm neutral surfaces |
+| `--gm-clay-50/300/400` | `#fdf3ef` / `#e2a08c` / `#d47a5c` | Danger tints |
+| `--gm-clay-500/700/800` | `#c65b3b` / `#9d4326` / `#7a3320` | Danger, destructive, deep danger text |
+| `--gm-berry-500` | `#b03a72` | Categorical marker (buyer channel) |
+| `--gm-ocean-50/400/500/700/800` | `#eef6f8` / `#4ea6bd` / `#2f8aa3` / `#1a5d72` / `#124a5c` | **Info** tone — the fourth semantic hue (good / warn / danger / info) |
+| `--gm-ink-950/900/800/700/600/500/400/300/50` | `#0b120d` → `#f6f9f7` | Text scale (headings → muted → hairline tints) |
+| `--gm-ink` / `--gm-muted` | `#1b261f` / `#6b7d72` | Long-form aliases of ink-800 / ink-400 |
+| `--gm-white-04/06/10/20` | `rgba(255,255,255,.04/.06/.10/.20)` | Translucent rails on dark surfaces |
 | `--gm-line` / `--gm-line-soft` | `#dfe9e1` / `#ecf2ed` | Borders |
 | `--gm-mist` | `#f3f6f3` | Page background |
-| `--gm-card` | `#ffffff` | Card background |
+| `--gm-paper` | `#f3f6f3` | App shell background alias |
+| `--gm-card` / `--gm-surface` | `#ffffff` | Card background (surface = alias) |
+| `--gm-deep` | `#0c2317` | Solid dark pill/bar surfaces |
+| `--gm-risk-high` | `#c65b3b` | High-risk badge fill |
 
 ### Signature gradients (the "constant flow")
 `--gm-grad-primary` (leaf flow) · `--gm-grad-deep` (dark hero/panel) ·
@@ -49,11 +67,16 @@
 
 ### Type, shape, shadow, motion
 - Fonts: `--gm-font-display` = **Fraunces** (headings, prices, numbers) ·
-  `--gm-font-body` = **Plus Jakarta Sans** (everything else)
+  `--gm-font-body` = **Plus Jakarta Sans** (everything else) ·
+  `--gm-font-mono` = `ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace`
+  (receipt codes, phone keys, SMS/USSD mocks — never hand-rolled stacks)
 - Radii: `--gm-r-xs 8` · `--gm-r-sm 12` · `--gm-r-md 18` · `--gm-r-lg 26` ·
-  `--gm-r-xl 36` · `--gm-r-pill 999`
+  `--gm-r-xl 36` · `--gm-r-pill 999` (+ `--gm-radius-sm/md/lg` long-form aliases)
 - Shadows: `--gm-shadow-xs/sm/md/lg` + `--gm-shadow-glow` (green) + `--gm-shadow-lime`
-- Motion: `--gm-ease` (spring), `--gm-t-fast .18s` / `med .35s` / `slow .6s`
+  (+ `--gm-shadow-card`, alias of `--gm-shadow-sm`)
+- Motion: `--gm-ease` (spring), `--gm-spring` (overshoot easing for pop/drawer),
+  `--gm-transition` (`0.2s` + ease), `--gm-t-fast .18s` / `med .35s` / `slow .6s`,
+  `--gm-d` (0s stagger delay default)
 - Layout: `--gm-max 1240px` container · `--gm-header-h 76px`
 - Breakpoints: **1080px** (grids stack, nav → drawer) · **640px** (compact, `.hide-sm` hides)
 
@@ -389,3 +412,313 @@ shape from finance.
 rows, 12 products, 6 alerts, 10 activity rows, 10 lab orders, settings, FAQ and
 glossary. Money goes through `kes()` from `data/site`; every figure is stated in
 KES and dated in the Sep 2026 Kenya farming calendar used by pages 1–13.
+
+## 18. Market & sales layer (page 10 — `/app/market`)
+
+Page-scoped stylesheet `src/market.css`, linked from `__root.tsx` after
+`soilCss` (`marketCss` → `?url` + `?v=1`). Every selector is prefixed with
+`.gm-app` or `.gm-modal-overlay`, token-only, no global `.gm-*` component
+redefined. It styles the live-price table, trend bar chart, buyer cards,
+scenario cards, contract cards, modal wizards, alerts and FAQ/glossary.
+
+**New `.gm-mk-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + KPIs | `.gm-mk-hero`(+`-head`, `-copy`, `-chips`, `-actions`, `-score`, `-grid`), `.gm-chip-live`, `.gm-dot-live` (pulse) |
+| 10.1 live prices | `.gm-mk-price-table`, `.gm-mk-price-row`, `.gm-mk-crop-cell`, `.gm-mk-crop-btn`, `.gm-mk-price-cell`, `.gm-mk-price-link`(`.is-best`), `.gm-mk-price-range`, `.gm-mk-best-tag`, `.gm-mk-trend`(`-up/-down/-stable`) |
+| 10.2 trend chart | `.gm-mk-chart`(`.is-lg`), `.gm-mk-chart-body`, `.gm-mk-chart-row`, `.gm-mk-chart-y`, `.gm-mk-chart-track`, `.gm-mk-chart-bar`, `.gm-mk-chart-tip`, `.gm-mk-chart-x` |
+| 10.3 best market | `.gm-mk-rec-list`, `.gm-mk-rec`(`.best/.higher/.far`), `.gm-mk-rec-rank`, `.gm-mk-rec-main`(`-head/-meta/-note/-bar`), `.gm-mk-rec-net` |
+| 10.4 buyers | `.gm-mk-buyer-grid`, `.gm-mk-buyer`(`-head/-body/-foot`, `-ava` variants), `.gm-mk-buyer-ident`, `.gm-mk-buyer-crops`, `.gm-mk-buyer-kv`, `.gm-mk-buyer-last`, `.gm-mk-buyer-rating`, `.gm-mk-v` |
+| 10.5 sales planner | `.gm-mk-scenario-grid`, `.gm-mk-scenario`(`.is-pick`), `.gm-mk-scenario-head/-sw/-figures/-note/-foot`, `.gm-mk-fig-label` |
+| 10.6 sales log | `.gm-mk-sale-row`, `.gm-mk-sale-date`, `.gm-mk-pay`, `.gm-grade` |
+| 10.7 contracts | `.gm-mk-contract-grid`, `.gm-mk-contract`(`-head/-body/-foot`, `-co`, `-row`, `-reqs`), `.gm-mk-price-k` |
+| Shared KV/callouts | `.gm-mk-kv`(`.is-2`, `-row`, `-k`, `-v`), `.gm-mk-callout`(`tone-info/warn/good`), `.gm-mk-form-grid`, `.gm-mk-list`, `.gm-mk-help`, `.gm-mk-err` |
+| Toolbar/menu | `.gm-mk-toolbar`, `.gm-mk-search`, `.gm-mk-count`, `.gm-mk-menu-wrap`, `.gm-mk-menu` |
+| Modal wizard bits | `.gm-mk-stack`, `.gm-mk-options`, `.gm-mk-opt-icon`, `.gm-mk-processing`(`.spin`), `.gm-mk-success`(`-mark`), `.gm-mk-receipt(`-lg`)`, `.gm-mk-pay-note`, `.gm-mk-share-btns` |
+| FAQ/glossary/alerts | `.gm-mk-faq`(`-row`), `.gm-mk-glossary`(`-row`), `.gm-mk-alert-list`, `.gm-mk-alert`(`.is-hot`, `-meta`), `.gm-mk-score-break`, `.gm-mk-phone`(`-num`) |
+
+**Responsive:** KPI/card/option grids collapse at **1080px**, recommendation
+rows reflow and toolbars go full-width at **640px**, scenario figures and
+buyer/contract footers stack at **380px**; `@media print` hides toolbars,
+footers and menu so prices and recommendations print cleanly. Reveal
+motion inherits `prefers-reduced-motion`.
+
+**Reusable widgets — `src/components/app/MarketWidgets.tsx`:** `MarketHero`,
+`PriceRow`, `PriceTrendChart`, `RecommendationRow`, `BuyerCard`,
+`ScenarioCard`, `SaleRow`, `ContractCard`, `MarketKv`, `MarketCallout`,
+`MarketEmpty`. **Workflows:** `src/components/app/MarketModals.tsx` (21
+dialogs/wizards: crop price detail, trend viewer with tabs, price alert
+wizard, recommendation detail, buyer detail, contact-buyer OTP wizard,
+scenario detail, activate-plan with OTP/PIN, sale detail, record-sale
+wizard, contract detail, apply-contract wizard, transport compare, export,
+share time-limited link, settings, FAQ/glossary, score breakdown, alerts
+list, quick-phone, generic confirm). Money flows use Amount → OTP
+(`123456`) → processing → receipt (QK/PL/SHK/MSG/AL/EXP prefixes).
+
+**Page data:** `src/data/app/market.ts` — 10 crops across 8 Kenyan markets
+with [low,high] price ranges and trend, 12-month Marikiti cabbage trend,
+6 ranked market recommendations, 10 verified buyers (broker, supermarket,
+restaurant, exporter, processor, cooperative, online), 4 harvest scenarios
+with AI pick, 10 sale records with M-Pesa receipts, 6 contracts, 5 transport
+options, 7-day price history, 8 FAQs and 8 glossary terms. Money uses
+`kes()` from `data/site`; every price matches the blueprint table exactly.
+
+## 19. Analytics & reporting layer (page 11 — `/app/analytics`)
+
+Page-scoped stylesheet `src/analytics.css`, linked from `__root.tsx` after
+`marketCss` (`analyticsCss` → `?url` + `?v=1`). Every selector is prefixed
+with `.gm-app` or `.gm-modal-overlay`, token-only, no global `.gm-*`
+component redefined.
+
+**New `.gm-an-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + KPIs | `.gm-an-hero`(+`-head`, `-copy`, `-score`, `-grid`), `.gm-an-hero-score-num/-label`, `.gm-an-score-link` |
+| 11.1 KPI tiles | `.gm-an-kpi-grid`, `.gm-an-kpi`(+`-icon/-label/-deltas`), `.gm-an-delta`(`-up/-down/-flat`) |
+| 11.2 crop bars | `.gm-an-crop-grid`, `.gm-an-crop-bar-row/head/track/fill/meta`, `.gm-an-crop-emo`, `.gm-an-crop-rank`, `.gm-an-roi` |
+| 11.3 cost bars | `.gm-an-cost-grid`, `.gm-an-cost-row/head/bar/fill`, `.gm-an-cost-ico/-pct` |
+| 11.4 revenue chart | `.gm-an-rev-chart`, `.gm-an-rev-col/track/target/fill`(`.is-hit/.is-miss`, `-tip`) |
+| 11.5 workers | `.gm-an-worker-row`, `.gm-an-w-ava`, `.gm-an-rating`, `.gm-an-worker-bars` |
+| 11.6 weather impact | `.gm-an-wx-grid`, `.gm-an-wx-row`(`tone-good/warn/bad`), `.gm-an-wx-impact` |
+| 11.8 reports | `.gm-an-report-grid`, `.gm-an-report`(`-icon/-body/-foot`), `.gm-an-report-use/-last` |
+| Toolbar/menu | `.gm-an-toolbar`, `.gm-an-search`, `.gm-an-menu-wrap/-menu` |
+| Builder walk | `.gm-an-builder-walk`, `.gm-an-step` |
+| Shared KV/callouts | `.gm-an-kv`(`.is-2`, `-row/-k/-v`), `.gm-an-callout`(`tone-info/warn/good`), `.gm-an-check-list`, `.gm-an-options` |
+| Modal wizard bits | `.gm-an-stack`, `.gm-an-processing`, `.gm-an-success`(`-mark`), `.gm-an-receipt(`-lg`)`, `.gm-an-share-btns` |
+| FAQ/glossary/score | `.gm-an-faq(-row)`, `.gm-an-glossary(-row)`, `.gm-an-score-break` |
+
+**Responsive:** KPI and report grids collapse at **1080px**, worker table
+and report-card footers wrap at **640px**, hero grid stacks at **380px**;
+`@media print` hides toolbars and footers for board-ready printouts.
+
+**Reusable widgets — `src/components/app/AnalyticsWidgets.tsx`:**
+`AnalyticsHero`, `DeltaChip`, `AnKpiCard`, `CropBar`, `CostRow`,
+`RevenueBar`, `WorkerRow`, `WeatherRow`, `ReportCard`, `AnKv`, `AnCallout`.
+**Workflows:** `src/components/app/AnalyticsModals.tsx` (13 dialogs/wizards:
+KPI drilldown, crop comparison, worker detail, premade-report run wizard,
+custom report builder wizard with OTP, report result viewer, loan
+application preview, analytics export bundle, share dialog, settings, FAQ,
+score breakdown, generic confirm). Generated reports issue `RPT-`/`CUSTOM-`/`BUNDLE-` receipt codes.
+
+**Page data:** `src/data/app/analytics.ts` — 8 farm KPIs (exact blueprint
+figures: 2.5 acres, KES 580,000 revenue, KES 210,000 expenses, KES 370,000
+profit, 176% ROI, 15% labour, 8% post-harvest loss), 5 crops with yield/cost/
+revenue/profit/ROI, 8 cost categories totalling KES 210,000, 7 revenue
+months including January projection (435,000), 8 labour-efficiency metrics
++ 6 workers, 4 weather-impact rows, 9 custom-report metrics across 3 groups,
+10 premade reports, 6 FAQs and 5 glossary terms. Money uses `kes()`.
+
+## 20. Wallet, payments & mobile money layer (page 14 — `/app/wallet`)
+
+Page-scoped stylesheet `src/wallet.css`, linked from `__root.tsx` after
+`analyticsCss` (`walletCss` → `?url` + `?v=1`). Every selector is prefixed
+with `.gm-app` or `.gm-modal-overlay`, token-only, and no global `.gm-*`
+component is redefined.
+
+**New `.gm-w-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| 14.1 hero + balance | `.gm-w-hero`(+`-head/-copy/-chips/-actions/-strip`), `.gm-w-balance`, `.gm-w-bal-row`(`.is-warn/.is-strong`), `.gm-w-bal-foot`, `.gm-w-action`(`.is-quiet`, `-ic`) |
+| 14.2 deposit rails | `.gm-w-method-grid`, `.gm-w-method`(`-ic/-facts/-cta`) |
+| 14.3 send / pay | `.gm-w-paytype-grid`, `.gm-w-paytype`(`.is-on`, `-hint`), `.gm-w-recipient-grid`, `.gm-w-recipient`(`-copy/-last`), `.gm-w-radio` |
+| 14.4 auto-pay | `.gm-w-rule`(`.is-on/.is-off`, `-main/-head/-meta/-note/-actions`) |
+| 14.5 ledger | `.gm-w-txn`, `.gm-w-dir`(`.in/.out`), `.gm-w-bal`, `.gm-w-method`, `.gm-w-ref`, `.gm-w-toolbar`, `.gm-field-inline`, `.gm-w-up` |
+| 14.6 budgets | `.gm-w-budget-grid`, `.gm-w-budget`(`-head/-emoji/-figures`) |
+| 14.7 security | `.gm-w-sec`(`-ic/-copy`), `.gm-w-limit`(`-head`) |
+| Shared | `.gm-w-kv`(`-row`/`dt`/`dd`), `.gm-w-callout`(`.is-info/.is-good/.is-warn`), `.gm-w-faq(-row)`, `.gm-w-glossary` |
+| Modal wizard bits | `.gm-w-wizard`, `.gm-w-note`(`.is-small`), `.gm-w-quick-amounts`, `.gm-w-steps`, `.gm-w-processing`(+`spin`), `.gm-w-receipt-block/-mark/-amount/-note`, `.gm-w-paytype-grid` |
+
+**Responsive:** hero stacks and the balance panel goes full width at
+**1080px**; deposit, pay-type, budget and recipient grids collapse to one
+column at **640px**; the hero action strip stacks at **380px**;
+`@media print` strips the hero background, the action strip and the toolbar.
+
+**Reusable widgets — `src/components/app/WalletWidgets.tsx`:**
+`WalletHero`, `TxnRow`, `DepositMethodCard`, `PayTypeCard`, `RecipientCard`,
+`AutopayRuleRow`, `BudgetCard`, `SecurityRow`, `WalletKv`, `WalletCallout`,
+`LimitMeter`, `WalletFaqList`, `WalletGlossary`.
+**Workflows:** `src/components/app/WalletModals.tsx` (11 dialogs/wizards:
+deposit wizard across all five rails, send/pay wizard with bank, biller and
+P2P rails, withdraw wizard, transaction detail with reversal request, auto-pay
+rule editor, budget allocation, add payee, statement share link, wallet
+settings, fraud/freeze confirmation and a generic confirm). Receipts use
+`DEP-`, `PL-`, `WDR-`, `PAYEE-`, `QK-` codes and OTP/PIN `123456`.
+
+**Page data:** `src/data/app/wallet.ts` — blueprint wallet figures (KES 35,000
+available, 20,000 in budgets, 15,000 free, 4,500 pending, 10,500 effective,
+60,000 deposits, 35,500 spend, 50,000 daily and 500,000 monthly limits),
+5 deposit rails with min/max/fee/speed, 5 pay rails, 6 saved payees, 4
+auto-pay rules, the 14-row October ledger (John/Peter/Grace weeding at KES 500,
+M-Pesa `QJK3L5X7YZ`/`PLM8NR2KQW`/`RTY9PV3NXM`, `SHK4RT9AB` deposit, DAP
+purchase, monthly subscription), three budget envelopes, nine security
+controls, 6 FAQs and 8 glossary terms. Money uses `kes()`.
+
+## 21. Settings, team & permissions layer (page 15 — `/app/settings`)
+
+Page-scoped stylesheet `src/settings.css`, linked from `__root.tsx` after
+`walletCss` (`settingsCss` → `?url` + `?v=1`), prefix `.gm-app` /
+`.gm-modal-overlay`, token-only.
+
+**New `.gm-st-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + stats | `.gm-st-hero`(+`-top/-copy/-actions/-stats`), `.gm-st-stat` |
+| 15.1 profile | `.gm-st-profile`(+`-copy/-chips`), `.gm-st-avatar`, `.gm-st-groups`, `.gm-st-group`, `.gm-st-panel-note`(`.is-good/.is-warn`) |
+| 15.2 plots | `.gm-st-plot-grid`, `.gm-st-plot`(`-head/-icon/-cta`) |
+| 15.3 team | `.gm-st-member-grid`, `.gm-st-member`(`-head/-ava/-line/-foot/-tasks`), `.gm-st-roles`, `.gm-st-role`(`-ic`), `.gm-st-matrix-wrap`, `.gm-st-matrix`(`td.is-y/.is-l/.is-n`, `.is-plans`), `.gm-st-matrix-note` |
+| 15.3 HR | `.gm-st-hr`, `.gm-st-row-actions`, `.gm-st-list`(`.is-grid`), `.gm-st-checklist`(`.is-action`), `.gm-st-check`, `.gm-st-rating`, `.gm-st-bars`, `.gm-st-bar`, `.gm-st-payroll-head`, `.gm-st-compliance(-row/-track)`, `.gm-st-good`, `.gm-st-warn` |
+| 15.4 notifications | `.gm-st-notif`(`-copy/-channels`), `.gm-st-toggle`(`.is-on`) |
+| 15.5 data | `.gm-st-data-list`, `.gm-st-data`(`.is-info/.is-good/.is-warn`) |
+| 15.6 plans | `.gm-st-plan-grid`, `.gm-st-plan`(`.is-current/.is-featured`, `-head/-icon/-price/-features/-badge`) |
+| FAQ/footer | `.gm-st-faq(-row)`, `.gm-st-glossary`, `.gm-st-footer-note` |
+| Modal wizard bits | `.gm-st-form`(`.is-two`), `.gm-st-note`, `.gm-st-processing`(+`spin`), `.gm-st-receipt`(`-mark`), `.gm-st-plan-grid` |
+
+**Responsive:** matrix padding tightens and compliance rows stack at
+**1080px**; two-column key/value and form grids collapse at **860px**; hero
+stats, plot, member and plan grids collapse at **640px**; stats stack at
+**380px**; `@media print` hides the action row, menu wrapper and tabs.
+
+**Reusable widgets — `src/components/app/SettingsWidgets.tsx`:**
+`SettingsHero`, `ProfileCard`, `ProfileFieldGroups`, `FarmPlotCard`,
+`FarmDefaults`, `TeamMemberCard`, `PermissionMatrix`, `RoleLegend`,
+`WorkerRow`, `HrPanel` (eight HR tabs), `NotifRow`, `PlanCard`,
+`PlanComparison`, `DataRow`, `KvList`, `SettingsFaqList`, `SettingsGlossary`.
+**Workflows:** `src/components/app/SettingsModals.tsx` (11 dialogs/wizards:
+three-step invite with owner OTP, member role editor, profile editor, plot
+editor, plan switcher, OTP-gated data action (export, retention, buyer list,
+deletion), worker detail with inline pay-by-PIN, weekly payroll run with
+batch receipts, job posting, onboarding checklist and a generic confirm).
+Receipts use `INV-`, `SHL`/`SHK`, `PAY-`, `JOB-`, `SET-`, `DEL-` codes.
+
+**Page data:** `src/data/app/settings.ts` — the 15.1 profile fields, 6 farm
+plots with soil and pH, 6 role definitions, the 13 × 6 permission matrix, 6
+team members with financial and payment authority plus validity windows, 6
+worker records with 30+ fields each, job post + 4 channels + 8 onboarding
+steps, 5 attendance methods with adoption, today's register and a monthly
+summary, 5 performance ratings + John Mwangi's performance card, 6 payslips
+totalling KES 9,312.50, 4 advances/deductions, 12 Kenyan labour compliance
+requirements, 9 labour analytics rows, 10 notification rows across push/SMS/
+WhatsApp/email, 6 data & privacy settings, three plans with the full blueprint
+feature comparison table, 6 FAQs and 5 glossary terms.
+
+## 22. Mobile, offline, USSD & SMS layer (page 16 — `/app/channels`)
+
+Page-scoped stylesheet `src/channels.css`, linked from `__root.tsx` after
+`settingsCss` (`channelsCss` → `?url` + `?v=1`), prefix `.gm-app` /
+`.gm-modal-overlay`, token-only.
+
+**New `.gm-ch-*` classes by blueprint section:**
+
+| Blueprint section | Classes |
+|---|---|
+| Hero + stats | `.gm-ch-hero`(+`-top/-copy/-actions/-stats`), `.gm-ch-stat` |
+| 16.1 offline | `.gm-ch-banner`(`.is-offline/.is-syncing`, `-ic`), `.gm-ch-queue`(`-head/-meta`), `.gm-ch-tips`, `.gm-ch-tip`, `.gm-ch-savers` |
+| 16.2 USSD | `.gm-ch-phone-wrap`, `.gm-ch-phone`(`-notch/-screen/-status/-code/-log/-line`, `-menu/-key/-foot`), `.gm-ch-phone-input`, `.gm-ch-ussd-notes` |
+| 16.3 SMS | `.gm-ch-sms-console`, `.gm-ch-sms-phone`(`-head/-thread/-compose`), `.gm-ch-sms-out/-in`, `.gm-ch-sms-commands`, `.gm-ch-sms-command` |
+| 16.4 WhatsApp | `.gm-ch-wa`(+`-chat/-head/-body/-msg/-photo/-quick/-btn/-side/-features`) |
+| 16.5 agents | `.gm-ch-agents`, `.gm-ch-agent`(`-head/-ava/-addr/-meta/-services/-actions`) |
+| Shared | `.gm-ch-kv`(`-row`/`dt`/`dd`), `.gm-ch-faq(-row)`, `.gm-ch-glossary`, `.gm-ch-footer-note` |
+| Modal wizard bits | `.gm-ch-form`, `.gm-ch-quick`, `.gm-ch-note`(`.is-small`), `.gm-ch-install`, `.gm-ch-processing`(+`spin`), `.gm-ch-done`(`-mark`) |
+
+**Responsive:** the phone/console/chat three two-column layouts collapse to one
+column and the handset is centred at **1080px**; hero stats, agent grid and
+SMS command grid collapse at **640px**; stats stack at **380px**;
+`@media print` hides tabs, hero actions and the tools menu, and keeps the
+phone, SMS and chat mocks unbroken.
+
+**Reusable widgets — `src/components/app/ChannelsWidgets.tsx`:**
+`ChannelsHero`, `OfflineBanner`, `OfflineFeatureTable`, `SyncQueue`,
+`OfflineTips`, `DataSaverList`, `UssdPhone` (a real navigable menu tree),
+`SmsConsole` (live keyword responder), `SmsFacts`, `SmsCommandRow`,
+`WhatsAppPanel`, `AgentsPanel`, `AgentProgramme`, `KvPairs`,
+`ChannelsFaqList`, `ChannelsGlossary`.
+**Workflows:** `src/components/app/ChannelsModals.tsx` (7 dialogs: three-step
+PWA install, offline action simulator that queues or posts, agent cash-in with
+OTP, agent registration, USSD help, SMS command list, WhatsApp bot help and the
+channel FAQ/glossary). Receipts use `QUEUE-`, `LIVE-`, `DEP-`, `AGENT-` codes.
+
+**Page data:** `src/data/app/channels.ts` — the 10 offline capabilities with
+queue limits and conflict rules, 2 queued actions with GPS, 20 USSD screens
+covering weather, tasks, wallet, prices, AI, payments, crops and help in
+Kiswahili, 8 SMS commands with exact replies, 3 WhatsApp diagnosis examples,
+8 bot capabilities, 3 agents with float and services, the agent programme
+terms, 6 FAQs, 7 glossary terms and 4 data-saver modes. Shortcodes are
+`*384#`, `20550` and `0700 000 384`; money uses `kes()`.
+
+---
+
+## 23. Contrast safety (app-wide — added after the Sep 2026 appearance audit)
+
+Root causes found on the shipped app pages:
+
+1. **Undefined design tokens.** 53 of the 118 referenced `var(--gm-*)` names
+   were never defined (e.g. `--gm-ink-500`, `--gm-leaf-400`, `--gm-deep`,
+   `--gm-surface`, `--gm-radius-md`, `--gm-white-10`). An undefined `var()`
+   without a fallback makes the whole declaration invalid at computed-value
+   time, so backgrounds fell back to transparent and `color` fell back to
+   *inherit* — that is what produced white-on-white text. All scale steps are
+   now defined in `:root` (121 tokens); the audit rule is **zero undefined
+   `var(--gm-*)` references**.
+2. **Light surfaces nested in dark heroes.** `.gm-app .gm-plan-head` sets
+   `color: var(--gm-card)`, which every descendant inherits — including white
+   `.gm-card` KPI tiles → white text on white cards.
+3. **Global heading default beats inheritance.** `h1..h5 { color:
+   var(--gm-ink-950) }` painted near-black headings onto dark hero gradients.
+
+The rules that keep this fixed (all in `src/styles.css`, appended as §23):
+
+```css
+/* 1 — light surfaces reset ink */
+.gm-card, .gm-check-row, .gm-stat { color: var(--gm-ink-800); }
+
+/* 2 — headings inside dark heroes/panels inherit the surface colour */
+.gm-app .gm-plan-head h1, … .gm-app .gm-d-hero h3 { color: inherit; }
+
+/* 3 — muted text inside dark heroes */
+.gm-app .gm-plan-head .gm-check-row small { color: var(--gm-ink-500); }
+
+/* 4 — one hero-title scale app-wide (matches pages 12/13/17) */
+.gm-app .gm-plan-head h1, .gm-app .gm-mk-hero h1, .gm-app .gm-an-hero h1,
+.gm-app .gm-w-hero h1, .gm-app .gm-st-hero h1, .gm-app .gm-ch-hero h1,
+.gm-app .gm-rec-hero h1, .gm-app .gm-soil-hero h1, .gm-app .gm-cm-hero h1 {
+  font-size: clamp(1.9rem, 4.2vw, 3rem); font-weight: 700;
+  line-height: 1.06; letter-spacing: -0.03em;
+}
+
+/* 5 — `.gm-h-section` inside the app is an in-card section title */
+.gm-app h2.gm-h-section, .gm-app h3.gm-h-section, … { font-size: 1.15rem; }
+```
+
+**Type scale now used by every app page**
+
+| Element | Spec |
+|---|---|
+| Page hero `h1` | Fraunces 700 · `clamp(1.9rem, 4.2vw, 3rem)` · line-height 1.06 · tracking -0.03em |
+| In-card section title (`h2/h3.gm-h-section`) | Fraunces 700 · `1.15rem` |
+| Sub-section `h3.font-display` | Fraunces 500 · `1.75rem` |
+| Body / labels / buttons | Plus Jakarta Sans |
+| Codes, receipts, phone keys, USSD/SMS mocks | `var(--gm-font-mono)` |
+
+**Also fixed in the same pass**
+
+- `.gm-chip-lime` is now a solid lime pill with `--gm-forest-950` text, so it
+  reads on both dark heroes and white cards (it used to be pale lime text on a
+  translucent lime fill → invisible on light surfaces).
+- `.gm-ava` owns its surface (`--gm-grad-primary`), so initials are readable on
+  white cards; inline `background` (auth hub) still wins.
+- `.gm-plan-compare-tray` gets its dark surface back (`--gm-deep` now defined).
+- Market/analytics hero KPI tiles were translucent glass on a dark gradient but
+  their values used the dashboard's deep-ink default → hero-scoped overrides in
+  `market.css` / `analytics.css`.
+- `dashboard.tsx` weather hero carries `.gm-d-hero` so its `h2` inherits the
+  hero's light colour.
+
+**Verification harness (not in the repo):** a CSS-cascade + WCAG-contrast audit
+(`/tmp/audit/audit.mjs`) that parses Bootstrap + all 13 project stylesheets,
+resolves `var()` chains, composites translucent/gradient backdrops and reports
+every text node below 3:1. Result: **0 findings on all 17 app routes at 1440px
+and 390px** (was 100+ findings, including pure 1.00 white-on-white).

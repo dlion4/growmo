@@ -1616,7 +1616,7 @@
   border-radius: var(--gm-r-sm);
   border: 1px dashed var(--gm-leaf-500);
   background: var(--gm-mint-50);
-  font-family: ui-monospace, monospace;
+  font-family: var(--gm-font-mono);
 }
 
 .gm-modal-overlay .gm-soil-receipt small {

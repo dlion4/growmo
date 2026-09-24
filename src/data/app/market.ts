@@ -1,414 +1,398 @@
 /* ============================================================================
-   PAGE 10 — MARKET & SALES (ENHANCED)
-   Market data for Mary Wanjiku's farm, Githunguri, Kiambu County.
-   Realistic Kenyan demo data: KES, 07XX phones, real markets, crops, buyers.
-   ========================================================================== */
-import {
-  BarChart3,
-  Building2,
-  FileText,
-  Globe,
-  Handshake,
-  MapPin,
-  MessageSquare,
-  ShieldCheck,
-  Smartphone,
-  Star,
-  TrendingDown,
-  TrendingUp,
-  Truck,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+   PAGE 10 — MARKET & SALES  (/app/market)
+   Kenyan market data for Mary's Farm, Githunguri (Kiambu), Sep 2026 season.
 
-/* ── helpers ──────────────────────────────────────────────────────────────── */
+   Blueprint sections covered:
+   10.1 live market prices across 8 Kenyan markets · 10.2 price trend charts ·
+   10.3 AI best-market recommendation with transport/fees net prices ·
+   10.4 buyer directory (brokers, supermarkets, exporters, cooperatives, online) ·
+   10.5 harvest sales planner (4 scenarios + AI pick) ·
+   10.6 sales recording with M-Pesa receipt · 10.7 contract farming board.
+   Prices, distances, fees and M-Pesa codes are realistic but fictional.
+   ========================================================================== */
+
 export const MARKET_CONTEXT = {
+  farm: "Mary's Farm",
   farmer: "Mary Wanjiku",
-  farm: "Wanjiku Mixed Farm",
-  location: "Githunguri, Kiambu County",
+  county: "Kiambu",
+  subCounty: "Githunguri",
   phone: "0712 345 678",
-  today: "13 Nov 2026",
-  season: "Short Rains 2026",
+  walletBalance: 85400,
+  mpesaName: "MARY WANJIKU K",
+  season: "SR 2026 · Short rains",
+  lastPriceUpdate: "22 Sep 2026 · 09:14",
+  subscribedAlerts: 4,
+  pendingContracts: 2,
+  salesYtd: 580000,
+  salesTarget: 720000,
+  buyersContacted: 12,
+  activeListings: 3,
+  marketScore: 78,
+  topMarket: "Thika",
+  transportRate: 35, // KES per km per 1,000 heads
 };
 
-export type MarketTrend = "up" | "down" | "stable";
-export type PriceStatus = "received" | "pending" | "forecast";
+/* ------------------------------------------------------------ 10.1 prices */
 
-/* ── 10.1 Live Market Prices ─────────────────────────────────────────────── */
-export interface MarketPriceRow {
-  id: string;
-  crop: string;
-  swahili: string;
-  unit: string;
-  marikiti: string;
-  wakulima: string;
-  kangemi: string;
-  kongowea: string;
-  kisumu: string;
-  eldoret: string;
-  nakuru: string;
-  thika: string;
-  trend: MarketTrend;
-  lastUpdate: string;
-  bestMarket: string;
-  advice: string;
-}
-
-export const MARKET_PRICES: MarketPriceRow[] = [
-  {
-    id: "mp-01", crop: "Cabbage", swahili: "Kabichi", unit: "per head",
-    marikiti: "25–40", wakulima: "20–35", kangemi: "25–40", kongowea: "20–35",
-    kisumu: "25–35", eldoret: "30–45", nakuru: "25–40", thika: "20–35",
-    trend: "stable", lastUpdate: "Today 08:00", bestMarket: "Eldoret",
-    advice: "Supply increasing — prices may dip in December. Sell before Dec 15.",
-  },
-  {
-    id: "mp-02", crop: "Tomato", swahili: "Nyanya", unit: "64kg crate",
-    marikiti: "2,500–5,000", wakulima: "2,000–4,500", kangemi: "2,800–5,500",
-    kongowea: "2,000–4,500", kisumu: "2,500–4,000", eldoret: "2,000–3,500",
-    nakuru: "2,200–4,000", thika: "2,500–5,000",
-    trend: "up", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Dry season starting — less supply, prices rising. Hold if possible.",
-  },
-  {
-    id: "mp-03", crop: "Maize", swahili: "Mahindi", unit: "90kg bag",
-    marikiti: "3,000–4,500", wakulima: "3,000–4,000", kangemi: "3,200–4,500",
-    kongowea: "3,200–4,000", kisumu: "3,000–4,200", eldoret: "3,200–4,500",
-    nakuru: "3,000–4,200", thika: "3,000–4,000",
-    trend: "down", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Rift Valley harvest flooding market. Store 2–3 months for better prices.",
-  },
-  {
-    id: "mp-04", crop: "Beans (Rosecoco)", swahili: "Maharagwe", unit: "90kg bag",
-    marikiti: "6,000–9,000", wakulima: "5,500–8,500", kangemi: "6,500–9,500",
-    kongowea: "5,500–8,000", kisumu: "5,000–7,500", eldoret: "6,000–8,500",
-    nakuru: "5,500–8,000", thika: "6,000–8,500",
-    trend: "up", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Off-season supply is tight. Sell now for top price.",
-  },
-  {
-    id: "mp-05", crop: "Potatoes", swahili: "Viazi", unit: "50kg bag",
-    marikiti: "1,500–2,500", wakulima: "1,200–2,200", kangemi: "1,500–2,500",
-    kongowea: "1,800–3,000", kisumu: "1,500–2,500", eldoret: "1,500–2,200",
-    nakuru: "1,400–2,200", thika: "1,500–2,500",
-    trend: "stable", lastUpdate: "Today 08:00", bestMarket: "Kongowea",
-    advice: "Mombasa pays premium for clean graded stock. Invest in sorting.",
-  },
-  {
-    id: "mp-06", crop: "Sukuma Wiki", swahili: "Sukuma Wiki", unit: "per bundle",
-    marikiti: "10–20", wakulima: "8–15", kangemi: "10–20", kongowea: "8–15",
-    kisumu: "10–15", eldoret: "10–20", nakuru: "10–18", thika: "8–15",
-    trend: "stable", lastUpdate: "Today 08:00", bestMarket: "Eldoret",
-    advice: "Consistent demand year-round. Sell fresh within 24 hours.",
-  },
-  {
-    id: "mp-07", crop: "Onions", swahili: "Vitunguu", unit: "50kg bag",
-    marikiti: "4,000–7,000", wakulima: "3,500–6,500", kangemi: "4,500–7,500",
-    kongowea: "3,000–6,000", kisumu: "3,500–6,000", eldoret: "3,500–6,500",
-    nakuru: "4,000–7,000", thika: "4,000–7,000",
-    trend: "up", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Prices rising with dry season. Store well for peak in January.",
-  },
-  {
-    id: "mp-08", crop: "Carrots", swahili: "Karoti", unit: "50kg bag",
-    marikiti: "2,000–3,500", wakulima: "1,800–3,000", kangemi: "2,200–3,800",
-    kongowea: "2,000–3,500", kisumu: "1,800–3,000", eldoret: "2,000–3,200",
-    nakuru: "2,000–3,500", thika: "2,000–3,000",
-    trend: "down", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Nyandarua supply increasing. Sell quickly — carrots don't store long.",
-  },
-  {
-    id: "mp-09", crop: "Capsicum", swahili: "Hoho", unit: "per kg",
-    marikiti: "40–80", wakulima: "35–70", kangemi: "45–90", kongowea: "30–60",
-    kisumu: "35–70", eldoret: "35–65", nakuru: "40–80", thika: "40–85",
-    trend: "up", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Greenhouse capsicum fetches premium. Grade and pack carefully.",
-  },
-  {
-    id: "mp-10", crop: "Avocado (Hass)", swahili: "Parachichi", unit: "per piece",
-    marikiti: "15–50", wakulima: "12–45", kangemi: "18–55", kongowea: "10–30",
-    kisumu: "12–35", eldoret: "15–40", nakuru: "15–45", thika: "15–50",
-    trend: "up", lastUpdate: "Today 08:00", bestMarket: "Kangemi",
-    advice: "Export demand pushing prices up. Avocado collection season strong.",
-  },
-];
-
-/* ── 10.2 Price Trend Data ───────────────────────────────────────────────── */
-export interface PriceTrendPoint {
-  date: string;
-  price: number;
-}
-
-export interface PriceTrend {
-  id: string;
-  crop: string;
+export interface MarketPrice {
   market: string;
-  unit: string;
-  current: number;
-  weekAgo: number;
-  monthAgo: number;
-  yearAgo: number;
-  trend: MarketTrend;
-  seasonPeak: string;
-  seasonLow: string;
-  insight: string;
-  data7d: PriceTrendPoint[];
-  data30d: PriceTrendPoint[];
+  marketShort: string;
+  distance: number;
+  transportPerHead: number;
+  marketFeePct: number;
+  reliability: number; // 0-5
 }
 
-export const PRICE_TRENDS: PriceTrend[] = [
+export const MARKETS: MarketPrice[] = [
+  { market: "Nairobi (Marikiti)", marketShort: "Marikiti", distance: 40, transportPerHead: 2.0, marketFeePct: 1, reliability: 3.5 },
+  { market: "Nairobi (Wakulima)", marketShort: "Wakulima", distance: 42, transportPerHead: 2.1, marketFeePct: 1, reliability: 3.8 },
+  { market: "Kangemi", marketShort: "Kangemi", distance: 35, transportPerHead: 1.75, marketFeePct: 1, reliability: 3.4 },
+  { market: "Mombasa (Kongowea)", marketShort: "Kongowea", distance: 450, transportPerHead: 12.0, marketFeePct: 1.5, reliability: 3.6 },
+  { market: "Kisumu (Kibos)", marketShort: "Kibos", distance: 290, transportPerHead: 8.5, marketFeePct: 1, reliability: 3.7 },
+  { market: "Eldoret", marketShort: "Eldoret", distance: 270, transportPerHead: 7.8, marketFeePct: 1, reliability: 4.0 },
+  { market: "Nakuru", marketShort: "Nakuru", distance: 140, transportPerHead: 4.0, marketFeePct: 1, reliability: 3.9 },
+  { market: "Thika", marketShort: "Thika", distance: 15, transportPerHead: 0.5, marketFeePct: 0, reliability: 4.2 },
+];
+
+export interface CropPriceRow {
+  crop: string;
+  unit: string;
+  swahili: string;
+  icon: string;
+  prices: Record<string, [number, number]>; // market -> [low,high]
+  trend: "up" | "down" | "stable";
+  changePct: number;
+  weekHigh: number;
+  weekLow: number;
+  tip: string;
+}
+
+export const CROP_PRICES: CropPriceRow[] = [
   {
-    id: "pt-01", crop: "Cabbage", market: "Marikiti", unit: "per head",
-    current: 32, weekAgo: 30, monthAgo: 28, yearAgo: 25,
-    trend: "up", seasonPeak: "Jan–Feb (KES 40)", seasonLow: "Jun–Aug (KES 20)",
-    insight: "Prices peak in Jan–Feb during dry season. Plant in Oct–Nov for peak harvest timing.",
-    data7d: [
-      { date: "Nov 7", price: 28 }, { date: "Nov 8", price: 30 }, { date: "Nov 9", price: 30 },
-      { date: "Nov 10", price: 31 }, { date: "Nov 11", price: 32 }, { date: "Nov 12", price: 32 }, { date: "Nov 13", price: 32 },
-    ],
-    data30d: [
-      { date: "Oct 14", price: 24 }, { date: "Oct 17", price: 25 }, { date: "Oct 20", price: 25 },
-      { date: "Oct 23", price: 26 }, { date: "Oct 26", price: 27 }, { date: "Oct 29", price: 27 },
-      { date: "Nov 1", price: 28 }, { date: "Nov 4", price: 28 }, { date: "Nov 7", price: 28 },
-      { date: "Nov 10", price: 31 }, { date: "Nov 13", price: 32 },
-    ],
+    crop: "Cabbage", unit: "Head", swahili: "Kabeji", icon: "🥬",
+    prices: {
+      "Nairobi (Marikiti)": [25, 40], "Nairobi (Wakulima)": [20, 35], "Kangemi": [25, 40],
+      "Mombasa (Kongowea)": [20, 35], "Kisumu (Kibos)": [25, 35], "Eldoret": [30, 45],
+      "Nakuru": [25, 40], "Thika": [20, 35],
+    },
+    trend: "up", changePct: 8, weekHigh: 45, weekLow: 22,
+    tip: "Prices climbing as dry season supply tightens — hold 2 weeks for peak.",
   },
   {
-    id: "pt-02", crop: "Tomato", market: "Kangemi", unit: "64kg crate",
-    current: 4200, weekAgo: 3800, monthAgo: 3500, yearAgo: 3000,
-    trend: "up", seasonPeak: "Dec–Feb (KES 5,500)", seasonLow: "Apr–Jun (KES 2,000)",
-    insight: "Dry season supply drops push prices up. Greenhouse farmers benefit most.",
-    data7d: [
-      { date: "Nov 7", price: 3800 }, { date: "Nov 8", price: 3900 }, { date: "Nov 9", price: 4000 },
-      { date: "Nov 10", price: 4000 }, { date: "Nov 11", price: 4100 }, { date: "Nov 12", price: 4100 }, { date: "Nov 13", price: 4200 },
-    ],
-    data30d: [
-      { date: "Oct 14", price: 3200 }, { date: "Oct 17", price: 3300 }, { date: "Oct 20", price: 3400 },
-      { date: "Oct 23", price: 3500 }, { date: "Oct 26", price: 3500 }, { date: "Oct 29", price: 3600 },
-      { date: "Nov 1", price: 3700 }, { date: "Nov 4", price: 3700 }, { date: "Nov 7", price: 3800 },
-      { date: "Nov 10", price: 4000 }, { date: "Nov 13", price: 4200 },
-    ],
+    crop: "Sukuma Wiki", unit: "Bundle", swahili: "Sukuma Wiki", icon: "🥬",
+    prices: {
+      "Nairobi (Marikiti)": [10, 20], "Nairobi (Wakulima)": [8, 15], "Kangemi": [10, 20],
+      "Mombasa (Kongowea)": [8, 15], "Kisumu (Kibos)": [10, 15], "Eldoret": [10, 20],
+      "Nakuru": [10, 18], "Thika": [8, 15],
+    },
+    trend: "stable", changePct: 0, weekHigh: 20, weekLow: 8,
+    tip: "Stable year-round; irrigate to keep leaf size consistent for premium.",
   },
   {
-    id: "pt-03", crop: "Maize", market: "Eldoret", unit: "90kg bag",
-    current: 3800, weekAgo: 3900, monthAgo: 4100, yearAgo: 4200,
-    trend: "down", seasonPeak: "May–Jul (KES 4,500)", seasonLow: "Oct–Dec (KES 3,000)",
-    insight: "Rift Valley harvest season pushing prices down. Store for 2–3 months for recovery.",
-    data7d: [
-      { date: "Nov 7", price: 3900 }, { date: "Nov 8", price: 3900 }, { date: "Nov 9", price: 3850 },
-      { date: "Nov 10", price: 3850 }, { date: "Nov 11", price: 3800 }, { date: "Nov 12", price: 3800 }, { date: "Nov 13", price: 3800 },
-    ],
-    data30d: [
-      { date: "Oct 14", price: 4100 }, { date: "Oct 17", price: 4100 }, { date: "Oct 20", price: 4050 },
-      { date: "Oct 23", price: 4000 }, { date: "Oct 26", price: 4000 }, { date: "Oct 29", price: 3950 },
-      { date: "Nov 1", price: 3950 }, { date: "Nov 4", price: 3900 }, { date: "Nov 7", price: 3900 },
-      { date: "Nov 10", price: 3850 }, { date: "Nov 13", price: 3800 },
-    ],
+    crop: "Tomato", unit: "64kg crate", swahili: "Nyanya", icon: "🍅",
+    prices: {
+      "Nairobi (Marikiti)": [2500, 5000], "Nairobi (Wakulima)": [2000, 4500], "Kangemi": [2800, 5500],
+      "Mombasa (Kongowea)": [2000, 4500], "Kisumu (Kibos)": [2500, 4000], "Eldoret": [2000, 3500],
+      "Nakuru": [2200, 4000], "Thika": [2500, 5000],
+    },
+    trend: "up", changePct: 12, weekHigh: 5500, weekLow: 2200,
+    tip: "Rain damage in Makueni has lifted prices — harvest mature pink for KES 5,000.",
   },
   {
-    id: "pt-04", crop: "Beans", market: "Nakuru", unit: "90kg bag",
-    current: 7800, weekAgo: 7500, monthAgo: 7200, yearAgo: 6500,
-    trend: "up", seasonPeak: "Nov–Jan (KES 9,000)", seasonLow: "Apr–Jun (KES 5,500)",
-    insight: "Off-season prices climbing. Good time to sell stored beans.",
-    data7d: [
-      { date: "Nov 7", price: 7500 }, { date: "Nov 8", price: 7600 }, { date: "Nov 9", price: 7600 },
-      { date: "Nov 10", price: 7700 }, { date: "Nov 11", price: 7700 }, { date: "Nov 12", price: 7800 }, { date: "Nov 13", price: 7800 },
-    ],
-    data30d: [
-      { date: "Oct 14", price: 7000 }, { date: "Oct 17", price: 7100 }, { date: "Oct 20", price: 7200 },
-      { date: "Oct 23", price: 7200 }, { date: "Oct 26", price: 7300 }, { date: "Oct 29", price: 7300 },
-      { date: "Nov 1", price: 7400 }, { date: "Nov 4", price: 7400 }, { date: "Nov 7", price: 7500 },
-      { date: "Nov 10", price: 7700 }, { date: "Nov 13", price: 7800 },
-    ],
+    crop: "Onion", unit: "50kg bag", swahili: "Kitunguu", icon: "🧅",
+    prices: {
+      "Nairobi (Marikiti)": [4000, 7000], "Nairobi (Wakulima)": [3500, 6500], "Kangemi": [4500, 7500],
+      "Mombasa (Kongowea)": [3000, 6000], "Kisumu (Kibos)": [3500, 6000], "Eldoret": [3500, 6500],
+      "Nakuru": [4000, 7000], "Thika": [4000, 7000],
+    },
+    trend: "down", changePct: -5, weekHigh: 7500, weekLow: 3200,
+    tip: "Tanzanian imports arriving — sell stored stock before further dip.",
   },
   {
-    id: "pt-05", crop: "Potatoes", market: "Kongowea", unit: "50kg bag",
-    current: 2400, weekAgo: 2300, monthAgo: 2200, yearAgo: 2000,
-    trend: "stable", seasonPeak: "Dec–Feb (KES 3,000)", seasonLow: "Jun–Aug (KES 1,500)",
-    insight: "Mombasa maintains steady premium. Clean grading pays.",
-    data7d: [
-      { date: "Nov 7", price: 2300 }, { date: "Nov 8", price: 2350 }, { date: "Nov 9", price: 2350 },
-      { date: "Nov 10", price: 2400 }, { date: "Nov 11", price: 2400 }, { date: "Nov 12", price: 2400 }, { date: "Nov 13", price: 2400 },
-    ],
-    data30d: [
-      { date: "Oct 14", price: 2200 }, { date: "Oct 17", price: 2200 }, { date: "Oct 20", price: 2200 },
-      { date: "Oct 23", price: 2250 }, { date: "Oct 26", price: 2250 }, { date: "Oct 29", price: 2250 },
-      { date: "Nov 1", price: 2300 }, { date: "Nov 4", price: 2300 }, { date: "Nov 7", price: 2300 },
-      { date: "Nov 10", price: 2400 }, { date: "Nov 13", price: 2400 },
-    ],
+    crop: "Maize", unit: "90kg bag", swahili: "Mahindi", icon: "🌽",
+    prices: {
+      "Nairobi (Marikiti)": [3000, 4500], "Nairobi (Wakulima)": [3000, 4000], "Kangemi": [3200, 4500],
+      "Mombasa (Kongowea)": [3200, 4000], "Kisumu (Kibos)": [3000, 4200], "Eldoret": [3200, 4500],
+      "Nakuru": [3000, 4200], "Thika": [3000, 4000],
+    },
+    trend: "stable", changePct: 2, weekHigh: 4500, weekLow: 3000,
+    tip: "NCPB floor price at KES 3,200 provides a backstop; consider selling to them.",
+  },
+  {
+    crop: "Beans", unit: "90kg bag", swahili: "Maharage", icon: "🫘",
+    prices: {
+      "Nairobi (Marikiti)": [6000, 9000], "Nairobi (Wakulima)": [5500, 8500], "Kangemi": [6500, 9500],
+      "Mombasa (Kongowea)": [5500, 8000], "Kisumu (Kibos)": [5000, 7500], "Eldoret": [6000, 8500],
+      "Nakuru": [5500, 8000], "Thika": [6000, 8500],
+    },
+    trend: "up", changePct: 6, weekHigh: 9500, weekLow: 5200,
+    tip: "Shortage across Eastern province pushing prices; Rosecoco at premium.",
+  },
+  {
+    crop: "Potatoes", unit: "50kg bag", swahili: "Viazi", icon: "🥔",
+    prices: {
+      "Nairobi (Marikiti)": [1500, 2500], "Nairobi (Wakulima)": [1200, 2200], "Kangemi": [1500, 2500],
+      "Mombasa (Kongowea)": [1800, 3000], "Kisumu (Kibos)": [1500, 2500], "Eldoret": [1500, 2200],
+      "Nakuru": [1400, 2200], "Thika": [1500, 2500],
+    },
+    trend: "down", changePct: -8, weekHigh: 2800, weekLow: 1200,
+    tip: "Glut from Kinangop harvest; store in dark cool place or sell at Kongowea.",
+  },
+  {
+    crop: "Carrot", unit: "50kg bag", swahili: "Karoti", icon: "🥕",
+    prices: {
+      "Nairobi (Marikiti)": [2000, 3500], "Nairobi (Wakulima)": [1800, 3000], "Kangemi": [2200, 3800],
+      "Mombasa (Kongowea)": [2000, 3500], "Kisumu (Kibos)": [1800, 3000], "Eldoret": [2000, 3200],
+      "Nakuru": [2000, 3500], "Thika": [2000, 3000],
+    },
+    trend: "up", changePct: 4, weekHigh: 3800, weekLow: 1800,
+    tip: "Steady demand from hotels; wash and grade for KES 3,500+.",
+  },
+  {
+    crop: "Capsicum", unit: "Kg", swahili: "Pilipili hoho", icon: "🫑",
+    prices: {
+      "Nairobi (Marikiti)": [40, 80], "Nairobi (Wakulima)": [35, 70], "Kangemi": [45, 90],
+      "Mombasa (Kongowea)": [30, 60], "Kisumu (Kibos)": [35, 70], "Eldoret": [35, 65],
+      "Nakuru": [40, 80], "Thika": [40, 85],
+    },
+    trend: "stable", changePct: 1, weekHigh: 90, weekLow: 30,
+    tip: "Coloured (red/yellow) capsicum earns 2x green; consider leaving to ripen.",
+  },
+  {
+    crop: "Avocado (Hass)", unit: "Piece", swahili: "Parachichi", icon: "🥑",
+    prices: {
+      "Nairobi (Marikiti)": [15, 50], "Nairobi (Wakulima)": [12, 45], "Kangemi": [18, 55],
+      "Mombasa (Kongowea)": [10, 30], "Kisumu (Kibos)": [12, 35], "Eldoret": [15, 40],
+      "Nakuru": [15, 45], "Thika": [15, 50],
+    },
+    trend: "up", changePct: 15, weekHigh: 55, weekLow: 10,
+    tip: "Export season opening; size 16-18 to packhouse earns KES 45+ per piece.",
   },
 ];
 
-/* ── 10.3 Best Market Recommendations ────────────────────────────────────── */
+/* ------------------------------------------------------------ 10.2 trends */
+
+export interface TrendPoint {
+  month: string;
+  monthShort: string;
+  price: number;
+  yearAgo?: number;
+  seasonalAvg?: number;
+  note?: string;
+}
+
+export const CABBAGE_MARIKITI_12M: TrendPoint[] = [
+  { month: "January", monthShort: "J", price: 48, yearAgo: 42, seasonalAvg: 45, note: "Peak — dry season low supply" },
+  { month: "February", monthShort: "F", price: 42, yearAgo: 40, seasonalAvg: 40 },
+  { month: "March", monthShort: "M", price: 35, yearAgo: 32, seasonalAvg: 35, note: "LR planting — supply increases" },
+  { month: "April", monthShort: "A", price: 28, yearAgo: 25, seasonalAvg: 30 },
+  { month: "May", monthShort: "M", price: 22, yearAgo: 20, seasonalAvg: 24 },
+  { month: "June", monthShort: "J", price: 32, yearAgo: 28, seasonalAvg: 28, note: "LR harvest peak ends" },
+  { month: "July", monthShort: "J", price: 36, yearAgo: 34, seasonalAvg: 32 },
+  { month: "August", monthShort: "A", price: 28, yearAgo: 30, seasonalAvg: 30 },
+  { month: "September", monthShort: "S", price: 32, yearAgo: 30, seasonalAvg: 31 },
+  { month: "October", monthShort: "O", price: 30, yearAgo: 26, seasonalAvg: 28, note: "SR plantings begin" },
+  { month: "November", monthShort: "N", price: 24, yearAgo: 22, seasonalAvg: 25 },
+  { month: "December", monthShort: "D", price: 20, yearAgo: 18, seasonalAvg: 22, note: "Festive demand but high supply" },
+];
+
+export const TREND_RANGES = {
+  "7d": { label: "Last 7 days (daily)", points: 7, interval: "day" },
+  "30d": { label: "Last 30 days (daily)", points: 30, interval: "day" },
+  "12m": { label: "Last 12 months (weekly)", points: 52, interval: "week" },
+  "yoy": { label: "Same period last year", points: 12, interval: "month" },
+  "seasonal": { label: "Seasonal pattern (multi-year)", points: 12, interval: "month" },
+};
+
+export const PRICE_ALERTS = [
+  { id: "a1", crop: "Tomato", market: "Marikiti", threshold: 4500, current: 5000, triggered: true, time: "08:42", trend: "up", phone: true },
+  { id: "a2", crop: "Cabbage", market: "Thika", threshold: 35, current: 30, triggered: false, time: "09:14", trend: "up", phone: true },
+  { id: "a3", crop: "Avocado", market: "Kangemi", threshold: 45, current: 55, triggered: true, time: "07:20", trend: "up", phone: false },
+  { id: "a4", crop: "Potatoes", market: "Marikiti", threshold: 2000, current: 1800, triggered: true, time: "06:55", trend: "down", phone: true },
+  { id: "a5", crop: "Beans", market: "Wakulima", threshold: 8000, current: 8500, triggered: true, time: "05:30", trend: "up", phone: false },
+  { id: "a6", crop: "Onion", market: "Nakuru", threshold: 5000, current: 5200, triggered: false, time: "09:00", trend: "down", phone: false },
+];
+
+/* ------------------------------------------------------------ 10.3 best market */
+
 export interface MarketRecommendation {
   rank: number;
   market: string;
-  county: string;
   distanceKm: number;
   pricePerHead: number;
   transportPerHead: number;
+  feePerHead: number;
   netPricePerHead: number;
-  buyerReliability: number;
-  volumeDemand: string;
-  verdict: string;
-  icon: LucideIcon;
+  verdict: "best" | "higher" | "similar" | "far";
+  note: string;
+  volumeScore: number;
+  reliabilityScore: number;
 }
 
-export const MARKET_RECOMMENDATIONS: MarketRecommendation[] = [
-  {
-    rank: 1, market: "Thika", county: "Kiambu", distanceKm: 15,
-    pricePerHead: 30, transportPerHead: 0.5, netPricePerHead: 29.5,
-    buyerReliability: 4.2, volumeDemand: "High daily demand",
-    verdict: "Best net — close and consistent demand",
-    icon: Star,
-  },
-  {
-    rank: 2, market: "Marikiti (Nairobi)", county: "Nairobi", distanceKm: 40,
-    pricePerHead: 35, transportPerHead: 2.0, netPricePerHead: 33.0,
-    buyerReliability: 3.5, volumeDemand: "Highest volume in Kenya",
-    verdict: "Higher price but broker fees eat margin",
-    icon: Building2,
-  },
-  {
-    rank: 3, market: "Kangemi", county: "Nairobi", distanceKm: 35,
-    pricePerHead: 32, transportPerHead: 1.75, netPricePerHead: 30.25,
-    buyerReliability: 4.0, volumeDemand: "Medium — good for vegetables",
-    verdict: "Solid middle option for weekly supply",
-    icon: MapPin,
-  },
-  {
-    rank: 4, market: "Nakuru", county: "Nakuru", distanceKm: 60,
-    pricePerHead: 30, transportPerHead: 3.0, netPricePerHead: 27.0,
-    buyerReliability: 3.8, volumeDemand: "High — agricultural hub",
-    verdict: "Too far for same price — skip for cabbage",
-    icon: Truck,
-  },
+export const CABBAGE_MARKET_RECS: MarketRecommendation[] = [
+  { rank: 1, market: "Thika", distanceKm: 15, pricePerHead: 30, transportPerHead: 0.5, feePerHead: 0, netPricePerHead: 29.5, verdict: "best", note: "Best — close + good price, low fees", volumeScore: 7, reliabilityScore: 4.2 },
+  { rank: 2, market: "Marikiti (Nairobi)", distanceKm: 40, pricePerHead: 35, transportPerHead: 2.0, feePerHead: 0.35, netPricePerHead: 32.65, verdict: "higher", note: "Higher price but more transport and fees", volumeScore: 10, reliabilityScore: 3.5 },
+  { rank: 3, market: "Kangemi", distanceKm: 35, pricePerHead: 32, transportPerHead: 1.75, feePerHead: 0.32, netPricePerHead: 29.93, verdict: "similar", note: "Similar net to Marikiti, less volume", volumeScore: 6, reliabilityScore: 3.4 },
+  { rank: 4, market: "Wakulima", distanceKm: 42, pricePerHead: 28, transportPerHead: 2.1, feePerHead: 0.28, netPricePerHead: 25.62, verdict: "far", note: "Price too low for the distance", volumeScore: 8, reliabilityScore: 3.8 },
+  { rank: 5, market: "Nakuru", distanceKm: 140, pricePerHead: 30, transportPerHead: 4.0, feePerHead: 0.30, netPricePerHead: 25.70, verdict: "far", note: "Too far for same price", volumeScore: 7, reliabilityScore: 3.9 },
+  { rank: 6, market: "Eldoret", distanceKm: 270, pricePerHead: 38, transportPerHead: 7.8, feePerHead: 0.38, netPricePerHead: 29.82, verdict: "similar", note: "High price but long haul", volumeScore: 5, reliabilityScore: 4.0 },
 ];
 
-/* ── 10.4 Buyer Directory ────────────────────────────────────────────────── */
+/* ------------------------------------------------------------ 10.4 buyer directory */
+
 export type BuyerType = "Broker" | "Supermarket" | "Restaurant" | "Exporter" | "Processor" | "Cooperative" | "Online" | "Direct";
-export type PaymentTerms = "Cash on delivery" | "M-Pesa same day" | "7-day invoice" | "30-day invoice" | "45-day invoice" | "Weekly settlement";
 
 export interface Buyer {
   id: string;
   name: string;
   type: BuyerType;
   location: string;
-  crops: string[];
+  cropsWanted: string[];
   minQuantity: string;
-  paymentTerms: PaymentTerms;
+  paymentTerms: string;
+  paymentDays: number;
+  contact: string;
   phone: string;
-  email: string;
+  email?: string;
   rating: number;
-  totalOrders: number;
-  lastOrder: string;
-  hue: string;
-  icon: LucideIcon;
+  reviewsCount: number;
+  lastOrder?: string;
+  totalSpent?: number;
+  verified: boolean;
   notes: string;
+  county: string;
 }
 
 export const BUYERS: Buyer[] = [
   {
-    id: "b-01", name: "Kamau Brokers", type: "Broker", location: "Marikiti Market, Nairobi",
-    crops: ["Cabbage", "Tomato", "Sukuma Wiki", "Onions"], minQuantity: "500 kg+",
-    paymentTerms: "Cash on delivery", phone: "0712 880 114", email: "",
-    rating: 3.5, totalOrders: 12, lastOrder: "12 Oct 2026", hue: "linear-gradient(135deg,#9a3412,#ea580c)",
-    icon: Users, notes: "Reliable for large volumes. Negotiate hard on price.",
+    id: "b1", name: "Kamau Brokers", type: "Broker", location: "Marikiti Market",
+    cropsWanted: ["All vegetables", "Tomato", "Cabbage", "Kale"], minQuantity: "500 kg+",
+    paymentTerms: "Cash on delivery", paymentDays: 0, contact: "Kamau Maina", phone: "0712 555 123",
+    rating: 3.5, reviewsCount: 28, lastOrder: "18 Sep 2026", totalSpent: 285000, verified: true,
+    notes: "Reliable but drives hard on price. Pay on the lorry before offload.", county: "Nairobi",
   },
   {
-    id: "b-02", name: "Naivas Supermarket", type: "Supermarket", location: "Nairobi HQ",
-    crops: ["Cabbage", "Tomato", "Kale", "Carrots", "Capsicum"], minQuantity: "1 tonne/week",
-    paymentTerms: "30-day invoice", phone: "020 440 5000", email: "procurement@naivas.co.ke",
-    rating: 4.2, totalOrders: 3, lastOrder: "28 Sep 2026", hue: "linear-gradient(135deg,#166534,#22a355)",
-    icon: Building2, notes: "Needs GlobalG.A.P or KS1758. Consistent weekly orders once approved.",
+    id: "b2", name: "Naivas Procurement", type: "Supermarket", location: "Nairobi HQ, Donholm",
+    cropsWanted: ["Cabbage", "Tomato", "Kale", "Carrots", "Potatoes"], minQuantity: "1 tonne/week",
+    paymentTerms: "30-day invoice", paymentDays: 30, contact: "Procurement Desk", phone: "0701 222 333",
+    email: "fresh-produce@naivas.co.ke", rating: 4.0, reviewsCount: 54, verified: true,
+    notes: "Requires uniform grading and bar-coded crates; consistent weekly offtake.", county: "Nairobi",
   },
   {
-    id: "b-03", name: "Karen Greens Restaurant", type: "Restaurant", location: "Karen, Nairobi",
-    crops: ["Cabbage", "Herbs", "Capsicum", "Tomato"], minQuantity: "50–100 heads/week",
-    paymentTerms: "M-Pesa same day", phone: "0733 441 600", email: "orders@karengreens.co.ke",
-    rating: 4.8, totalOrders: 8, lastOrder: "10 Nov 2026", hue: "linear-gradient(135deg,#065f46,#10b981)",
-    icon: Star, notes: "Premium buyer. Pays KES 35/head. Wants clean, sorted produce.",
+    id: "b3", name: "Tuskys Fresh Division", type: "Supermarket", location: "Nairobi, Mombasa Rd",
+    cropsWanted: ["Tomato", "Capsicum", "Onion", "Potatoes"], minQuantity: "800 kg/week",
+    paymentTerms: "45-day invoice", paymentDays: 45, contact: "Jane Muthoni", phone: "0733 444 555",
+    email: "supply@tuskys.co.ke", rating: 3.6, reviewsCount: 42, lastOrder: "02 Sep 2026", totalSpent: 142000, verified: true,
+    notes: "Payment sometimes slips to 60 days — chase weekly.", county: "Nairobi",
   },
   {
-    id: "b-04", name: "Vegpro Ltd", type: "Exporter", location: "Nairobi Industrial Area",
-    crops: ["French beans", "Avocado", "Baby corn", "Snow peas"], minQuantity: "Contract basis",
-    paymentTerms: "45-day invoice", phone: "020 693 2200", email: "exports@vegpro.co.ke",
-    rating: 4.5, totalOrders: 0, lastOrder: "Never", hue: "linear-gradient(135deg,#581c87,#a855f7)",
-    icon: Globe, notes: "Requires GlobalG.A.P certification. Long-term contracts available.",
+    id: "b4", name: "Karen Greens Restaurant", type: "Restaurant", location: "Karen, Nairobi",
+    cropsWanted: ["Cabbage", "Herbs", "Spinach", "Managu", "Tomato"], minQuantity: "50–100 heads/week",
+    paymentTerms: "Weekly M-Pesa", paymentDays: 7, contact: "Chef Pauline", phone: "0733 888 999",
+    rating: 4.8, reviewsCount: 16, lastOrder: "20 Sep 2026", totalSpent: 58000, verified: true,
+    notes: "Pays promptly; prefers clean, small heads for salad plates.", county: "Nairobi",
   },
   {
-    id: "b-05", name: "Kiambu Green Bistro", type: "Restaurant", location: "Kiambu Town",
-    crops: ["Cabbage", "Sukuma Wiki", "Avocado"], minQuantity: "30–60 heads/week",
-    paymentTerms: "Weekly settlement", phone: "0720 881 460", email: "",
-    rating: 4.3, totalOrders: 2, lastOrder: "05 Nov 2026", hue: "linear-gradient(135deg,#0c4a6e,#0284c7)",
-    icon: Building2, notes: "New buyer — started ordering in October. Pays well for quality.",
+    id: "b5", name: "Vegpro Ltd (Vegcare)", type: "Exporter", location: "Nairobi, Athi River",
+    cropsWanted: ["French beans", "Avocado", "Baby corn", "Mange tout", "Snow peas"], minQuantity: "Contract",
+    paymentTerms: "45-day invoice", paymentDays: 45, contact: "Outgrower Manager", phone: "020 555 777",
+    email: "outgrowers@vegpro.co.ke", rating: 4.5, reviewsCount: 88, verified: true,
+    notes: "Requires GlobalG.A.P.; premium prices for export-grade; strict PHI records.", county: "Machakos",
   },
   {
-    id: "b-06", name: "Twiga Foods", type: "Online", location: "Nairobi (app-based)",
-    crops: ["Cabbage", "Tomato", "Onions", "Potatoes"], minQuantity: "100 kg+",
-    paymentTerms: "7-day invoice", phone: "0709 999 100", email: "vendors@twiga.ke",
-    rating: 4.0, totalOrders: 5, lastOrder: "20 Oct 2026", hue: "linear-gradient(135deg,#1e3a8a,#3b82f6)",
-    icon: Smartphone, notes: "App-based ordering. Good for clearing bulk stock quickly.",
+    id: "b6", name: "Butali Sugar Mills", type: "Processor", location: "Kakamega, Butali",
+    cropsWanted: ["Sugarcane"], minQuantity: "Per tonne",
+    paymentTerms: "Per tonne rate, 30-day", paymentDays: 30, contact: "Weighbridge Office", phone: "0722 666 000",
+    rating: 3.8, reviewsCount: 12, verified: false,
+    notes: "Factory-registered farmers only; payment via cooperative SACCO.", county: "Kakamega",
   },
   {
-    id: "b-07", name: "Kiambu Cereal Union", type: "Cooperative", location: "Kiambu County",
-    crops: ["Maize", "Beans"], minQuantity: "Any — for members",
-    paymentTerms: "Weekly settlement", phone: "0722 510 765", email: "info@kiambucereal.coop",
-    rating: 4.1, totalOrders: 6, lastOrder: "18 Oct 2026", hue: "linear-gradient(135deg,#b45309,#fbbf24)",
-    icon: Handshake, notes: "Best for beans and maize. Bulk pooling gets better transport rates.",
+    id: "b7", name: "Kiambu Farmers Cooperative", type: "Cooperative", location: "Kiambu Town",
+    cropsWanted: ["Mixed vegetables", "Milk", "Avocado", "Potatoes"], minQuantity: "Any",
+    paymentTerms: "Weekly settlement", paymentDays: 7, contact: "Secretary", phone: "0722 111 222",
+    email: "info@kiambufarmers.coop", rating: 4.2, reviewsCount: 34, lastOrder: "15 Sep 2026", totalSpent: 92000, verified: true,
+    notes: "Member-owned; group transport saves KES 0.8/head vs direct haul.", county: "Kiambu",
   },
   {
-    id: "b-08", name: "Walk-in Buyers", type: "Direct", location: "Githunguri Market",
-    crops: ["All vegetables", "Eggs", "Milk"], minQuantity: "Any quantity",
-    paymentTerms: "Cash on delivery", phone: "—", email: "",
-    rating: 4.0, totalOrders: 20, lastOrder: "Today", hue: "linear-gradient(135deg,#334155,#64748b)",
-    icon: Users, notes: "Local market buyers. Best for small quantities and surplus.",
+    id: "b8", name: "Twiga Foods", type: "Online", location: "Nairobi, Baba Dogo",
+    cropsWanted: ["All vegetables", "Bananas", "Potatoes", "Onions"], minQuantity: "100 kg+",
+    paymentTerms: "7-day payment via app", paymentDays: 7, contact: "Supplier Desk", phone: "0700 333 444",
+    email: "suppliers@twiga.co.ke", rating: 4.0, reviewsCount: 120, verified: true,
+    notes: "App-based ordering; consistent demand; rejection rate ~5% for size.", county: "Nairobi",
+  },
+  {
+    id: "b9", name: "Kakuzi Ltd", type: "Exporter", location: "Murang'a, Makuyu",
+    cropsWanted: ["Hass avocado", "Macadamia", "Blueberries"], minQuantity: "1 acre+ contract",
+    paymentTerms: "Market + 10%, monthly", paymentDays: 30, contact: "Outgrower Relations", phone: "0705 777 888",
+    email: "outgrowers@kakuzi.co.ke", rating: 4.3, reviewsCount: 22, verified: true,
+    notes: "5-year contracts; organic preferred; provides seedlings and agronomist visits.", county: "Murang'a",
+  },
+  {
+    id: "b10", name: "Kenyan Kitchen Ltd", type: "Processor", location: "Nairobi, Industrial Area",
+    cropsWanted: ["Tomato", "Onion", "Garlic", "Capsicum"], minQuantity: "200 kg/week",
+    paymentTerms: "14-day invoice", paymentDays: 14, contact: "Supply Chain", phone: "0719 666 777",
+    rating: 4.1, reviewsCount: 19, lastOrder: "10 Sep 2026", totalSpent: 68000, verified: true,
+    notes: "Buys Grade B tomatoes for processing at KES 40/kg min; suitable for second grade.", county: "Nairobi",
   },
 ];
 
-/* ── 10.5 Harvest Sales Planner ──────────────────────────────────────────── */
-export interface SaleScenario {
+/* ------------------------------------------------------------ 10.5 sales planner */
+
+export interface SalesScenario {
   id: string;
   label: string;
+  swahili: string;
   quantity: number;
+  split?: { label: string; pct: number; price: number }[];
   pricePerHead: number;
   grossRevenue: number;
-  transportCost: number;
+  transport: number;
   marketFees: number;
   netRevenue: number;
-  recommended: boolean;
+  vsBaseline: number;
+  risk: "low" | "medium" | "high";
+  aiPick?: boolean;
   note: string;
 }
 
-export const SALE_SCENARIOS: SaleScenario[] = [
+export const SALES_SCENARIOS: SalesScenario[] = [
   {
-    id: "sc-01", label: "Sell all at Marikiti", quantity: 14500, pricePerHead: 30,
-    grossRevenue: 435000, transportCost: 29000, marketFees: 4350, netRevenue: 401650,
-    recommended: false, note: "Quickest clearance, but lowest net margin.",
+    id: "s1", label: "Sell all at Marikiti", swahili: "Uza Marikiti yote",
+    quantity: 14500, pricePerHead: 30, grossRevenue: 435000, transport: 29000, marketFees: 4350,
+    netRevenue: 401650, vsBaseline: 0, risk: "low",
+    note: "Simple, fast, broker handles everything. Baseline option.",
   },
   {
-    id: "sc-02", label: "50% Marikiti + 50% direct", quantity: 14500, pricePerHead: 33,
-    grossRevenue: 471250, transportCost: 14500, marketFees: 2175, netRevenue: 454575,
-    recommended: false, note: "Balanced — reduces broker dependency.",
+    id: "s2", label: "Split 50% Marikiti + 50% direct restaurants", swahili: "Gawanya: nusu soko, nusu migahawa",
+    quantity: 14500,
+    split: [
+      { label: "Marikiti 50%", pct: 50, price: 30 },
+      { label: "Restaurants 50%", pct: 50, price: 35 },
+    ],
+    pricePerHead: 32.5, grossRevenue: 471250, transport: 14500, marketFees: 2175,
+    netRevenue: 454575, vsBaseline: 52925, risk: "medium",
+    note: "Requires two delivery runs and direct relationships with chefs.",
   },
   {
-    id: "sc-03", label: "Sell all direct to restaurants", quantity: 14500, pricePerHead: 35,
-    grossRevenue: 507500, transportCost: 7250, marketFees: 0, netRevenue: 500250,
-    recommended: false, note: "Highest per-head price but slower clearance.",
+    id: "s3", label: "Sell all direct to restaurants", swahili: "Uza migahawa yote",
+    quantity: 14500, pricePerHead: 35, grossRevenue: 507500, transport: 7250, marketFees: 0,
+    netRevenue: 500250, vsBaseline: 98600, risk: "high",
+    note: "Top price but you need 40+ restaurant buyers; small weekly offtake per buyer.",
   },
   {
-    id: "sc-04", label: "Store 2 weeks then sell at peak", quantity: 14500, pricePerHead: 40,
-    grossRevenue: 580000, transportCost: 29000, marketFees: 5800, netRevenue: 545200,
-    recommended: true, note: "+KES 143,550 vs immediate Marikiti. Risk: spoilage in store.",
+    id: "s4", label: "Store 2 weeks, sell at peak", swahili: "Hifadhi wiki 2, uza bei ya juu",
+    quantity: 14500, pricePerHead: 40, grossRevenue: 580000, transport: 29000, marketFees: 5800,
+    netRevenue: 545200, vsBaseline: 143550, risk: "medium", aiPick: true,
+    note: "Cool storage KES 8,000; AI predicts +8 pts rise by Jan 29; 3% spoilage risk in shade net.",
   },
 ];
 
-/* ── 10.6 Sales Records ──────────────────────────────────────────────────── */
-export type SaleStatus = "Completed" | "Pending" | "In Transit" | "Disputed" | "Cancelled";
+/* ------------------------------------------------------------ 10.6 sales records */
 
 export interface SaleRecord {
   id: string;
   date: string;
+  dateIso: string;
   crop: string;
   variety: string;
   quantity: number;
@@ -417,279 +401,252 @@ export interface SaleRecord {
   totalAmount: number;
   buyer: string;
   buyerPhone: string;
-  paymentMethod: string;
-  mpesaReceipt: string | null;
-  saleStatus: SaleStatus;
+  paymentMethod: "M-Pesa" | "Cash" | "Bank" | "Invoice";
+  mpesaReceipt?: string;
+  paymentStatus: "Received" | "Pending" | "Partial" | "Overdue";
   transportCost: number;
   marketFees: number;
   netIncome: number;
-  qualityGrade: string;
+  qualityGrade: "A" | "B" | "C";
   notes: string;
-  market: string;
+  recordedBy: string;
+  plot: string;
 }
 
-export const SALES_RECORDS: SaleRecord[] = [
+export const SALE_RECORDS: SaleRecord[] = [
   {
-    id: "sr-01", date: "10 Nov 2026", crop: "Cabbage", variety: "Gloria F1",
-    quantity: 2000, unit: "heads", pricePerUnit: 35, totalAmount: 70000,
-    buyer: "Karen Greens Restaurant", buyerPhone: "0733 441 600",
-    paymentMethod: "M-Pesa", mpesaReceipt: "SHK7PQ2RT",
-    saleStatus: "Completed", transportCost: 2000, marketFees: 0, netIncome: 68000,
-    qualityGrade: "A", notes: "Delivered fresh. Buyer wants weekly supply starting Dec.",
-    market: "Direct",
+    id: "sal-001", date: "15 Jan 2027", dateIso: "2027-01-15", crop: "Cabbage", variety: "Gloria F1",
+    quantity: 5000, unit: "Head", pricePerUnit: 30, totalAmount: 150000,
+    buyer: "Kamau Brokers, Marikiti", buyerPhone: "0712 555 123", paymentMethod: "M-Pesa",
+    mpesaReceipt: "SHK7PQ2RT", paymentStatus: "Received", transportCost: 10000, marketFees: 1500,
+    netIncome: 138500, qualityGrade: "A",
+    notes: "Buyer complained about size variation — sort better next time.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 1",
   },
   {
-    id: "sr-02", date: "05 Nov 2026", crop: "Tomato", variety: "Anna F1",
-    quantity: 12, unit: "crates", pricePerUnit: 1800, totalAmount: 21600,
-    buyer: "Wakulima market trader", buyerPhone: "0710 551 230",
-    paymentMethod: "M-Pesa", mpesaReceipt: "WKM9R4T6P",
-    saleStatus: "Completed", transportCost: 1500, marketFees: 800, netIncome: 19300,
-    qualityGrade: "A", notes: "First greenhouse picking. Small but good quality.",
-    market: "Wakulima",
+    id: "sal-002", date: "12 Sep 2026", dateIso: "2026-09-12", crop: "Tomato", variety: "Roma VF",
+    quantity: 240, unit: "64kg crate", pricePerUnit: 4800, totalAmount: 1152000,
+    buyer: "Naivas Procurement", buyerPhone: "0701 222 333", paymentMethod: "Invoice",
+    paymentStatus: "Received", transportCost: 8500, marketFees: 0,
+    netIncome: 1143500, qualityGrade: "A",
+    notes: "Paid 28 days after delivery; Naivas invoice NV-2026-4471.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 2",
   },
   {
-    id: "sr-03", date: "01 Nov 2026", crop: "Cabbage", variety: "Gloria F1",
-    quantity: 1500, unit: "heads", pricePerUnit: 28, totalAmount: 42000,
-    buyer: "Kamau Brokers", buyerPhone: "0712 880 114",
-    paymentMethod: "M-Pesa", mpesaReceipt: "KMB5N8T1",
-    saleStatus: "Completed", transportCost: 3000, marketFees: 2100, netIncome: 36900,
-    qualityGrade: "B", notes: "Size variation — sort better next time. Price negotiable.",
-    market: "Marikiti",
+    id: "sal-003", date: "08 Sep 2026", dateIso: "2026-09-08", crop: "Kale", variety: "Thousand Head",
+    quantity: 180, unit: "Bundle", pricePerUnit: 15, totalAmount: 2700,
+    buyer: "Karen Greens Restaurant", buyerPhone: "0733 888 999", paymentMethod: "M-Pesa",
+    mpesaReceipt: "QGR4MK9VX", paymentStatus: "Received", transportCost: 1200, marketFees: 0,
+    netIncome: 1500, qualityGrade: "A",
+    notes: "Weekly delivery; Chef Pauline asks for extra 20 bundles next week.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 3",
   },
   {
-    id: "sr-04", date: "20 Oct 2026", crop: "Avocado", variety: "Hass",
-    quantity: 120, unit: "kg", pricePerUnit: 85, totalAmount: 10200,
-    buyer: "Kiambu Fresh Traders", buyerPhone: "0722 300 890",
-    paymentMethod: "M-Pesa", mpesaReceipt: "AVO5N8T1",
-    saleStatus: "Completed", transportCost: 500, marketFees: 0, netIncome: 9700,
-    qualityGrade: "B", notes: "Boundary trees — grade 2 fruit. Exporter wants larger.",
-    market: "Local",
+    id: "sal-004", date: "02 Sep 2026", dateIso: "2026-09-02", crop: "Potato", variety: "Shangi",
+    quantity: 12, unit: "50kg bag", pricePerUnit: 2200, totalAmount: 26400,
+    buyer: "Twiga Foods", buyerPhone: "0700 333 444", paymentMethod: "Bank",
+    paymentStatus: "Received", transportCost: 1800, marketFees: 0,
+    netIncome: 24600, qualityGrade: "B",
+    notes: "App delivery; 1 bag rejected for greening, replaced next day.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 4",
   },
   {
-    id: "sr-05", date: "15 Oct 2026", crop: "Eggs", variety: "Poultry",
-    quantity: 6, unit: "trays", pricePerUnit: 450, totalAmount: 2700,
-    buyer: "Githunguri market", buyerPhone: "—",
-    paymentMethod: "Cash", mpesaReceipt: null,
-    saleStatus: "Completed", transportCost: 0, marketFees: 0, netIncome: 2700,
-    qualityGrade: "A", notes: "Side income from poultry house.",
-    market: "Githunguri",
+    id: "sal-005", date: "28 Aug 2026", dateIso: "2026-08-28", crop: "Maize", variety: "H6213",
+    quantity: 18, unit: "90kg bag", pricePerUnit: 3500, totalAmount: 63000,
+    buyer: "Kiambu Farmers Cooperative", buyerPhone: "0722 111 222", paymentMethod: "M-Pesa",
+    mpesaReceipt: "PLK2ZR6NY", paymentStatus: "Received", transportCost: 2500, marketFees: 630,
+    netIncome: 59870, qualityGrade: "A",
+    notes: "Deductions: cooperative cess 1%. Sold at SGR satellite depot.",
+    recordedBy: "Peter (farm hand)", plot: "Plot 5",
   },
   {
-    id: "sr-06", date: "12 Nov 2026", crop: "Milk", variety: "Dairy",
-    quantity: 170, unit: "litres", pricePerUnit: 52, totalAmount: 8840,
-    buyer: "Githunguri Dairy Co-op", buyerPhone: "0722 510 200",
-    paymentMethod: "M-Pesa", mpesaReceipt: "DAIRY-9402",
-    saleStatus: "Completed", transportCost: 0, marketFees: 100, netIncome: 8740,
-    qualityGrade: "A", notes: "Monthly milk sales — consistent side income.",
-    market: "Cooperative",
+    id: "sal-006", date: "20 Aug 2026", dateIso: "2026-08-20", crop: "Cabbage", variety: "Gloria F1",
+    quantity: 2000, unit: "Head", pricePerUnit: 28, totalAmount: 56000,
+    buyer: "Kamau Brokers, Marikiti", buyerPhone: "0712 555 123", paymentMethod: "Cash",
+    paymentStatus: "Received", transportCost: 4000, marketFees: 560,
+    netIncome: 51440, qualityGrade: "B",
+    notes: "Slightly small heads from edge rows; priced down KES 2.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 1",
   },
   {
-    id: "sr-07", date: "14 Nov 2026", crop: "Cabbage", variety: "Gloria F1",
-    quantity: 3000, unit: "heads", pricePerUnit: 30, totalAmount: 90000,
-    buyer: "Kamau Brokers", buyerPhone: "0712 880 114",
-    paymentMethod: "M-Pesa", mpesaReceipt: null,
-    saleStatus: "Pending", transportCost: 6000, marketFees: 4500, netIncome: 79500,
-    qualityGrade: "A", notes: "Larger batch — broker confirmed price. Awaiting delivery.",
-    market: "Marikiti",
+    id: "sal-007", date: "15 Aug 2026", dateIso: "2026-08-15", crop: "Avocado (Hass)", variety: "Hass",
+    quantity: 800, unit: "Piece", pricePerUnit: 38, totalAmount: 30400,
+    buyer: "Vegpro Ltd", buyerPhone: "020 555 777", paymentMethod: "Invoice",
+    paymentStatus: "Pending", transportCost: 1500, marketFees: 0,
+    netIncome: 28900, qualityGrade: "A",
+    notes: "Export grade, size 16; invoice VP-2026-8842, due 29 Sep.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 9 (orchard)",
   },
   {
-    id: "sr-08", date: "20 Nov 2026", crop: "Tomato", variety: "Anna F1",
-    quantity: 18, unit: "crates", pricePerUnit: 2200, totalAmount: 39600,
-    buyer: "Kiambu Green Bistro", buyerPhone: "0720 881 460",
-    paymentMethod: "M-Pesa", mpesaReceipt: null,
-    saleStatus: "In Transit", transportCost: 800, marketFees: 0, netIncome: 38800,
-    qualityGrade: "A", notes: "Premium restaurant order. Delivering today.",
-    market: "Direct",
+    id: "sal-008", date: "10 Aug 2026", dateIso: "2026-08-10", crop: "Beans", variety: "Rosecoco",
+    quantity: 8, unit: "90kg bag", pricePerUnit: 7500, totalAmount: 60000,
+    buyer: "Kangemi Market (Wanjiku Traders)", buyerPhone: "0720 333 444", paymentMethod: "M-Pesa",
+    mpesaReceipt: "MKB8WP4QL", paymentStatus: "Received", transportCost: 3000, marketFees: 600,
+    netIncome: 56400, qualityGrade: "A",
+    notes: "Rosecoco premium at KES 7,500; dried to 12% moisture before sale.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 8",
   },
   {
-    id: "sr-09", date: "25 Nov 2026", crop: "Beans", variety: "Rosecoco",
-    quantity: 4, unit: "bags", pricePerUnit: 7200, totalAmount: 28800,
-    buyer: "Kiambu Cereal Union", buyerPhone: "0722 510 765",
-    paymentMethod: "Bank", mpesaReceipt: null,
-    saleStatus: "Pending", transportCost: 2000, marketFees: 500, netIncome: 26300,
-    qualityGrade: "A", notes: "Cooperative pooling — better transport rates.",
-    market: "Cooperative",
+    id: "sal-009", date: "03 Aug 2026", dateIso: "2026-08-03", crop: "Spinach", variety: "Fordhook Giant",
+    quantity: 60, unit: "Bundle", pricePerUnit: 18, totalAmount: 1080,
+    buyer: "WhatsApp group (direct)", buyerPhone: "0715 000 111", paymentMethod: "M-Pesa",
+    mpesaReceipt: "DTB5KR2HX", paymentStatus: "Received", transportCost: 0, marketFees: 0,
+    netIncome: 1080, qualityGrade: "A",
+    notes: "Farm-gate pickup; neighbour Nduta forwarded to her chama.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 6",
   },
   {
-    id: "sr-10", date: "30 Dec 2026", crop: "Cabbage", variety: "Gloria F1",
-    quantity: 8000, unit: "heads", pricePerUnit: 38, totalAmount: 304000,
-    buyer: "Multiple buyers", buyerPhone: "—",
-    paymentMethod: "M-Pesa", mpesaReceipt: null,
-    saleStatus: "Forecast", transportCost: 16000, marketFees: 8000, netIncome: 280000,
-    qualityGrade: "A/B", notes: "Peak season forecast. Split between Marikiti + direct.",
-    market: "Mixed",
+    id: "sal-010", date: "28 Jul 2026", dateIso: "2026-07-28", crop: "Carrot", variety: "Nantes",
+    quantity: 10, unit: "50kg bag", pricePerUnit: 2800, totalAmount: 28000,
+    buyer: "Tuskys Fresh Division", buyerPhone: "0733 444 555", paymentMethod: "Invoice",
+    paymentStatus: "Overdue", transportCost: 2200, marketFees: 0,
+    netIncome: 25800, qualityGrade: "A",
+    notes: "Invoice overdue by 12 days — flagged for chase. Escalate to area manager.",
+    recordedBy: "Mary Wanjiku", plot: "Plot 4",
   },
 ];
 
-/* ── 10.7 Contract Farming Board ─────────────────────────────────────────── */
-export type ContractStatus = "Open" | "Applied" | "Accepted" | "Closed";
+/* ------------------------------------------------------------ 10.7 contracts */
 
-export interface FarmContract {
+export interface Contract {
   id: string;
+  title: string;
   company: string;
-  companyPhone: string;
   crop: string;
   variety: string;
   acreage: string;
   duration: string;
   priceGuarantee: string;
   requirements: string[];
-  location: string;
-  status: ContractStatus;
+  countyMatch: boolean;
+  cropMatch: boolean;
   applicationDeadline: string;
-  slotsAvailable: number;
-  hue: string;
+  status: "open" | "applied" | "awarded" | "rejected";
+  rating: number;
+  applicants: number;
+  contactPerson: string;
+  phone: string;
+  email: string;
 }
 
-export const FARM_CONTRACTS: FarmContract[] = [
+export const CONTRACTS: Contract[] = [
   {
-    id: "fc-01", company: "Vegpro Ltd", companyPhone: "020 693 2200",
-    crop: "French beans", variety: "Julien", acreage: "0.5+ acre",
-    duration: "6 months", priceGuarantee: "KES 80/kg",
-    requirements: ["GlobalG.A.P certification", "Specific variety — Julien", "Spray diary maintained"],
-    location: "Export — Nairobi", status: "Open", applicationDeadline: "30 Nov 2026",
-    slotsAvailable: 15, hue: "linear-gradient(135deg,#581c87,#a855f7)",
+    id: "c1", title: "French Beans Export Supply", company: "Vegpro Ltd (Vegcare)",
+    crop: "French beans", variety: "Julien", acreage: "0.5+ acre", duration: "6 months",
+    priceGuarantee: "KES 80/kg",
+    requirements: ["GlobalG.A.P. certification", "Julien variety only", "Drip irrigation preferred", "Spray records 2 yr"],
+    countyMatch: true, cropMatch: false, applicationDeadline: "15 Oct 2026",
+    status: "open", rating: 4.5, applicants: 48,
+    contactPerson: "Outgrower Manager", phone: "020 555 777", email: "outgrowers@vegpro.co.ke",
   },
   {
-    id: "fc-02", company: "Butali Sugar", companyPhone: "0722 300 500",
-    crop: "Sugarcane", variety: "CO 421", acreage: "2+ acres",
-    duration: "4 years", priceGuarantee: "KES 4,200/tonne",
-    requirements: ["Registered with factory", "Specific cane variety", "Minimum 2 acres"],
-    location: "Kakamega County", status: "Open", applicationDeadline: "15 Jan 2027",
-    slotsAvailable: 50, hue: "linear-gradient(135deg,#b45309,#fbbf24)",
+    id: "c2", title: "Sugarcane Supply Agreement", company: "Butali Sugar Mills",
+    crop: "Sugarcane", variety: "CO 421 / EAK 73-325", acreage: "2+ acres", duration: "4 years (ratoon cycle)",
+    priceGuarantee: "KES 4,200/tonne",
+    requirements: ["Registered with factory zone", "Recommended variety only", "Weeding schedule twice/year"],
+    countyMatch: false, cropMatch: false, applicationDeadline: "Rolling",
+    status: "open", rating: 3.8, applicants: 22,
+    contactPerson: "Zone Extension Officer", phone: "0722 666 000", email: "outgrowers@butalisugar.co.ke",
   },
   {
-    id: "fc-03", company: "Kakuzi Ltd", companyPhone: "020 691 3000",
-    crop: "Hass Avocado", variety: "Hass", acreage: "1+ acre",
-    duration: "5 years", priceGuarantee: "Market price + 10%",
-    requirements: ["Organic preferred", "Specific grades (size 14–18)", "No chemical residue"],
-    location: "Thika / Murang'a", status: "Applied", applicationDeadline: "28 Feb 2027",
-    slotsAvailable: 30, hue: "linear-gradient(135deg,#065f46,#10b981)",
+    id: "c3", title: "Hass Avocado Offtake", company: "Kakuzi Ltd",
+    crop: "Avocado", variety: "Hass", acreage: "1+ acre", duration: "5 years",
+    priceGuarantee: "Market price + 10%",
+    requirements: ["Organic certification preferred", "Grade 14-20 only", "Planting material supplied by Kakuzi", "12 tree spacing"],
+    countyMatch: true, cropMatch: true, applicationDeadline: "30 Nov 2026",
+    status: "applied", rating: 4.3, applicants: 120,
+    contactPerson: "Outgrower Relations", phone: "0705 777 888", email: "outgrowers@kakuzi.co.ke",
   },
   {
-    id: "fc-04", company: "Kenyan Kitchen Ltd", companyPhone: "0733 200 400",
-    crop: "Tomatoes", variety: "Anna F1", acreage: "0.5+ acre",
-    duration: "1 year", priceGuarantee: "KES 40/kg minimum",
-    requirements: ["Consistent supply — min 200kg/week", "Greenhouse preferred", "Food safety records"],
-    location: "Nairobi / Kiambu", status: "Open", applicationDeadline: "31 Dec 2026",
-    slotsAvailable: 8, hue: "linear-gradient(135deg,#9a3412,#ea580c)",
+    id: "c4", title: "Processing Tomato Supply", company: "Kenyan Kitchen Ltd",
+    crop: "Tomato", variety: "Roma VF / Cal J", acreage: "0.5+ acre", duration: "1 year (renewable)",
+    priceGuarantee: "KES 40/kg minimum",
+    requirements: ["Consistent supply 200 kg/week minimum", "Spray records", "Cool-box delivery", "MRL testing on request"],
+    countyMatch: true, cropMatch: true, applicationDeadline: "30 Sep 2026",
+    status: "open", rating: 4.1, applicants: 34,
+    contactPerson: "Supply Chain Lead", phone: "0719 666 777", email: "supply@kenyankitchen.co.ke",
+  },
+  {
+    id: "c5", title: "Wakulima Horticulture Export", company: "Wakulima Exporters EA",
+    crop: "Mange tout / Sugar snaps", variety: "Norli / Sugar Ann", acreage: "0.25+ acre", duration: "8 months",
+    priceGuarantee: "KES 180/kg",
+    requirements: ["Net shed mandatory", "Daily harvest", "Cold room at packing", "HACCP training provided"],
+    countyMatch: true, cropMatch: false, applicationDeadline: "01 Oct 2026",
+    status: "open", rating: 4.4, applicants: 18,
+    contactPerson: "Field Coordinator", phone: "0715 222 333", email: "growers@wakulima-ea.com",
+  },
+  {
+    id: "c6", title: "Potato Supply (Crisping)", company: "Tropical Heat & Snacks",
+    crop: "Potato", variety: "Shangi / Dutch Robjin", acreage: "1+ acre", duration: "Seasonal",
+    priceGuarantee: "KES 38/kilogram (large)",
+    requirements: ["Specific gravity ≥ 1.080", "Low reducing sugars", "Contract storage period"],
+    countyMatch: true, cropMatch: true, applicationDeadline: "20 Oct 2026",
+    status: "open", rating: 4.0, applicants: 26,
+    contactPerson: "Raw Materials", phone: "0721 888 999", email: "rawmat@tropicalheat.co.ke",
   },
 ];
 
-/* ── Price Alerts ────────────────────────────────────────────────────────── */
-export interface PriceAlert {
-  id: string;
-  crop: string;
-  market: string;
-  condition: "above" | "below";
-  threshold: number;
-  currentPrice: number;
-  active: boolean;
-  createdAt: string;
-  triggeredAt: string | null;
-}
+/* ------------------------------------------------------------ extras */
 
-export const PRICE_ALERTS: PriceAlert[] = [
-  {
-    id: "pa-01", crop: "Cabbage", market: "Marikiti", condition: "above",
-    threshold: 35, currentPrice: 32, active: true, createdAt: "01 Nov 2026",
-    triggeredAt: null,
-  },
-  {
-    id: "pa-02", crop: "Tomato", market: "Kangemi", condition: "above",
-    threshold: 4500, currentPrice: 4200, active: true, createdAt: "15 Oct 2026",
-    triggeredAt: null,
-  },
-  {
-    id: "pa-03", crop: "Maize", market: "Eldoret", condition: "below",
-    threshold: 3500, currentPrice: 3800, active: true, createdAt: "20 Oct 2026",
-    triggeredAt: null,
-  },
-  {
-    id: "pa-04", crop: "Beans", market: "Nakuru", condition: "above",
-    threshold: 8500, currentPrice: 7800, active: true, createdAt: "01 Nov 2026",
-    triggeredAt: null,
-  },
-  {
-    id: "pa-05", crop: "Cabbage", market: "Thika", condition: "above",
-    threshold: 30, currentPrice: 30, active: false, createdAt: "15 Sep 2026",
-    triggeredAt: "10 Nov 2026",
-  },
+export const TRANSPORT_OPTIONS = [
+  { id: "t1", mode: "Own pickup", costPerKm: 0, note: "Small Suzuki — max 1,000 heads", leadTime: "Same day" },
+  { id: "t2", mode: "Boda-boda (Kifaru)", costPerKm: 30, note: "Up to 400 kg, suitable for direct restaurant runs", leadTime: "1 hour" },
+  { id: "t3", mode: "Cooperative lorry (Kiambu Co-op)", costPerKm: 80, note: "Shared load, 8-tonne Isuzu, SGR point runs Tues/Fridays", leadTime: "2 days notice" },
+  { id: "t4", mode: "Hired lorry (1.5T)", costPerKm: 60, note: "Isuzu Elf, up to 6,000 heads, returns farm-gate", leadTime: "Same day" },
+  { id: "t5", mode: "Twiga pickup", costPerKm: 0, note: "Free pickup from collection point Githunguri stage", leadTime: "Book 24hrs" },
 ];
 
-/* ── Portfolio (Crop listings visible to buyers) ─────────────────────────── */
-export interface CropListing {
-  id: string;
-  crop: string;
-  variety: string;
-  plot: string;
-  acreage: string;
-  expectedHarvest: string;
-  estimatedQuantity: number;
-  unit: string;
-  qualityGrade: string;
-  minOrder: number;
-  priceAsk: number;
-  photos: number;
-  views: number;
-  orders: number;
-  status: "Active" | "Sold Out" | "Draft";
-  shareLink: string;
-}
-
-export const CROP_LISTINGS: CropListing[] = [
-  {
-    id: "cl-01", crop: "Cabbage", variety: "Gloria F1", plot: "Plot 1",
-    acreage: "0.5 acre", expectedHarvest: "15 Jan 2027", estimatedQuantity: 14500,
-    unit: "heads", qualityGrade: "A/B", minOrder: 100, priceAsk: 35,
-    photos: 4, views: 87, orders: 3, status: "Active",
-    shareLink: "growmo.ke/p/mary/cabbage-jan27",
-  },
-  {
-    id: "cl-02", crop: "Tomato", variety: "Anna F1", plot: "Greenhouse 1",
-    acreage: "0.08 acre", expectedHarvest: "Weekly from Nov 2026", estimatedQuantity: 18,
-    unit: "crates/week", qualityGrade: "A", minOrder: 5, priceAsk: 2200,
-    photos: 3, views: 42, orders: 1, status: "Active",
-    shareLink: "growmo.ke/p/mary/tomato-gh1",
-  },
-  {
-    id: "cl-03", crop: "Beans", variety: "Rosecoco", plot: "Plot 3",
-    acreage: "1 acre", expectedHarvest: "28 Feb 2027", estimatedQuantity: 6,
-    unit: "bags", qualityGrade: "A", minOrder: 1, priceAsk: 7500,
-    photos: 2, views: 23, orders: 0, status: "Active",
-    shareLink: "growmo.ke/p/mary/beans-feb27",
-  },
-  {
-    id: "cl-04", crop: "Maize", variety: "H6213", plot: "Plot 2",
-    acreage: "2 acres", expectedHarvest: "15 Mar 2027", estimatedQuantity: 31,
-    unit: "bags", qualityGrade: "A", minOrder: 5, priceAsk: 4200,
-    photos: 2, views: 15, orders: 0, status: "Draft",
-    shareLink: "growmo.ke/p/mary/maize-mar27",
-  },
+export const PRICE_HISTORY_7D_CABBAGE = [
+  { day: "Mon 16", marikiti: 30, thika: 28, kangemi: 32, volume: 12000 },
+  { day: "Tue 17", marikiti: 30, thika: 28, kangemi: 32, volume: 13500 },
+  { day: "Wed 18", marikiti: 32, thika: 28, kangemi: 32, volume: 15800 },
+  { day: "Thu 19", marikiti: 32, thika: 30, kangemi: 34, volume: 14200 },
+  { day: "Fri 20", marikiti: 33, thika: 30, kangemi: 34, volume: 18000 },
+  { day: "Sat 21", marikiti: 35, thika: 30, kangemi: 35, volume: 22000 },
+  { day: "Sun 22", marikiti: 35, thika: 30, kangemi: 35, volume: 9800 },
 ];
 
-/* ── Helper functions ────────────────────────────────────────────────────── */
-export function saleStatusTone(status: SaleStatus): "low" | "medium" | "high" | "neutral" {
-  if (status === "Completed") return "low";
-  if (status === "Pending") return "medium";
-  if (status === "In Transit") return "medium";
-  if (status === "Disputed") return "high";
-  return "neutral";
-}
+export const MARKET_FAQ = [
+  { q: "Why does Marikiti have a wider price range than other markets?", a: "Marikiti is the largest wholesale market in East Africa. The low end is early-morning broker-to-broker trades while the high end is late-morning retail restocks. Time your arrival between 6-7am for best bulk prices." },
+  { q: "How do I avoid being cheated by brokers?", a: "Always agree on the unit price per head/crate (not per kg) before offloading, get payment before offloading when possible, and use the GrowMO receipt log with broker name and plate number." },
+  { q: "When is the best day to sell?", a: "Wednesday-Friday is generally best for urban restocking before the weekend. Avoid Mondays as many markets are glutted from overnight rural deliveries." },
+  { q: "Are online buyers like Twiga reliable?", a: "Twiga pays within 7 days and the app tracks every rejection. The trade-off is slightly lower prices than direct retail, and ~5% rejection for size/grade issues." },
+  { q: "How do I qualify for export contracts?", a: "Most exporters require GlobalG.A.P. certification, 0.5+ acres dedicated to the export crop, a spray diary covering 2 years, and (for beans/peas) a net shed. Vegpro and Kakuzi run free certification support for qualifying outgrowers." },
+  { q: "What does \"indicative price\" mean?", a: "Prices shown are from daily KAMIS (Kenya Agricultural Market Information System) feeds plus cooperative reports. Actual transacted price may vary by KES 2-5 depending on quality, time of day and relationship." },
+  { q: "Can I set a price alert?", a: "Yes — use the bell icon next to any crop to set a threshold for SMS or in-app alerts. You have 4 active alerts." },
+  { q: "How is net price calculated?", a: "Net price = market price − transport per unit − market fees/cess. We use a per-km rate of KES 35/1,000 heads for hired transport, and cooperative cess of 1% where applicable." },
+];
 
-export function contractStatusTone(status: ContractStatus): "low" | "medium" | "high" | "neutral" {
-  if (status === "Accepted") return "low";
-  if (status === "Applied") return "medium";
-  if (status === "Open") return "neutral";
-  return "high";
-}
+export const MARKET_GLOSSARY = [
+  { term: "Cess", def: "Market entry fee charged by county governments, usually 1-2% of value." },
+  { term: "KAMIS", def: "Kenya Agricultural Market Information System — the government's daily price feed." },
+  { term: "Offtake", def: "The quantity a buyer commits to purchase over a period." },
+  { term: "GlobalG.A.P.", def: "International farm certification required by EU supermarkets and most Kenyan exporters." },
+  { term: "MRL", def: "Maximum Residue Level — the legal pesticide residue limit for produce." },
+  { term: "PHI", def: "Pre-Harvest Interval — days you must wait between last spray and harvest." },
+  { term: "Outgrower", def: "A farmer who grows under contract for a company that supplies inputs and buys output." },
+  { term: "Ratoon", def: "A second or subsequent crop regrown from the root-stock of the previous planting (used for sugarcane)." },
+];
 
-export function trendIcon(trend: MarketTrend): typeof TrendingUp {
-  if (trend === "up") return TrendingUp;
-  if (trend === "down") return TrendingDown;
-  return TrendingUp;
-}
+export const MARKET_SETTINGS_DEFAULTS = {
+  smsAlerts: true,
+  priceThresholdPct: 10,
+  defaultMarket: "Thika",
+  shareReceiptsWhatsApp: true,
+  autoRecordSales: true,
+  indicativePriceDisclaimer: true,
+  distanceUnit: "km",
+  preferredPayment: "M-Pesa",
+  reminderHarvestWindow: 3,
+  weekendDelivery: false,
+};
 
-export function formatPrice(value: number): string {
-  return `KES ${value.toLocaleString("en-KE")}`;
+export function marketTotals() {
+  const salesYtd = SALE_RECORDS.reduce((s, r) => s + r.netIncome, 0);
+  const grossYtd = SALE_RECORDS.reduce((s, r) => s + r.totalAmount, 0);
+  const transportYtd = SALE_RECORDS.reduce((s, r) => s + r.transportCost, 0);
+  const feesYtd = SALE_RECORDS.reduce((s, r) => s + r.marketFees, 0);
+  const pending = SALE_RECORDS.filter((r) => r.paymentStatus === "Pending" || r.paymentStatus === "Overdue")
+    .reduce((s, r) => s + r.totalAmount, 0);
+  return { salesYtd, grossYtd, transportYtd, feesYtd, pending };
 }

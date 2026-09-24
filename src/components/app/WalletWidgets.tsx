@@ -1,229 +1,412 @@
 /* ============================================================================
-   PAGE 14 — WALLET & PAYMENTS WIDGETS
-   Reusable widget components for the wallet page.
+   PAGE 14 — WALLET widgets
+   Small presentational pieces for /app/wallet. Every class is page-scoped
+   (.gm-w-*) or a shared master-theme class; styling lives in src/wallet.css.
    ========================================================================== */
 import {
   ArrowDownLeft,
-  ArrowRight,
   ArrowUpRight,
-  TrendingDown,
-  TrendingUp,
+  Banknote,
+  Lock,
+  MoreHorizontal,
+  ShieldCheck,
+  Snowflake,
+  Wallet,
 } from "lucide-react";
-import { StatusChip } from "../../components/app/DashboardWidgets";
+import type { ReactNode } from "react";
+import type {
+  AutoPayRule,
+  DepositMethod,
+  PayType,
+  Recipient,
+  SecurityControl,
+  Txn,WALLET_CONTEXT, 
+  WalletBudget
+} from "../../data/app/wallet";
 import { kes } from "../../data/site";
-import type { SpendCategory, Transaction } from "../../data/app/wallet";
+import { ProgressLine, StatusChip } from "./DashboardWidgets";
 
-/* ── Mini spend bar chart ────────────────────────────────────────────────── */
-export function SpendBarChart({ categories }: { categories: SpendCategory[] }) {
-  const max = Math.max(...categories.map((c) => c.amount), 1);
+/* ---------------- 14.1 hero ---------------- */
+export function WalletHero({
+  ctx,
+  totals,
+  onAction,
+}: {
+  ctx: typeof WALLET_CONTEXT;
+  totals: { inflow: number; outflow: number; count: number };
+  onAction: (id: "deposit" | "send" | "withdraw" | "freeze") => void;
+}) {
+  const actions: { id: "deposit" | "send" | "withdraw" | "freeze"; icon: ReactNode; label: string; sub: string }[] = [
+    { id: "deposit", icon: <ArrowDownLeft />, label: "Deposit money", sub: "STK, Paybill, bank, agent, card" },
+    { id: "send", icon: <ArrowUpRight />, label: "Send / pay", sub: "Workers, suppliers, bills, P2P" },
+    { id: "withdraw", icon: <Banknote />, label: "Withdraw", sub: "To M-Pesa or your bank" },
+    { id: "freeze", icon: <Snowflake />, label: "Freeze wallet", sub: "One-tap kill switch" },
+  ];
+
   return (
-    <div className="gm-bar-chart">
-      {categories.map((cat) => (
-        <div key={cat.id} className="gm-bar-row">
-          <span className="gm-bar-label">
-            <strong>{cat.category}</strong>
-            <small>{cat.percent}%</small>
+    <section className="gm-w-hero">
+      <div className="gm-w-hero-head">
+        <div className="gm-w-hero-copy">
+          <span className="gm-chip gm-chip-live">
+            <span className="gm-dot-live" /> Safaricom Daraja · live
           </span>
-          <div className="gm-bar-track">
-            <span
-              className="gm-bar-fill"
-              style={{
-                width: `${(cat.amount / max) * 100}%`,
-                background: cat.color,
-              }}
-            />
+          <h1 className="font-display">Wallet, payments & M-Pesa</h1>
+          <p>
+            GrowMO holds your farm wallet, sends M-Pesa to workers and suppliers, pays bills on schedule and
+            keeps every receipt against the crop and budget it belongs to.
+          </p>
+          <div className="gm-w-hero-chips">
+            <span className="gm-chip gm-chip-dark">{ctx.farmer}</span>
+            <span className="gm-chip gm-chip-dark">{ctx.phone}</span>
+            <span className="gm-chip gm-chip-dark">Paybill {ctx.paybill}</span>
+            <span className="gm-chip gm-chip-dark">{ctx.accountNo}</span>
           </div>
-          <span className="gm-bar-value font-display">{kes(cat.amount)}</span>
+        </div>
+
+        <div className="gm-w-balance">
+          <small>Available balance</small>
+          <strong className="font-display">{kes(ctx.availableBalance)}</strong>
+          <div className="gm-w-bal-row">
+            <span>Free balance</span>
+            <b>{kes(ctx.freeBalance)}</b>
+          </div>
+          <div className="gm-w-bal-row">
+            <span>In budgets</span>
+            <b>{kes(ctx.inBudgets)}</b>
+          </div>
+          <div className="gm-w-bal-row is-warn">
+            <span>Pending outflows</span>
+            <b>– {kes(ctx.pendingOutflows)}</b>
+          </div>
+          <div className="gm-w-bal-row is-strong">
+            <span>Effective available</span>
+            <b>{kes(ctx.effectiveAvailable)}</b>
+          </div>
+          <div className="gm-w-bal-foot">
+            <span>
+              <Wallet /> {ctx.tier} wallet
+            </span>
+            <span>
+              <ShieldCheck /> {ctx.trustAccount}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="gm-w-hero-actions">
+        {actions.map((action) => (
+          <button
+            key={action.id}
+            type="button"
+            className={`gm-w-action ${action.id === "freeze" ? "is-quiet" : ""}`}
+            onClick={() => onAction(action.id)}
+          >
+            <span className="gm-w-action-ic">{action.icon}</span>
+            <strong>{action.label}</strong>
+            <small>{action.sub}</small>
+          </button>
+        ))}
+      </div>
+
+      <div className="gm-w-hero-strip">
+        <div>
+          <small>Money in (Oct)</small>
+          <b>{kes(totals.inflow)}</b>
+        </div>
+        <div>
+          <small>Money out (Oct)</small>
+          <b>{kes(totals.outflow)}</b>
+        </div>
+        <div>
+          <small>Transactions logged</small>
+          <b>{totals.count}</b>
+        </div>
+        <div>
+          <small>Monthly deposits budget</small>
+          <b>{kes(ctx.monthlyDeposits)}</b>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- 14.5 transaction row ---------------- */
+export function TxnRow({ t, onOpen }: { t: Txn; onOpen: (t: Txn) => void }) {
+  return (
+    <tr className="gm-w-txn" onClick={() => onOpen(t)}>
+      <td>
+        <span className={`gm-w-dir ${t.type === "In" ? "in" : "out"}`}>
+          {t.type === "In" ? <ArrowDownLeft /> : <ArrowUpRight />}
+        </span>
+      </td>
+      <td>
+        <strong>{t.description}</strong>
+        <small>
+          {t.date} · {t.category}
+          {t.crop ? ` · ${t.crop}` : ""}
+        </small>
+      </td>
+      <td className={t.type === "In" ? "is-up" : "is-down"}>
+        {t.type === "In" ? "+" : "–"}
+        {kes(Math.abs(t.amount))}
+      </td>
+      <td className="gm-w-bal">{kes(t.balanceAfter)}</td>
+      <td>
+        <span className="gm-w-method">{t.method}</span>
+      </td>
+      <td>
+        <span className="gm-w-ref">{t.refNo}</span>
+      </td>
+      <td>
+        <StatusChip
+          label={t.status}
+          tone={t.status === "Success" ? "low" : t.status === "Pending" ? "medium" : "high"}
+        />
+      </td>
+      <td>
+        <button
+          type="button"
+          className="gm-iconbtn"
+          aria-label={`Open ${t.refNo}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onOpen(t);
+          }}
+        >
+          <MoreHorizontal />
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+/* ---------------- 14.2 deposit method ---------------- */
+export function DepositMethodCard({ m, onPick }: { m: DepositMethod; onPick: (m: DepositMethod) => void }) {
+  return (
+    <button type="button" className="gm-w-method" onClick={() => onPick(m)}>
+      <span className="gm-w-method-ic">{m.icon}</span>
+      <strong>{m.name}</strong>
+      <small>{m.swahili}</small>
+      <ul className="gm-w-method-facts">
+        <li>
+          <span>Speed</span>
+          <b>{m.speed}</b>
+        </li>
+        <li>
+          <span>Fee</span>
+          <b>{m.fee}</b>
+        </li>
+        <li>
+          <span>Range</span>
+          <b>
+            {kes(m.min)} – {kes(m.max)}
+          </b>
+        </li>
+      </ul>
+      <span className="gm-w-method-cta">Deposit →</span>
+    </button>
+  );
+}
+
+/* ---------------- 14.3 pay type ---------------- */
+export function PayTypeCard({ p, onPick }: { p: PayType; onPick: (p: PayType) => void }) {
+  return (
+    <button type="button" className="gm-w-paytype" onClick={() => onPick(p)}>
+      <span className="gm-w-method-ic">{p.icon}</span>
+      <strong>{p.label}</strong>
+      <small>{p.swahili}</small>
+      <p className="gm-w-paytype-hint">{p.hint}</p>
+    </button>
+  );
+}
+
+export function RecipientCard({ r, onPick }: { r: Recipient; onPick: (r: Recipient) => void }) {
+  return (
+    <button type="button" className="gm-w-recipient" onClick={() => onPick(r)}>
+      <span className="gm-ava">{r.avatar}</span>
+      <span className="gm-w-recipient-copy">
+        <strong>{r.name}</strong>
+        <small>
+          {r.role} · {r.phone}
+        </small>
+      </span>
+      <span className="gm-w-recipient-last">{kes(r.recent)}</span>
+    </button>
+  );
+}
+
+/* ---------------- 14.4 autopay ---------------- */
+export function AutopayRuleRow({
+  r,
+  onToggle,
+  onEdit,
+}: {
+  r: AutoPayRule;
+  onToggle: (id: string) => void;
+  onEdit: (r: AutoPayRule) => void;
+}) {
+  const on = r.status === "Active";
+  return (
+    <div className={`gm-w-rule ${on ? "is-on" : "is-off"}`}>
+      <div className="gm-w-rule-main">
+        <div className="gm-w-rule-head">
+          <strong>{r.label}</strong>
+          <StatusChip label={r.status} tone={on ? "low" : "medium"} />
+        </div>
+        <small>
+          {r.trigger} → {r.recipients}
+        </small>
+        <small className="gm-w-rule-meta">
+          Amount {r.amount} · cap {kes(r.amountCap)} · last {r.lastTriggered} · next {r.nextRun}
+        </small>
+        <p className="gm-w-rule-note">{r.note}</p>
+      </div>
+      <div className="gm-w-rule-actions">
+        <button type="button" className={`gm-btn gm-btn-sm ${on ? "gm-btn-soft" : "gm-btn-lime"}`} onClick={() => onToggle(r.id)}>
+          {on ? "Pause" : "Resume"}
+        </button>
+        <button type="button" className="gm-btn gm-btn-sm gm-btn-outline" onClick={() => onEdit(r)}>
+          Edit rule
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- 14.6 budgets ---------------- */
+export function BudgetCard({ b, onOpen }: { b: WalletBudget; onOpen: (b: WalletBudget) => void }) {
+  const pct = b.allocated > 0 ? Math.round((b.spent / b.allocated) * 100) : 0;
+  const remaining = b.allocated - b.spent;
+  return (
+    <button type="button" className="gm-w-budget" onClick={() => onOpen(b)}>
+      <div className="gm-w-budget-head">
+        <span className="gm-w-budget-emoji">{b.emoji}</span>
+        <div>
+          <strong>{b.name}</strong>
+          <small>{b.crop ? `${b.crop} budget` : "Unallocated envelope"}</small>
+        </div>
+      </div>
+      <div className="gm-w-budget-figures">
+        <span>{kes(b.spent)}</span>
+        <small>spent of {kes(b.allocated)}</small>
+      </div>
+      <ProgressLine value={pct} label={`${b.name} ${pct}% spent`} />
+      <small className={remaining > 0 ? "is-good" : "is-quiet"}>
+        {b.allocated === 0
+          ? "Nothing allocated yet"
+          : remaining > 0
+            ? `${kes(remaining)} still available for this crop`
+            : "Fully spent — top up to keep spending"}
+      </small>
+    </button>
+  );
+}
+
+/* ---------------- 14.7 security ---------------- */
+export function SecurityRow({ s, onToggle }: { s: SecurityControl; onToggle: (id: string) => void }) {
+  return (
+    <div className="gm-w-sec">
+      <span className={`gm-w-sec-ic ${s.enabled ? "is-on" : ""}`}>
+        <Lock />
+      </span>
+      <div className="gm-w-sec-copy">
+        <strong>{s.k}</strong>
+        <small>{s.v}</small>
+      </div>
+      {s.lockable ? (
+        <button
+          type="button"
+          className={`gm-btn gm-btn-sm ${s.enabled ? "gm-btn-soft" : "gm-btn-outline"}`}
+          onClick={() => onToggle(s.id)}
+        >
+          {s.enabled ? "On" : "Off"}
+        </button>
+      ) : (
+        <span className="gm-chip gm-chip-lime">Always on</span>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- shared bits ---------------- */
+export function WalletKv({ items }: { items: { k: string; v: ReactNode }[] }) {
+  return (
+    <dl className="gm-w-kv">
+      {items.map((item) => (
+        <div key={item.k} className="gm-w-kv-row">
+          <dt>{item.k}</dt>
+          <dd>{item.v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+export function WalletCallout({
+  tone = "info",
+  title,
+  children,
+}: {
+  tone?: "info" | "good" | "warn";
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className={`gm-w-callout is-${tone}`}>
+      {title ? <strong>{title}</strong> : null}
+      <p>{children}</p>
+    </div>
+  );
+}
+
+export function LimitMeter({ label, used, limit }: { label: string; used: number; limit: number }) {
+  const pct = Math.round((used / limit) * 100);
+  return (
+    <div className="gm-w-limit">
+      <div className="gm-w-limit-head">
+        <span>{label}</span>
+        <b>
+          {kes(used)} of {kes(limit)}
+        </b>
+      </div>
+      <ProgressLine value={pct} label={`${label} ${pct}% used`} />
+      <small>{pct}% used · resets on the 1st</small>
+    </div>
+  );
+}
+
+export function WalletFaqList({
+  items,
+  open,
+  onOpen,
+}: {
+  items: { q: string; a: string }[];
+  open: number | null;
+  onOpen: (index: number | null) => void;
+}) {
+  return (
+    <div className="gm-w-faq">
+      {items.map((item, index) => (
+        <div key={item.q} className={`gm-w-faq-row ${open === index ? "is-open" : ""}`}>
+          <button type="button" onClick={() => onOpen(open === index ? null : index)}>
+            {item.q}
+          </button>
+          {open === index ? <p>{item.a}</p> : null}
         </div>
       ))}
     </div>
   );
 }
 
-/* ── Stacked spend bar ───────────────────────────────────────────────────── */
-export function StackedSpendBar({
-  categories,
-  total,
-}: {
-  categories: SpendCategory[];
-  total: number;
-}) {
+export function WalletGlossary({ items }: { items: { term: string; def: string }[] }) {
   return (
-    <div className="gm-stacked-bar-wrap">
-      <div className="gm-stacked-bar">
-        {categories.map((c) => (
-          <span
-            key={c.id}
-            className="gm-stacked-segment"
-            style={{
-              width: `${(c.amount / Math.max(total, 1)) * 100}%`,
-              background: c.color,
-            }}
-            title={`${c.category}: ${kes(c.amount)}`}
-          />
-        ))}
-      </div>
-      <div className="d-flex flex-wrap gap-3 mt-2">
-        {categories.map((c) => (
-          <span key={c.id} className="d-flex align-items-center gap-1">
-            <span
-              style={{
-                width: 10,
-                height: 10,
-                borderRadius: 3,
-                background: c.color,
-                display: "inline-block",
-              }}
-            />
-            <small>
-              {c.category}: {kes(c.amount)} ({c.percent}%)
-            </small>
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ── Mini transaction list ───────────────────────────────────────────────── */
-export function TransactionMiniList({
-  txns,
-  onSelect,
-}: {
-  txns: Transaction[];
-  onSelect: (txn: Transaction) => void;
-}) {
-  return (
-    <div className="gm-wallet-activity-mini">
-      {txns.slice(0, 5).map((txn) => (
-        <button
-          key={txn.id}
-          type="button"
-          className="gm-check-row"
-          onClick={() => onSelect(txn)}
-        >
-          <span
-            className={`gm-finance-activity-icon ${txn.type === "In" ? "is-in" : "is-out"}`}
-            style={{ width: 32, height: 32 }}
-          >
-            {txn.type === "In" ? (
-              <ArrowDownLeft width={16} height={16} />
-            ) : (
-              <ArrowUpRight width={16} height={16} />
-            )}
-          </span>
-          <span style={{ flex: 1 }}>
-            <strong style={{ fontSize: ".84rem" }}>{txn.description}</strong>
-            <small className="d-block text-muted">
-              {txn.date} · {txn.time}
-            </small>
-          </span>
-          <strong
-            className={`font-display ${txn.type === "In" ? "text-success" : ""}`}
-            style={{ fontSize: ".88rem" }}
-          >
-            {txn.type === "In" ? "+" : "−"}
-            {kes(txn.amount)}
-          </strong>
-        </button>
+    <div className="gm-w-glossary">
+      {items.map((item) => (
+        <div key={item.term}>
+          <strong>{item.term}</strong>
+          <span>{item.def}</span>
+        </div>
       ))}
-    </div>
-  );
-}
-
-/* ── Wallet balance ring ─────────────────────────────────────────────────── */
-export function WalletRing({
-  balance,
-  allocated,
-  pending,
-}: {
-  balance: number;
-  allocated: number;
-  pending: number;
-}) {
-  const free = balance - allocated - pending;
-  const total = Math.max(balance, 1);
-  return (
-    <div className="gm-wallet-ring-wrap">
-      <svg viewBox="0 0 100 100" width="120" height="120">
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke="var(--gm-line-soft)"
-          strokeWidth="10"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke="var(--gm-leaf-500)"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={`${(free / total) * 264} 264`}
-          transform="rotate(-90 50 50)"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke="var(--gm-gold-500)"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={`${(allocated / total) * 264} 264`}
-          strokeDashoffset={`${-(free / total) * 264}`}
-          transform="rotate(-90 50 50)"
-        />
-        <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke="var(--gm-clay-500)"
-          strokeWidth="10"
-          strokeLinecap="round"
-          strokeDasharray={`${(pending / total) * 264} 264`}
-          strokeDashoffset={`${-((free + allocated) / total) * 264}`}
-          transform="rotate(-90 50 50)"
-        />
-      </svg>
-      <div className="gm-wallet-ring-center">
-        <strong className="font-display">{kes(balance)}</strong>
-        <small>Total</small>
-      </div>
-    </div>
-  );
-}
-
-/* ── Wallet card header (big balance) ────────────────────────────────────── */
-export function WalletBalanceCard({
-  balance,
-  effective,
-  pending,
-}: {
-  balance: number;
-  effective: number;
-  pending: number;
-}) {
-  return (
-    <div className="gm-wallet-balance-card">
-      <span className="gm-eyebrow on-dark">Available balance</span>
-      <h2 className="font-display gm-wallet-balance-value">
-        {kes(balance)}
-      </h2>
-      <div className="d-flex flex-wrap gap-3 mt-2">
-        <span className="gm-wallet-balance-meta">
-          <small>Effective available</small>
-          <strong>{kes(effective)}</strong>
-        </span>
-        <span className="gm-wallet-balance-meta">
-          <small>Pending outflows</small>
-          <strong>{kes(pending)}</strong>
-        </span>
-      </div>
     </div>
   );
 }

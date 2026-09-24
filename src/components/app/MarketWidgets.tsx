@@ -1,167 +1,333 @@
 /* ============================================================================
-   PAGE 10 — Market & Sales widgets (reusable across the page)
+   PAGE 10 — MARKET & SALES (/app/market)  — reusable widgets
    ========================================================================== */
 import {
   ArrowRight,
-  Check,
-  Copy,
+  Award,
+  BadgeCheck,
+  Building2,
+  Car,
+  Clock,
+  Download,
+  ExternalLink,
   Eye,
-  Globe,
   MapPin,
-  MessageSquare,
   Phone,
-  Share2,
+  ShieldCheck,
   Star,
   TrendingDown,
   TrendingUp,
+  Truck,
 } from "lucide-react";
-import {
-  type Buyer,
-  type CropListing,
-  type MarketRecommendation,
-  type MarketTrend,
-  type PriceTrendPoint,
-  formatPrice,
+import type { ReactNode } from "react";
+import { kes } from "../../data/site";
+import type {
+  Buyer,
+  Contract,
+  CropPriceRow,
+  MarketRecommendation,
+  SaleRecord,
+  SalesScenario,
+  TrendPoint,
 } from "../../data/app/market";
-import { StatusChip } from "./DashboardWidgets";
+import { ProgressLine, StatusChip } from "./DashboardWidgets";
 
-/* ── Mini sparkline chart for price trends ───────────────────────────────── */
-export function Sparkline({
-  data,
-  width = 120,
-  height = 36,
-  color = "var(--gm-leaf-500)",
-}: {
-  data: PriceTrendPoint[];
-  width?: number;
-  height?: number;
-  color?: string;
-}) {
-  if (data.length < 2) return null;
-  const prices = data.map((d) => d.price);
-  const min = Math.min(...prices);
-  const max = Math.max(...prices);
-  const range = max - min || 1;
-  const padding = 2;
-  const w = width - padding * 2;
-  const h = height - padding * 2;
-  const points = data
-    .map((d, i) => {
-      const x = padding + (i / (data.length - 1)) * w;
-      const y = padding + h - ((d.price - min) / range) * h;
-      return `${x},${y}`;
-    })
-    .join(" ");
-  return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
-      <polyline
-        points={points}
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+/* ---------- Hero ---------- */
 
-/* ── Bar chart for market comparison ─────────────────────────────────────── */
-export function MarketBarChart({
-  rows,
-  formatValue,
+export function MarketHero({
+  score,
+  ytd,
+  target,
+  topMarket,
+  children,
 }: {
-  rows: { label: string; value: number; sub?: string; highlight?: boolean }[];
-  formatValue?: (v: number) => string;
+  score: number;
+  ytd: number;
+  target: number;
+  topMarket: string;
+  children?: ReactNode;
 }) {
-  const max = Math.max(...rows.map((r) => r.value), 1);
+  const pct = Math.min(100, Math.round((ytd / target) * 100));
   return (
-    <div className="gm-bar-chart">
-      {rows.map((row) => (
-        <div key={row.label} className="gm-bar-row">
-          <div className="gm-bar-label">
-            <strong>{row.label}</strong>
-            {row.sub && <small>{row.sub}</small>}
-          </div>
-          <div className="gm-bar-track">
-            <i
-              className={`gm-bar-fill ${row.highlight ? "highlight" : ""}`}
-              style={{ width: `${(row.value / max) * 100}%` }}
-            />
-          </div>
-          <span className="gm-bar-value font-display">
-            {formatValue ? formatValue(row.value) : formatPrice(row.value)}
+    <div className="gm-mk-hero">
+      <div className="gm-mk-hero-head">
+        <div className="gm-mk-hero-copy">
+          <span className="gm-chip gm-chip-live">
+            <span className="gm-dot-live" /> LIVE · KAMIS feed 09:14
           </span>
+          <h1 className="font-display">Market &amp; Sales</h1>
+          <p className="gm-lead mb-0">
+            Live wholesale prices across 8 Kenyan markets, AI-ranked net returns
+            after transport and cess, a verified buyer directory and
+            contract-farming opportunities — so you harvest into the best price.
+          </p>
+          <div className="gm-mk-hero-chips">
+            <span className="gm-chip">
+              <MapPin width={13} height={13} /> Based: Githunguri, Kiambu
+            </span>
+            <span className="gm-chip">
+              <Clock width={13} height={13} /> Next harvest: 15 Jan
+            </span>
+            <span className="gm-chip">
+              <ShieldCheck width={13} height={13} /> 12 KES-verified buyers
+            </span>
+          </div>
         </div>
-      ))}
+        <div className="gm-mk-hero-score">
+          <div className="gm-mk-hero-score-num">
+            <strong>{score}</strong>
+            <small>/ 100</small>
+          </div>
+          <div className="gm-mk-hero-score-label">
+            <strong>Market readiness</strong>
+            <small>{topMarket} top net market · 4 alerts live</small>
+            <span className="gm-mk-hero-score-link">See scoring factors →</span>
+          </div>
+        </div>
+      </div>
+      <div className="gm-mk-hero-grid">
+        <div className="gm-stat">
+          <span className="gm-mega-icon">
+            <TrendingUp />
+          </span>
+          <strong className="gm-stat-value font-display">{kes(ytd)}</strong>
+          <span className="gm-stat-label">Net sales YTD</span>
+          <div className="gm-stat-progress">
+            <ProgressLine value={pct} label="Sales vs target" />
+            <small>{pct}% of {kes(target)} target</small>
+          </div>
+        </div>
+        <div className="gm-stat">
+          <span className="gm-mega-icon">
+            <Building2 />
+          </span>
+          <strong className="gm-stat-value font-display">10</strong>
+          <span className="gm-stat-label">Verified buyers contacted</span>
+          <small>3 with active orders · 1 overdue invoice</small>
+        </div>
+        <div className="gm-stat">
+          <span className="gm-mega-icon">
+            <Award />
+          </span>
+          <strong className="gm-stat-value font-display">2</strong>
+          <span className="gm-stat-label">Open contracts</span>
+          <small>Kakuzi applied · 4 more match your crops</small>
+        </div>
+        <div className="gm-stat">
+          <span className="gm-mega-icon">
+            <Truck />
+          </span>
+          <strong className="gm-stat-value font-display">{kes(0.5)}</strong>
+          <span className="gm-stat-label">Transport / head (Thika)</span>
+          <small>Best net · 15 km · co-op lorries Tue/Fri</small>
+        </div>
+      </div>
+      {children}
     </div>
   );
 }
 
-/* ── Trend badge ─────────────────────────────────────────────────────────── */
-export function TrendBadge({ trend }: { trend: MarketTrend }) {
-  if (trend === "up") {
-    return (
-      <span className="gm-chip" style={{ background: "var(--gm-mint-100)", color: "var(--gm-leaf-700)" }}>
-        <TrendingUp width={12} height={12} /> Rising
-      </span>
-    );
-  }
-  if (trend === "down") {
-    return (
-      <span className="gm-chip" style={{ background: "rgba(198, 91, 59, 0.12)", color: "var(--gm-clay-500)" }}>
-        <TrendingDown width={12} height={12} /> Falling
-      </span>
-    );
-  }
+/* ---------- 10.1 price grid row ---------- */
+
+export function PriceRow({
+  crop,
+  markets,
+  onCropClick,
+  onMarketClick,
+}: {
+  crop: CropPriceRow;
+  markets: { market: string; marketShort: string }[];
+  onCropClick: (crop: CropPriceRow) => void;
+  onMarketClick: (crop: CropPriceRow, market: string) => void;
+}) {
   return (
-    <span className="gm-chip">
-      <TrendingUp width={12} height={12} style={{ opacity: 0.5 }} /> Stable
-    </span>
+    <tr className="gm-mk-price-row">
+      <td className="gm-mk-crop-cell">
+        <button type="button" className="gm-mk-crop-btn" onClick={() => onCropClick(crop)}>
+          <span className="gm-mk-crop-icon">{crop.icon}</span>
+          <span className="gm-mk-crop-name">
+            <strong>{crop.crop}</strong>
+            <small>{crop.swahili} · per {crop.unit}</small>
+          </span>
+        </button>
+      </td>
+      {markets.map((m) => {
+        const [low, high] = crop.prices[m.market] ?? [0, 0];
+        const isBest = high === Math.max(...markets.map((mm) => (crop.prices[mm.market] ?? [0, 0])[1]));
+        return (
+          <td key={m.market} className="gm-mk-price-cell">
+            <button
+              type="button"
+              className={`gm-mk-price-link ${isBest ? "is-best" : ""}`}
+              onClick={() => onMarketClick(crop, m.market)}
+              title={`${low}–${high} KES · click for detail`}
+            >
+              <span className="gm-mk-price-range">
+                {typeof low === "number" && low >= 100 ? `${low.toLocaleString("en-KE")}–${high.toLocaleString("en-KE")}` : `${low}–${high}`}
+              </span>
+              {isBest ? <small className="gm-mk-best-tag">Best</small> : null}
+            </button>
+          </td>
+        );
+      })}
+      <td className="gm-mk-trend-cell">
+        <span className={`gm-mk-trend gm-mk-trend-${crop.trend}`}>
+          {crop.trend === "up" ? <TrendingUp width={14} height={14} /> : crop.trend === "down" ? <TrendingDown width={14} height={14} /> : "↔"}
+          {crop.changePct > 0 ? "+" : ""}
+          {crop.changePct}%
+        </span>
+      </td>
+    </tr>
   );
 }
 
-/* ── Buyer card ──────────────────────────────────────────────────────────── */
+/* ---------- Trend chart (ASCII but stylised) ---------- */
+
+export function PriceTrendChart({
+  points,
+  highlight,
+  onPointClick,
+}: {
+  points: TrendPoint[];
+  highlight?: string;
+  onPointClick: (p: TrendPoint) => void;
+}) {
+  const prices = points.map((p) => p.price);
+  const min = Math.min(...prices) - 3;
+  const max = Math.max(...prices) + 3;
+  const rows = 8;
+  return (
+    <div className="gm-mk-chart">
+      <div className="gm-mk-chart-body">
+        {Array.from({ length: rows }).map((_, ri) => {
+          const v = max - ((max - min) * ri) / (rows - 1);
+          return (
+            <div key={ri} className="gm-mk-chart-row">
+              <span className="gm-mk-chart-y">{Math.round(v)}</span>
+              <div className="gm-mk-chart-track">
+                {points.map((p) => {
+                  const h = ((p.price - min) / (max - min)) * 100;
+                  const isHi = highlight === p.month;
+                  return (
+                    <button
+                      key={p.month}
+                      type="button"
+                      className={`gm-mk-chart-bar ${isHi ? "is-on" : ""}`}
+                      style={{ height: `${h}%` }}
+                      onClick={() => onPointClick(p)}
+                      aria-label={`${p.month}: KES ${p.price}`}
+                    >
+                      <span className="gm-mk-chart-tip">
+                        {p.month} · KES {p.price}
+                        {p.note ? ` · ${p.note}` : ""}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+        <div className="gm-mk-chart-x">
+          {points.map((p) => (
+            <span key={p.month}>{p.monthShort}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Best-market recommendation row ---------- */
+
+export function RecommendationRow({
+  rec,
+  onOpen,
+}: {
+  rec: MarketRecommendation;
+  onOpen: (rec: MarketRecommendation) => void;
+}) {
+  const pct = Math.round((rec.netPricePerHead / 33) * 100);
+  return (
+    <button type="button" className={`gm-mk-rec gm-mk-rec-${rec.verdict}`} onClick={() => onOpen(rec)}>
+      <div className="gm-mk-rec-rank">#{rec.rank}</div>
+      <div className="gm-mk-rec-main">
+        <div className="gm-mk-rec-head">
+          <strong>{rec.market}</strong>
+          {rec.verdict === "best" ? (
+            <span className="gm-chip gm-chip-lime">AI pick</span>
+          ) : rec.verdict === "higher" ? (
+            <span className="gm-chip gm-chip-gold">Higher price</span>
+          ) : rec.verdict === "far" ? (
+            <span className="gm-chip gm-risk gm-risk-low">Too far</span>
+          ) : (
+            <span className="gm-chip">Similar</span>
+          )}
+        </div>
+        <div className="gm-mk-rec-meta">
+          <span><Car width={12} height={12} /> {rec.distanceKm} km</span>
+          <span>Reliability {rec.reliabilityScore}★</span>
+          <span>Volume {rec.volumeScore}/10</span>
+        </div>
+        <div className="gm-mk-rec-note">{rec.note}</div>
+        <div className="gm-mk-rec-bar">
+          <ProgressLine value={Math.min(100, pct)} label={`Net KES ${rec.netPricePerHead}`} />
+        </div>
+      </div>
+      <div className="gm-mk-rec-net">
+        <small>Net / head</small>
+        <strong>KES {rec.netPricePerHead.toFixed(2)}</strong>
+        <ArrowRight />
+      </div>
+    </button>
+  );
+}
+
+/* ---------- Buyer card ---------- */
+
 export function BuyerCard({
   buyer,
-  onView,
+  onOpen,
   onContact,
 }: {
   buyer: Buyer;
-  onView: () => void;
-  onContact: () => void;
+  onOpen: (b: Buyer) => void;
+  onContact: (b: Buyer) => void;
 }) {
-  const Icon = buyer.icon;
   return (
-    <div className="gm-card gm-buyer-card">
-      <div className="gm-buyer-header">
-        <span className="gm-mega-icon" style={{ background: buyer.hue, color: "#fff" }}>
-          <Icon />
-        </span>
-        <div>
-          <strong>{buyer.name}</strong>
-          <small>{buyer.type} · {buyer.location}</small>
+    <div className="gm-mk-buyer">
+      <div className="gm-mk-buyer-head">
+        <div className={`gm-mk-buyer-ava gm-mk-buyer-${buyer.type.toLowerCase().replace(/\s/g, "-")}`}>
+          {buyer.name.charAt(0)}
         </div>
-        <span className="gm-buyer-rating">
-          <Star width={14} height={14} fill="var(--gm-gold-500)" color="var(--gm-gold-500)" />
-          {buyer.rating}
+        <div className="gm-mk-buyer-ident">
+          <strong>{buyer.name}</strong>
+          <small>
+            {buyer.type} · <MapPin width={11} height={11} /> {buyer.location}
+            {buyer.verified ? <BadgeCheck width={12} height={12} className="gm-mk-v" /> : null}
+          </small>
+        </div>
+        <span className="gm-mk-buyer-rating">
+          <Star width={12} height={12} fill="currentColor" /> {buyer.rating}
         </span>
       </div>
-      <div className="gm-buyer-crops">
-        {buyer.crops.slice(0, 3).map((c) => (
-          <span key={c} className="gm-chip">{c}</span>
-        ))}
-        {buyer.crops.length > 3 && <span className="gm-chip">+{buyer.crops.length - 3}</span>}
+      <div className="gm-mk-buyer-body">
+        <div className="gm-mk-buyer-crops">{buyer.cropsWanted.slice(0, 3).map((c) => (
+          <span key={c} className="gm-chip gm-chip-ghost">{c}</span>
+        ))}{buyer.cropsWanted.length > 3 ? <span className="gm-chip gm-chip-ghost">+{buyer.cropsWanted.length - 3}</span> : null}</div>
+        <div className="gm-mk-buyer-kv">
+          <span><strong>Min qty:</strong> {buyer.minQuantity}</span>
+          <span><strong>Terms:</strong> {buyer.paymentTerms}</span>
+        </div>
+        {buyer.lastOrder ? (
+          <small className="gm-mk-buyer-last">Last order {buyer.lastOrder}{buyer.totalSpent ? ` · ${kes(buyer.totalSpent)} YTD` : ""}</small>
+        ) : null}
       </div>
-      <div className="gm-buyer-meta">
-        <span><strong>Payment:</strong> {buyer.paymentTerms}</span>
-        <span><strong>Orders:</strong> {buyer.totalOrders}</span>
-      </div>
-      <div className="gm-buyer-actions">
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onView}>
-          <Eye width={14} height={14} /> Profile
+      <div className="gm-mk-buyer-foot">
+        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => onOpen(buyer)}>
+          <Eye width={14} height={14} /> View
         </button>
-        <button type="button" className="gm-btn gm-btn-soft gm-btn-sm" onClick={onContact}>
+        <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => onContact(buyer)}>
           <Phone width={14} height={14} /> Contact
         </button>
       </div>
@@ -169,126 +335,162 @@ export function BuyerCard({
   );
 }
 
-/* ── Market Recommendation Row ───────────────────────────────────────────── */
-export function RecommendationRow({
-  rec,
+/* ---------- Sales scenario card ---------- */
+
+export function ScenarioCard({
+  s,
   onOpen,
 }: {
-  rec: MarketRecommendation;
-  onOpen: () => void;
+  s: SalesScenario;
+  onOpen: (s: SalesScenario) => void;
 }) {
-  const Icon = rec.icon;
   return (
-    <button type="button" className="gm-check-row" onClick={onOpen}>
-      <span className="gm-mega-icon">
-        <Icon />
-      </span>
-      <span style={{ flex: 1 }}>
-        <strong>
-          #{rec.rank} {rec.market}
-          {rec.rank === 1 && (
-            <span className="gm-chip gm-chip-lime" style={{ marginLeft: 8, fontSize: "0.68rem" }}>
-              Best pick
-            </span>
-          )}
-        </strong>
-        <small>
-          {rec.distanceKm} km · Net {formatPrice(rec.netPricePerHead)}/head · {rec.volumeDemand}
-        </small>
-      </span>
-      <StatusChip
-        label={formatPrice(rec.netPricePerHead)}
-        tone={rec.rank === 1 ? "low" : rec.rank === 2 ? "medium" : "neutral"}
-      />
+    <button
+      type="button"
+      className={`gm-mk-scenario ${s.aiPick ? "is-pick" : ""}`}
+      onClick={() => onOpen(s)}
+    >
+      <div className="gm-mk-scenario-head">
+        <strong>{s.label}</strong>
+        {s.aiPick ? <span className="gm-chip gm-chip-lime"><Award width={12} height={12} /> AI pick</span> : <StatusChip label={s.risk} tone={s.risk === "low" ? "high" : s.risk === "high" ? "low" : "medium"} />}
+      </div>
+      <small className="gm-mk-scenario-sw">{s.swahili}</small>
+      <div className="gm-mk-scenario-figures">
+        <div><span className="gm-mk-fig-label">Net revenue</span><strong>{kes(s.netRevenue)}</strong></div>
+        <div><span className="gm-mk-fig-label">vs baseline</span>
+          <strong className={s.vsBaseline >= 0 ? "up" : "down"}>{s.vsBaseline > 0 ? "+" : ""}{kes(s.vsBaseline)}</strong>
+        </div>
+        <div><span className="gm-mk-fig-label">Price/head</span><strong>{kes(s.pricePerHead)}</strong></div>
+      </div>
+      <div className="gm-mk-scenario-note">{s.note}</div>
+      <div className="gm-mk-scenario-foot">
+        <Download width={14} height={14} /> Open breakdown <ArrowRight />
+      </div>
     </button>
   );
 }
 
-/* ── Crop Listing Card (Portfolio) ───────────────────────────────────────── */
-export function ListingCard({
-  listing,
-  onShare,
+/* ---------- Sales record row ---------- */
+
+export function SaleRow({
+  sale,
+  onOpen,
+}: {
+  sale: SaleRecord;
+  onOpen: (s: SaleRecord) => void;
+}) {
+  const tone = sale.paymentStatus === "Received" ? "high" : sale.paymentStatus === "Overdue" ? "low" : sale.paymentStatus === "Partial" ? "medium" : "neutral";
+  return (
+    <tr className="gm-mk-sale-row" onClick={() => onOpen(sale)}>
+      <td>
+        <div className="gm-mk-sale-date">
+          <strong>{sale.date.split(" ")[0]}</strong>
+          <small>{sale.date.split(" ").slice(1).join(" ")}</small>
+        </div>
+      </td>
+      <td>
+        <strong>{sale.crop}</strong>
+        <small>{sale.variety} · {sale.plot}</small>
+      </td>
+      <td>{sale.quantity.toLocaleString("en-KE")} {sale.unit}{sale.quantity > 1 ? "s" : ""}</td>
+      <td>{kes(sale.pricePerUnit)}</td>
+      <td><strong>{kes(sale.totalAmount)}</strong></td>
+      <td>{sale.buyer.split(",")[0]}</td>
+      <td>
+        <span className="gm-mk-pay">
+          {sale.paymentMethod}{sale.mpesaReceipt ? ` · ${sale.mpesaReceipt.slice(0, 6)}…` : ""}
+        </span>
+      </td>
+      <td><StatusChip label={sale.paymentStatus} tone={tone} /></td>
+      <td><strong>{kes(sale.netIncome)}</strong></td>
+      <td><span className="gm-chip gm-grade">{sale.qualityGrade}</span></td>
+      <td><button type="button" className="gm-icon-btn" onClick={(e) => { e.stopPropagation(); onOpen(sale); }}><ExternalLink width={15} height={15} /></button></td>
+    </tr>
+  );
+}
+
+/* ---------- Contract card ---------- */
+
+export function ContractCard({
+  c,
+  onApply,
   onView,
 }: {
-  listing: CropListing;
-  onShare: () => void;
-  onView: () => void;
+  c: Contract;
+  onApply: (c: Contract) => void;
+  onView: (c: Contract) => void;
 }) {
   return (
-    <div className="gm-card p-3">
-      <div className="d-flex justify-content-between align-items-start mb-2">
+    <div className="gm-mk-contract">
+      <div className="gm-mk-contract-head">
+        <div className="gm-mk-contract-co">{c.company.charAt(0)}</div>
         <div>
-          <strong style={{ fontSize: "1rem" }}>{listing.crop} — {listing.variety}</strong>
-          <small className="d-block" style={{ color: "var(--gm-ink-400)", fontWeight: 600 }}>
-            {listing.plot} · {listing.acreage}
-          </small>
+          <strong>{c.title}</strong>
+          <small>{c.company} · {c.duration} · <MapPin width={11} height={11} /> {c.countyMatch ? "Kiambu match" : "Out of county"}</small>
         </div>
-        <StatusChip
-          label={listing.status}
-          tone={listing.status === "Active" ? "low" : listing.status === "Sold Out" ? "high" : "neutral"}
-        />
+        {c.status === "applied" ? <span className="gm-chip gm-chip-gold">Applied</span> : c.status === "awarded" ? <span className="gm-chip gm-chip-lime">Awarded</span> : c.status === "rejected" ? <span className="gm-chip gm-risk gm-risk-low">Rejected</span> : <span className="gm-chip gm-chip-lime">Open</span>}
       </div>
-      <div className="gm-listing-stats">
-        <div>
-          <small>Expected</small>
-          <strong>{listing.expectedHarvest}</strong>
+      <div className="gm-mk-contract-body">
+        <div className="gm-mk-contract-row">
+          <span className="gm-mk-contract-k">Crop</span><span>{c.crop} ({c.variety})</span>
         </div>
-        <div>
-          <small>Quantity</small>
-          <strong>{listing.estimatedQuantity.toLocaleString("en-KE")} {listing.unit}</strong>
+        <div className="gm-mk-contract-row">
+          <span className="gm-mk-contract-k">Acreage</span><span>{c.acreage}</span>
         </div>
-        <div>
-          <small>Ask price</small>
-          <strong className="font-display">{formatPrice(listing.priceAsk)}/{listing.unit.split("/")[0]}</strong>
+        <div className="gm-mk-contract-row">
+          <span className="gm-mk-contract-k">Price</span>
+          <strong className="gm-mk-price-k">{c.priceGuarantee}</strong>
         </div>
-        <div>
-          <small>Views</small>
-          <strong>{listing.views}</strong>
+        <div className="gm-mk-contract-row">
+          <span className="gm-mk-contract-k">Deadline</span><span>{c.applicationDeadline}</span>
+        </div>
+        <div className="gm-mk-reqs">
+          {c.requirements.slice(0, 3).map((r) => (
+            <span key={r} className="gm-chip gm-chip-ghost">{r}</span>
+          ))}
+          {c.requirements.length > 3 ? <span className="gm-chip gm-chip-ghost">+{c.requirements.length - 3}</span> : null}
         </div>
       </div>
-      <div className="d-flex gap-2 mt-2">
-        <button type="button" className="gm-btn gm-btn-soft gm-btn-sm" onClick={onShare}>
-          <Share2 width={14} height={14} /> Share link
-        </button>
-        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={onView}>
+      <div className="gm-mk-contract-foot">
+        <button type="button" className="gm-btn gm-btn-outline gm-btn-sm" onClick={() => onView(c)}>
           <Eye width={14} height={14} /> Details
         </button>
+        {c.status === "open" ? (
+          <button type="button" className="gm-btn gm-btn-lime gm-btn-sm" onClick={() => onApply(c)}>
+            Apply <ArrowRight />
+          </button>
+        ) : null}
       </div>
     </div>
   );
 }
 
-/* ── Scenario comparison row ─────────────────────────────────────────────── */
-export function ScenarioRow({
-  scenario,
-  onOpen,
-}: {
-  scenario: { id: string; label: string; netRevenue: number; recommended: boolean; note: string };
-  onOpen: () => void;
-}) {
+/* ---------- KV list ---------- */
+
+export function MarketKv({ items, columns = 1 }: { items: { k: string; v: ReactNode; tone?: "good" | "warn" | "bad" }[]; columns?: 1 | 2 }) {
   return (
-    <button
-      type="button"
-      className={`gm-check-row ${scenario.recommended ? "gm-scenario-rec" : ""}`}
-      onClick={onOpen}
-    >
-      <span className="gm-mega-icon" style={scenario.recommended ? { background: "var(--gm-grad-primary)", color: "#fff" } : undefined}>
-        {scenario.recommended ? <Star /> : <MapPin />}
-      </span>
-      <span style={{ flex: 1 }}>
-        <strong>
-          {scenario.label}
-          {scenario.recommended && (
-            <span className="gm-chip gm-chip-lime" style={{ marginLeft: 8, fontSize: "0.68rem" }}>
-              AI recommended
-            </span>
-          )}
-        </strong>
-        <small>{scenario.note}</small>
-      </span>
-      <span className="font-display" style={{ fontSize: "1.1rem", fontWeight: 900, color: "var(--gm-leaf-700)" }}>
-        {formatPrice(scenario.netRevenue)}
-      </span>
-    </button>
+    <div className={`gm-mk-kv ${columns === 2 ? "is-2" : ""}`}>
+      {items.map((it) => (
+        <div key={it.k} className={`gm-mk-kv-row ${it.tone ? `is-${it.tone}` : ""}`}>
+          <span className="gm-mk-kv-k">{it.k}</span>
+          <span className="gm-mk-kv-v">{it.v}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function MarketCallout({ tone = "info", children }: { tone?: "info" | "warn" | "good"; children: ReactNode }) {
+  return <div className={`gm-mk-callout tone-${tone}`}>{children}</div>;
+}
+
+export function MarketEmpty({ title, sub, action }: { title: string; sub?: string; action?: ReactNode }) {
+  return (
+    <div className="gm-empty">
+      <div className="gm-empty-art">🥬</div>
+      <h4>{title}</h4>
+      {sub ? <p>{sub}</p> : null}
+      {action}
+    </div>
   );
 }
