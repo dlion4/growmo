@@ -123,7 +123,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Farm Map",
         desc: "Plots & GPS",
         icon: MapIcon,
-        ready: false,
+        ready: true,
         page: 19,
       },
       {

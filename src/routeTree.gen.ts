@@ -23,6 +23,7 @@ import { Route as AppFinanceRouteImport } from './routes/app/finance'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLabourRouteImport } from './routes/app/labour'
 import { Route as AppLogsRouteImport } from './routes/app/logs'
+import { Route as AppMapRouteImport } from './routes/app/map'
 import { Route as AppMarketRouteImport } from './routes/app/market'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
@@ -116,6 +117,11 @@ const AppLabourRoute = AppLabourRouteImport.update({
 const AppLogsRoute = AppLogsRouteImport.update({
   id: '/app/logs',
   path: '/app/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppMapRoute = AppMapRouteImport.update({
+  id: '/app/map',
+  path: '/app/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppMarketRoute = AppMarketRouteImport.update({
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/logs': typeof AppLogsRoute
+  '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/logs': typeof AppLogsRoute
+  '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/logs': typeof AppLogsRoute
+  '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
@@ -376,6 +385,7 @@ export interface FileRouteTypes {
     | '/app/inventory'
     | '/app/labour'
     | '/app/logs'
+    | '/app/map'
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/app/inventory'
     | '/app/labour'
     | '/app/logs'
+    | '/app/map'
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
@@ -456,6 +467,7 @@ export interface FileRouteTypes {
     | '/app/inventory'
     | '/app/labour'
     | '/app/logs'
+    | '/app/map'
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
@@ -497,6 +509,7 @@ export interface RootRouteChildren {
   AppInventoryRoute: typeof AppInventoryRoute
   AppLabourRoute: typeof AppLabourRoute
   AppLogsRoute: typeof AppLogsRoute
+  AppMapRoute: typeof AppMapRoute
   AppMarketRoute: typeof AppMarketRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppPlannerRoute: typeof AppPlannerRoute
@@ -622,6 +635,13 @@ declare module '@tanstack/react-router' {
       path: '/app/logs'
       fullPath: '/app/logs'
       preLoaderRoute: typeof AppLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/map': {
+      id: '/app/map'
+      path: '/app/map'
+      fullPath: '/app/map'
+      preLoaderRoute: typeof AppMapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/market': {
@@ -809,6 +829,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppInventoryRoute: AppInventoryRoute,
   AppLabourRoute: AppLabourRoute,
   AppLogsRoute: AppLogsRoute,
+  AppMapRoute: AppMapRoute,
   AppMarketRoute: AppMarketRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppPlannerRoute: AppPlannerRoute,

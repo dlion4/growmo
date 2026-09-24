@@ -860,3 +860,48 @@ state changes.
 **Nav:** `src/data/app/nav.ts` — new item `/app/team` (`page: 15.3`,
 `UserPlus` icon, `ready: true`) in the Manage group after `/app/labour`;
 no other shell edits.
+
+## 26. Farm mapping & plot management layer (page 19 — `/app/map`)
+
+The interactive farm map is a **crafted SVG** (`FarmMap`, viewBox `0 0 800 520`,
+scale 1 px ≈ 0.525 m, elevation band 1,785–1,800 m) — no map library. Geometry
+lives in `src/data/app/map.ts`; styling lives in `src/map.css` (loaded in
+`__root.tsx` after `teamCss`). All colors are theme tokens.
+
+| Area | Classes |
+| --- | --- |
+| Page shell | `.gm-map-page`, `.gm-map-hero`(`-title`, `-stats`), `.gm-hero-chip`, `.gm-statgrid`, `.gm-chiprow`, `.gm-quickgrid`, `.gm-card-h`, `.gm-muted`, `.gm-map-overview-grid`(`-side`), `.gm-alert-list`, `.gm-alert`(`.warn/.info/.success`) |
+| 19.1 map | `.gm-map-frame` + `.gm-view-satellite`/`.gm-view-terrain` (two CSS backgrounds of the same SVG), `.gm-map-svg`, `.gm-map-bg`, `.gm-map-contours`, `.gm-farm-boundary`, `.gm-plot-g`(`.is-selected`) + `.gm-plot-shape` + `.gm-plot-leaf/-gold/-sprout/-clay/-berry/-ink`, `.gm-plot-label/-sub`, `.gm-road`/`-dash`, `.gm-stream`, `.gm-irrigation`, `.gm-tree`, `.gm-structure`(`-label`), `.gm-soil-g/-ring/-dot`, `.gm-measure-line/-dot/-label`, `.gm-pin-g/-halo/-tri/-hole` + `.gm-pin-low/-medium/-high`, `.gm-map-compass`/`gm-compass-ring/-needle/-n`, `.gm-scalebar`/`gm-scale-line/-text`, `.gm-map-view-badge`, `.gm-map-layout`, `.gm-map-card`, `.gm-map-side`, `.gm-map-toolbar`, `.gm-map-capture`(`-label`), `.gm-map-foot` |
+| 19.1 controls | `.gm-layer-list`/`-head`, `.gm-layer-item`(`.on`)/`-dot`(`.is-on`)/`-name`, `.gm-view-toggle` |
+| 19.2 creation | `.gm-method-grid`, `.gm-method-card`(`.on`)/`-icon/-main/-meta`, `.gm-walksim`(`-stage/-svg/-idle/-status/-actions`), `.gm-walk-path`(`.is-done`), `.gm-walk-dot`, `.gm-walk-fx/-done`, `.gm-dims-row`, `.gm-coords-grid`, `.gm-swatches`, `.gm-swatch`(`.gm-swatch-…`, `.on`), `.gm-upload-box`, `.gm-registry-row/-result`, `.gm-method-result/-done/-cta`, `.gm-saved-box`, `.gm-review-box`, `.gm-rowwrap` |
+| 19.3 plot drawer | `.gm-minitabs`, `.gm-plot-head`(`-health`), `.gm-facts`, `.gm-field`, `.gm-note-callout`, `.gm-subhead`, `.gm-quickrow`, `.gm-pin-inline`, `.gm-weather`(`-now/-days/-day/-day-name/-ic/-spray`, `-full`), `.gm-soil`(`-compact/-top/-latest/-rec/-actions`), `.gm-task-list`(`.gm-task-done`)/`-time/-body`, `.gm-labour-list`(`-ic`, `-since`), `.gm-addform`(`-row`), `.gm-input`/`.gm-textarea`, `.gm-label`, `.gm-success-line`, `.gm-soiltest-row` |
+| 19.5 pins | `.gm-pinrows`, `.gm-pin-row`(`.sev-low/-medium/-high`)/`-ic/-main/-meta/-actions`, `.gm-pin-detail`(`-head`), `.gm-pin-badge`, `.gm-confirm-row` |
+| 19.6/19.7 tools | `.gm-toolgrid`, `.gm-tool-card`/`-icon/-main`, `.gm-elev-chart`/`gm-elev-svg/-axis/-line/-pt/-val`, `.gm-slope-list`, `.gm-slope-row`(`.steep`)/`-pct`, `.gm-sun-chart`/`-legend`, `.gm-sun-row`/`-plot/-bars/-bar-line/-dec/-jun/-note`, `.gm-preset-list`, `.gm-preset`(`.on`), `.gm-arearead` |
+| Money + sim | `.gm-simwork`/`-spin` (`@keyframes gm-spin`), `.gm-mpesa`(`-head/-row/-err/-process`) — STK-style PIN confirm (`PinPad` 123456) |
+| Mini-map | `.gm-minimap-frame/-svg/-hint`, `.gm-minimap-plot`, `.gm-tap-poly`(`.is-closed`), `.gm-tap-pt-ring/-pt` |
+| Export | `.gm-export-list`, `.gm-export-card`(`.on`) |
+| Tables (shared, extended) | `.gm-table-caption`, `.gm-table-sm`, `.gm-row-link`, `.gm-td-bar`, `.gm-row-actions`, `.gm-avg-row`, `.gm-roi` |
+| Legend/dots | `.gm-dot`(`-leaf/-gold/-sprout/-clay/-berry/-ink`), `.gm-legend`/`-item`/`-soil/-pin/-water/-tree/-note` |
+| Destructive | `.gm-btn-danger` (solid `--gm-risk-high`) — the hard variant missing from `styles.css` |
+
+Responsive: map/side 2-col → 1 at 1080px (side becomes 2-up), KPIs 4→2→1,
+method cards / preset list / fact grid / coord grid / add-form rows 2→1 at
+640px, weather strip 7→4→2, photo grid 3→2, toolbar stacks full-width.
+
+**Route:** `src/routes/app/map.tsx` — 6 tabs via `PlannerSubtabs`:
+overview (19.4 table + KPIs + alerts), interactive map (19.1: satellite/terrain
+toggle, 7 layer toggles, 8 capture buttons, legend, selected-plot card, open
+pins), plots (19.2 register + 19.4), pins (19.5 rows + full log table),
+compare (19.6 table + farm average), measure (19.7 five tool cards). One
+discriminated-union modal state (`ModalState`, **29 kinds** — see
+`MapModals.tsx`): plot drawer (10 mini-tabs), 3-step create wizard (6 capture
+methods: walk simulation, tap-points, dimensions, GPS coords, file upload,
+registry lookup), edit-plot, add-pin / pin / resolve-pin, weather / soil /
+soil-point / soil-test (M-Pesa KES 1,850), tasks / labour / inputs / finance
+(top-up KES 5,000 via M-Pesa) / photos / history / notes, distance / area
+(shoelace) / elevation / slope / sun, export. Live state: layers, view mode,
+selected plot, per-plot task/note/input/photo lists. Toasts only on real
+state changes.
+
+**Nav:** `src/data/app/nav.ts` — existing item `/app/map` (`page: 19`,
+`MapIcon`) flipped `ready: false → true`; no other shell edits.
