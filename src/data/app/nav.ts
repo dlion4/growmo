@@ -234,7 +234,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Buyers & contracts",
         icon: Store,
         count: 2,
-        ready: false,
+        ready: true,
         page: 21,
       },
       {
