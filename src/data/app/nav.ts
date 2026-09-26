@@ -242,7 +242,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Harvest",
         desc: "Grading & storage",
         icon: Warehouse,
-        ready: false,
+        ready: true,
         page: 24,
       },
       {

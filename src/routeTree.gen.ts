@@ -21,6 +21,7 @@ import { Route as AppCooperativeRouteImport } from './routes/app/cooperative'
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
+import { Route as AppHarvestRouteImport } from './routes/app/harvest'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLabourRouteImport } from './routes/app/labour'
 import { Route as AppMachineryRouteImport } from './routes/app/machinery'
@@ -108,6 +109,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppFinanceRoute = AppFinanceRouteImport.update({
   id: '/app/finance',
   path: '/app/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppHarvestRoute = AppHarvestRouteImport.update({
+  id: '/app/harvest',
+  path: '/app/harvest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
@@ -263,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
+  '/app/harvest': typeof AppHarvestRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/machinery': typeof AppMachineryRoute
@@ -305,6 +312,7 @@ export interface FileRoutesByTo {
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
+  '/app/harvest': typeof AppHarvestRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/machinery': typeof AppMachineryRoute
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
+  '/app/harvest': typeof AppHarvestRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/machinery': typeof AppMachineryRoute
@@ -392,6 +401,7 @@ export interface FileRouteTypes {
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
+    | '/app/harvest'
     | '/app/inventory'
     | '/app/labour'
     | '/app/machinery'
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
+    | '/app/harvest'
     | '/app/inventory'
     | '/app/labour'
     | '/app/machinery'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
+    | '/app/harvest'
     | '/app/inventory'
     | '/app/labour'
     | '/app/machinery'
@@ -519,6 +531,7 @@ export interface RootRouteChildren {
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
+  AppHarvestRoute: typeof AppHarvestRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLabourRoute: typeof AppLabourRoute
   AppMachineryRoute: typeof AppMachineryRoute
@@ -634,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/app/finance'
       fullPath: '/app/finance'
       preLoaderRoute: typeof AppFinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/harvest': {
+      id: '/app/harvest'
+      path: '/app/harvest'
+      fullPath: '/app/harvest'
+      preLoaderRoute: typeof AppHarvestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/inventory': {
@@ -847,6 +867,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,
+  AppHarvestRoute: AppHarvestRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLabourRoute: AppLabourRoute,
   AppMachineryRoute: AppMachineryRoute,
