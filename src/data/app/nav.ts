@@ -194,7 +194,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Machinery",
         desc: "Equipment log",
         icon: Tractor,
-        ready: false,
+        ready: true,
         page: 20,
       },
       {
