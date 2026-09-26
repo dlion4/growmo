@@ -123,7 +123,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Farm Map",
         desc: "Plots & GPS",
         icon: MapIcon,
-        ready: false,
+        ready: true,
         page: 19,
       },
       {
@@ -180,6 +180,14 @@ export const APP_NAV: AppNavGroup[] = [
         icon: Users,
         ready: true,
         page: 6,
+      },
+      {
+        to: "/app/team",
+        label: "Team & HR",
+        desc: "Directory, payroll, compliance",
+        icon: UserPlus,
+        ready: true,
+        page: 15.3,
       },
       {
         to: "/app/finance",
@@ -289,7 +297,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Logs",
         desc: "Activity & logs",
         icon: ShieldCheck,
-        ready: false,
+        ready: true,
         page: 18,
       },
       {

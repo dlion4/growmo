@@ -22,12 +22,15 @@ import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLabourRouteImport } from './routes/app/labour'
+import { Route as AppLogsRouteImport } from './routes/app/logs'
+import { Route as AppMapRouteImport } from './routes/app/map'
 import { Route as AppMarketRouteImport } from './routes/app/market'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
 import { Route as AppRecordsRouteImport } from './routes/app/records'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSoilRouteImport } from './routes/app/soil'
+import { Route as AppTeamRouteImport } from './routes/app/team'
 import { Route as AppWalletRouteImport } from './routes/app/wallet'
 import { Route as AppWeatherRouteImport } from './routes/app/weather'
 import { Route as AppWeatherProRouteImport } from './routes/app/weather-pro'
@@ -111,6 +114,16 @@ const AppLabourRoute = AppLabourRouteImport.update({
   path: '/app/labour',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppLogsRoute = AppLogsRouteImport.update({
+  id: '/app/logs',
+  path: '/app/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppMapRoute = AppMapRouteImport.update({
+  id: '/app/map',
+  path: '/app/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppMarketRoute = AppMarketRouteImport.update({
   id: '/app/market',
   path: '/app/market',
@@ -139,6 +152,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
 const AppSoilRoute = AppSoilRouteImport.update({
   id: '/app/soil',
   path: '/app/soil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/app/team',
+  path: '/app/team',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppWalletRoute = AppWalletRouteImport.update({
@@ -240,12 +258,15 @@ export interface FileRoutesByFullPath {
   '/app/finance': typeof AppFinanceRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
+  '/app/logs': typeof AppLogsRoute
+  '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
+  '/app/team': typeof AppTeamRoute
   '/app/wallet': typeof AppWalletRoute
   '/app/weather': typeof AppWeatherRoute
   '/app/weather-pro': typeof AppWeatherProRoute
@@ -278,12 +299,15 @@ export interface FileRoutesByTo {
   '/app/finance': typeof AppFinanceRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
+  '/app/logs': typeof AppLogsRoute
+  '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
+  '/app/team': typeof AppTeamRoute
   '/app/wallet': typeof AppWalletRoute
   '/app/weather': typeof AppWeatherRoute
   '/app/weather-pro': typeof AppWeatherProRoute
@@ -317,12 +341,15 @@ export interface FileRoutesById {
   '/app/finance': typeof AppFinanceRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
+  '/app/logs': typeof AppLogsRoute
+  '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
   '/app/onboarding': typeof AppOnboardingRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
+  '/app/team': typeof AppTeamRoute
   '/app/wallet': typeof AppWalletRoute
   '/app/weather': typeof AppWeatherRoute
   '/app/weather-pro': typeof AppWeatherProRoute
@@ -357,12 +384,15 @@ export interface FileRouteTypes {
     | '/app/finance'
     | '/app/inventory'
     | '/app/labour'
+    | '/app/logs'
+    | '/app/map'
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
     | '/app/records'
     | '/app/settings'
     | '/app/soil'
+    | '/app/team'
     | '/app/wallet'
     | '/app/weather'
     | '/app/weather-pro'
@@ -395,12 +425,15 @@ export interface FileRouteTypes {
     | '/app/finance'
     | '/app/inventory'
     | '/app/labour'
+    | '/app/logs'
+    | '/app/map'
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
     | '/app/records'
     | '/app/settings'
     | '/app/soil'
+    | '/app/team'
     | '/app/wallet'
     | '/app/weather'
     | '/app/weather-pro'
@@ -433,12 +466,15 @@ export interface FileRouteTypes {
     | '/app/finance'
     | '/app/inventory'
     | '/app/labour'
+    | '/app/logs'
+    | '/app/map'
     | '/app/market'
     | '/app/onboarding'
     | '/app/planner'
     | '/app/records'
     | '/app/settings'
     | '/app/soil'
+    | '/app/team'
     | '/app/wallet'
     | '/app/weather'
     | '/app/weather-pro'
@@ -472,12 +508,15 @@ export interface RootRouteChildren {
   AppFinanceRoute: typeof AppFinanceRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLabourRoute: typeof AppLabourRoute
+  AppLogsRoute: typeof AppLogsRoute
+  AppMapRoute: typeof AppMapRoute
   AppMarketRoute: typeof AppMarketRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
   AppPlannerRoute: typeof AppPlannerRoute
   AppRecordsRoute: typeof AppRecordsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSoilRoute: typeof AppSoilRoute
+  AppTeamRoute: typeof AppTeamRoute
   AppWalletRoute: typeof AppWalletRoute
   AppWeatherRoute: typeof AppWeatherRoute
   AppWeatherProRoute: typeof AppWeatherProRoute
@@ -591,6 +630,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLabourRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/logs': {
+      id: '/app/logs'
+      path: '/app/logs'
+      fullPath: '/app/logs'
+      preLoaderRoute: typeof AppLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/map': {
+      id: '/app/map'
+      path: '/app/map'
+      fullPath: '/app/map'
+      preLoaderRoute: typeof AppMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/market': {
       id: '/app/market'
       path: '/app/market'
@@ -631,6 +684,13 @@ declare module '@tanstack/react-router' {
       path: '/app/soil'
       fullPath: '/app/soil'
       preLoaderRoute: typeof AppSoilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/team': {
+      id: '/app/team'
+      path: '/app/team'
+      fullPath: '/app/team'
+      preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/wallet': {
@@ -768,12 +828,15 @@ const rootRouteChildren: RootRouteChildren = {
   AppFinanceRoute: AppFinanceRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLabourRoute: AppLabourRoute,
+  AppLogsRoute: AppLogsRoute,
+  AppMapRoute: AppMapRoute,
   AppMarketRoute: AppMarketRoute,
   AppOnboardingRoute: AppOnboardingRoute,
   AppPlannerRoute: AppPlannerRoute,
   AppRecordsRoute: AppRecordsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSoilRoute: AppSoilRoute,
+  AppTeamRoute: AppTeamRoute,
   AppWalletRoute: AppWalletRoute,
   AppWeatherRoute: AppWeatherRoute,
   AppWeatherProRoute: AppWeatherProRoute,

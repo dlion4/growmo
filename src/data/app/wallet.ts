@@ -3,11 +3,12 @@
 
    Blueprint sections
    14.1 Wallet dashboard   14.2 Deposit money         14.3 Send money / pay
-   14.4 Auto-pay           14.5 Transaction history   14.6 Budget allocation
-   14.7 Security & controls
+   14.3c Bulk payouts      14.4 Auto-pay              14.5 Transaction history
+   14.6 Budget allocation  14.7 Security & controls
 
    All money is Kenyan shillings. Receipts follow GrowMO conventions:
-   QK… quick share · PL… payment · DEP… deposit · WDR… withdrawal.
+   QK… quick share · PL… payment · DEP… deposit · WDR… withdrawal ·
+   BATCH… bulk batch · INV… cash invoice.
    ========================================================================== */
 
 export const WALLET_CONTEXT = {
@@ -186,6 +187,89 @@ export const BILLERS = [
   { id: "saf", name: "Safaricom Postpaid", account: "0712345678", icon: "📶" },
 ];
 
+/* ---------- 14.3c Bulk payouts (multi-recipient wizard) ---------- */
+export type PayoutChannelId = "mpesa" | "bank" | "growmo" | "cash";
+
+export interface PayoutChannelOption {
+  id: PayoutChannelId;
+  label: string;
+  swahili: string;
+  icon: string;
+  idLabel: string;
+  idPlaceholder: string;
+  hint: string;
+  feeNote: string;
+}
+
+export const PAYOUT_CHANNELS: PayoutChannelOption[] = [
+  {
+    id: "mpesa",
+    label: "M-Pesa phone",
+    swahili: "Namba ya M-Pesa",
+    icon: "📱",
+    idLabel: "M-Pesa phone number",
+    idPlaceholder: "07XX XXX XXX",
+    hint: "Business-to-person send to any Safaricom line — workers, helpers, suppliers.",
+    feeNote: "Standard B2C tariff",
+  },
+  {
+    id: "bank",
+    label: "Bank account",
+    swahili: "Akaunti ya benki",
+    icon: "🏦",
+    idLabel: "Bank + account number",
+    idPlaceholder: "KCB · 1122 3344 55",
+    hint: "KCB, Equity, Co-op, NCBA — settles by 9am the next working day.",
+    feeNote: "KES 50 per transfer",
+  },
+  {
+    id: "growmo",
+    label: "GrowMO wallet",
+    swahili: "Purse ya GrowMO",
+    icon: "🔁",
+    idLabel: "GrowMO phone or wallet ID",
+    idPlaceholder: "07XX XXX XXX · GM-1024-7781",
+    hint: "Instant and free between GrowMO wallets — co-op members, share buyers.",
+    feeNote: "Free",
+  },
+  {
+    id: "cash",
+    label: "Cash — record only",
+    swahili: "Rekodi ya fedha",
+    icon: "💵",
+    idLabel: "ID number / phone (optional)",
+    idPlaceholder: "e.g. N-1234567 (2001)",
+    hint: "Money already left your pocket — GrowMO writes the invoice & payslip.",
+    feeNote: "No fee · no wallet movement",
+  },
+];
+
+export interface PayoutLine {
+  id: string;
+  name: string;
+  channel: PayoutChannelId;
+  identifier: string;
+  amount: number;
+  memo: string;
+  savedId?: string;
+}
+
+export const PAYOUT_PURPOSES = [
+  { id: "Labour payout", icon: "👷", sub: "Wages, piece rates & day labour" },
+  { id: "Supplier invoices", icon: "🏪", sub: "Agrovet, seed, transport & fuel invoices" },
+  { id: "Advances", icon: "⏳", sub: "School fees, medical, emergency top-ups" },
+  { id: "Co-op shares", icon: "🌾", sub: "Dues, share buy-backs & levies" },
+  { id: "Custom batch", icon: "✏️", sub: "Any other group of payees" },
+];
+
+export const SCHEDULE_PRESETS = [
+  { id: "fri", label: "Next Friday · 5:00 PM", detail: "Standard payday run" },
+  { id: "mon", label: "Monday · 9:00 AM", detail: "First bank clearing of the week" },
+  { id: "month", label: "1st of month · 6:00 AM", detail: "Before dues & subscriptions run" },
+];
+
+export const CASH_RECEIPT_MODES = ["SMS to each payee", "WhatsApp receipt", "Print for the paper file"];
+
 /* ---------- 14.4 Auto-pay management ---------- */
 export interface AutoPayRule {
   id: string;
@@ -242,8 +326,8 @@ export const TRANSACTIONS: Txn[] = [
 ];
 
 export const TXN_TYPES = ["All", "In", "Out"] as const;
-export const TXN_METHODS = ["All", "M-Pesa B2C", "M-Pesa B2B", "M-Pesa C2B", "Bill pay", "Internal"] as const;
-export const TXN_CATEGORIES = ["All", "Deposit", "Labour", "Inputs", "Advance", "Transport", "Utilities", "Sales", "Co-op", "Equipment", "Subscription"] as const;
+export const TXN_METHODS = ["All", "M-Pesa B2C", "M-Pesa B2B", "M-Pesa C2B", "Bill pay", "Internal", "Bank", "Cash record"] as const;
+export const TXN_CATEGORIES = ["All", "Deposit", "Labour", "Inputs", "Advance", "Transport", "Utilities", "Sales", "Co-op", "Equipment", "Subscription", "Invoice", "General"] as const;
 export const TXN_STATUSES = ["All", "Success", "Pending", "Failed"] as const;
 
 /* ---------- 14.6 Budget allocation ---------- */
