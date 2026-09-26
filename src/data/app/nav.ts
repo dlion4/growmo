@@ -139,7 +139,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Nursery",
         desc: "Seeds & seedlings",
         icon: Leaf,
-        ready: false,
+        ready: true,
         page: 25,
       },
       {
