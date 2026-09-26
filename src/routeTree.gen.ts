@@ -17,6 +17,7 @@ import { Route as AppAdvisorRouteImport } from './routes/app/advisor'
 import { Route as AppAnalyticsRouteImport } from './routes/app/analytics'
 import { Route as AppChannelsRouteImport } from './routes/app/channels'
 import { Route as AppCommunityRouteImport } from './routes/app/community'
+import { Route as AppCooperativeRouteImport } from './routes/app/cooperative'
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
@@ -86,6 +87,11 @@ const AppChannelsRoute = AppChannelsRouteImport.update({
 const AppCommunityRoute = AppCommunityRouteImport.update({
   id: '/app/community',
   path: '/app/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppCooperativeRoute = AppCooperativeRouteImport.update({
+  id: '/app/cooperative',
+  path: '/app/cooperative',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppCropsRoute = AppCropsRouteImport.update({
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/channels': typeof AppChannelsRoute
   '/app/community': typeof AppCommunityRoute
+  '/app/cooperative': typeof AppCooperativeRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -287,6 +294,7 @@ export interface FileRoutesByTo {
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/channels': typeof AppChannelsRoute
   '/app/community': typeof AppCommunityRoute
+  '/app/cooperative': typeof AppCooperativeRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/channels': typeof AppChannelsRoute
   '/app/community': typeof AppCommunityRoute
+  '/app/cooperative': typeof AppCooperativeRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
@@ -370,6 +379,7 @@ export interface FileRouteTypes {
     | '/app/analytics'
     | '/app/channels'
     | '/app/community'
+    | '/app/cooperative'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -410,6 +420,7 @@ export interface FileRouteTypes {
     | '/app/analytics'
     | '/app/channels'
     | '/app/community'
+    | '/app/cooperative'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/app/analytics'
     | '/app/channels'
     | '/app/community'
+    | '/app/cooperative'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
@@ -491,6 +503,7 @@ export interface RootRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppChannelsRoute: typeof AppChannelsRoute
   AppCommunityRoute: typeof AppCommunityRoute
+  AppCooperativeRoute: typeof AppCooperativeRoute
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
@@ -580,6 +593,13 @@ declare module '@tanstack/react-router' {
       path: '/app/community'
       fullPath: '/app/community'
       preLoaderRoute: typeof AppCommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/cooperative': {
+      id: '/app/cooperative'
+      path: '/app/cooperative'
+      fullPath: '/app/cooperative'
+      preLoaderRoute: typeof AppCooperativeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/crops': {
@@ -803,6 +823,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppChannelsRoute: AppChannelsRoute,
   AppCommunityRoute: AppCommunityRoute,
+  AppCooperativeRoute: AppCooperativeRoute,
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,

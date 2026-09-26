@@ -251,7 +251,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Group workspace",
         icon: Handshake,
         count: 5,
-        ready: false,
+        ready: true,
         page: 22,
       },
     ],
