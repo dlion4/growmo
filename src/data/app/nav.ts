@@ -131,7 +131,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Seasons",
         desc: "Rotation plans",
         icon: CalendarRange,
-        ready: false,
+        ready: true,
         page: 23,
       },
       {
@@ -139,7 +139,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Nursery",
         desc: "Seeds & seedlings",
         icon: Leaf,
-        ready: false,
+        ready: true,
         page: 25,
       },
       {
@@ -194,7 +194,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Machinery",
         desc: "Equipment log",
         icon: Tractor,
-        ready: false,
+        ready: true,
         page: 20,
       },
       {
@@ -234,7 +234,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Buyers & contracts",
         icon: Store,
         count: 2,
-        ready: false,
+        ready: true,
         page: 21,
       },
       {
@@ -242,7 +242,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Harvest",
         desc: "Grading & storage",
         icon: Warehouse,
-        ready: false,
+        ready: true,
         page: 24,
       },
       {
@@ -251,7 +251,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Group workspace",
         icon: Handshake,
         count: 5,
-        ready: false,
+        ready: true,
         page: 22,
       },
     ],
