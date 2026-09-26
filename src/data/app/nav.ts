@@ -131,7 +131,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Seasons",
         desc: "Rotation plans",
         icon: CalendarRange,
-        ready: false,
+        ready: true,
         page: 23,
       },
       {

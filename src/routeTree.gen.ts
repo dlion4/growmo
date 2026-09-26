@@ -29,6 +29,7 @@ import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
 import { Route as AppOrdersRouteImport } from './routes/app/orders'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
 import { Route as AppRecordsRouteImport } from './routes/app/records'
+import { Route as AppSeasonsRouteImport } from './routes/app/seasons'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSoilRouteImport } from './routes/app/soil'
 import { Route as AppWalletRouteImport } from './routes/app/wallet'
@@ -149,6 +150,11 @@ const AppRecordsRoute = AppRecordsRouteImport.update({
   path: '/app/records',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppSeasonsRoute = AppSeasonsRouteImport.update({
+  id: '/app/seasons',
+  path: '/app/seasons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/app/settings',
   path: '/app/settings',
@@ -265,6 +271,7 @@ export interface FileRoutesByFullPath {
   '/app/orders': typeof AppOrdersRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
+  '/app/seasons': typeof AppSeasonsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
   '/app/wallet': typeof AppWalletRoute
@@ -306,6 +313,7 @@ export interface FileRoutesByTo {
   '/app/orders': typeof AppOrdersRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
+  '/app/seasons': typeof AppSeasonsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
   '/app/wallet': typeof AppWalletRoute
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/app/orders': typeof AppOrdersRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
+  '/app/seasons': typeof AppSeasonsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
   '/app/wallet': typeof AppWalletRoute
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/app/orders'
     | '/app/planner'
     | '/app/records'
+    | '/app/seasons'
     | '/app/settings'
     | '/app/soil'
     | '/app/wallet'
@@ -432,6 +442,7 @@ export interface FileRouteTypes {
     | '/app/orders'
     | '/app/planner'
     | '/app/records'
+    | '/app/seasons'
     | '/app/settings'
     | '/app/soil'
     | '/app/wallet'
@@ -473,6 +484,7 @@ export interface FileRouteTypes {
     | '/app/orders'
     | '/app/planner'
     | '/app/records'
+    | '/app/seasons'
     | '/app/settings'
     | '/app/soil'
     | '/app/wallet'
@@ -515,6 +527,7 @@ export interface RootRouteChildren {
   AppOrdersRoute: typeof AppOrdersRoute
   AppPlannerRoute: typeof AppPlannerRoute
   AppRecordsRoute: typeof AppRecordsRoute
+  AppSeasonsRoute: typeof AppSeasonsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSoilRoute: typeof AppSoilRoute
   AppWalletRoute: typeof AppWalletRoute
@@ -679,6 +692,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRecordsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/seasons': {
+      id: '/app/seasons'
+      path: '/app/seasons'
+      fullPath: '/app/seasons'
+      preLoaderRoute: typeof AppSeasonsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/settings': {
       id: '/app/settings'
       path: '/app/settings'
@@ -835,6 +855,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppOrdersRoute: AppOrdersRoute,
   AppPlannerRoute: AppPlannerRoute,
   AppRecordsRoute: AppRecordsRoute,
+  AppSeasonsRoute: AppSeasonsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSoilRoute: AppSoilRoute,
   AppWalletRoute: AppWalletRoute,
