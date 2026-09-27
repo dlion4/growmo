@@ -1,0 +1,388 @@
+/* ============================================================================
+   PAGE 20 — MACHINERY & EQUIPMENT MANAGEMENT  (gm-mach-page)
+   Documented in docs/MASTER_THEME.md §27. Tokens only.
+   ========================================================================== */
+
+/* ---------- page shell + hero ---------- */
+
+.gm-mach-page {
+  background:
+    radial-gradient(1000px 380px at 80% -10%, var(--gm-mint-50), transparent 60%),
+    var(--gm-paper);
+}
+
+.gm-mach-hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(135deg, var(--gm-forest-900), var(--gm-forest-800) 55%, var(--gm-clay-700));
+  color: var(--gm-cream-50);
+  border-radius: var(--gm-r-lg);
+  padding: 22px 24px;
+  margin-bottom: 16px;
+  box-shadow: var(--gm-shadow-md);
+}
+.gm-mach-hero .gm-eyebrow { color: var(--gm-gold-300); }
+.gm-mach-hero-title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin: 2px 0 6px;
+  color: var(--gm-white-04);
+}
+.gm-mach-hero .gm-lead { color: var(--gm-mint-100); max-width: 56ch; }
+.gm-mach-hero-actions { display: flex; gap: 8px; }
+
+/* ---------- stat grid (reuse .gm-stat) ---------- */
+
+.gm-mach-page .gm-statgrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* ---------- overview layout ---------- */
+
+.gm-mach-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+.gm-mach-overview-side { display: grid; gap: 16px; }
+
+/* top asset list rows */
+.gm-mach-toplist { display: grid; }
+.gm-mach-toprow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px dashed var(--gm-line-soft);
+  padding: 10px 6px;
+  cursor: pointer;
+  transition: background var(--gm-t-fast) var(--gm-ease);
+}
+.gm-mach-toprow:last-child { border-bottom: none; }
+.gm-mach-toprow:hover { background: var(--gm-mint-50); }
+.gm-mach-topmain { flex: 1; display: grid; gap: 1px; min-width: 0; }
+.gm-mach-topmain strong { font-size: .86rem; color: var(--gm-ink-900); }
+.gm-mach-topmain small { font-size: .73rem; color: var(--gm-ink-500); }
+.gm-mach-topval { font-size: .95rem; color: var(--gm-forest-800); }
+
+/* category icon chip */
+.gm-mach-cat-ic {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-forest-850);
+  color: var(--gm-lime-200);
+  flex: none;
+}
+.gm-mach-cat-ic-lg { width: 40px; height: 40px; }
+.gm-mach-eqname { display: inline-flex; align-items: center; gap: 9px; }
+.gm-mach-eqname span:last-child { display: grid; gap: 1px; }
+.gm-mach-eqname strong { font-size: .84rem; color: var(--gm-ink-900); }
+.gm-mach-eqname small { font-size: .72rem; color: var(--gm-ink-500); }
+
+/* ---------- drawer head ---------- */
+
+.gm-mach-head {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  flex-wrap: wrap;
+}
+.gm-mach-head > div { flex: 1; min-width: 150px; display: grid; gap: 1px; }
+.gm-mach-head strong { font-size: .95rem; color: var(--gm-ink-900); }
+.gm-mach-head small { font-size: .75rem; color: var(--gm-ink-500); }
+
+/* generic equipment record row (drawer tabs, reports) */
+.gm-mach-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-sm);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  background: var(--gm-surface);
+}
+.gm-mach-row > span:first-child { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.gm-mach-row strong { font-size: .83rem; color: var(--gm-ink-900); }
+.gm-mach-row small { font-size: .73rem; color: var(--gm-ink-500); }
+.gm-mach-row-end {
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+  font-size: .78rem;
+  color: var(--gm-ink-700);
+  white-space: nowrap;
+}
+.gm-mach-row-end strong { font-size: .86rem; color: var(--gm-forest-800); }
+.gm-mach-row-click { cursor: pointer; width: 100%; text-align: left; transition: border-color var(--gm-t-fast) var(--gm-ease); }
+.gm-mach-row-click:hover { border-color: var(--gm-leaf-500); }
+
+/* ---------- registry filters ---------- */
+
+.gm-mach-filters { display: grid; gap: 10px; margin-bottom: 14px; }
+.gm-mach-search { max-width: 340px; }
+.gm-mach-page .gm-filter-chips { flex-wrap: wrap; }
+
+/* ---------- depreciation bits ---------- */
+
+.gm-dep-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.gm-dep-head strong { font-size: 1rem; color: var(--gm-ink-900); }
+.gm-dep-head small { display: block; color: var(--gm-ink-500); font-size: .76rem; }
+.gm-dep-result {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 14px 0;
+}
+.gm-dep-result > div {
+  display: grid;
+  gap: 2px;
+  background: var(--gm-surface);
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-sm);
+  padding: 10px 12px;
+}
+.gm-dep-result small { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--gm-ink-400); }
+.gm-dep-result strong { font-size: 1.05rem; color: var(--gm-forest-800); }
+
+/* ---------- chip picks (attachments, payment method) ---------- */
+
+.gm-chip-picks { display: flex; flex-wrap: wrap; gap: 7px; }
+.gm-chip-pick {
+  border: 1.5px solid var(--gm-line-soft);
+  background: var(--gm-surface);
+  color: var(--gm-ink-600);
+  font: 600 .76rem var(--gm-font-body);
+  border-radius: var(--gm-r-pill);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-chip-pick:hover { border-color: var(--gm-leaf-400); }
+.gm-chip-pick.on {
+  background: var(--gm-forest-850);
+  border-color: var(--gm-forest-850);
+  color: var(--gm-cream-50);
+}
+.gm-attach-picks { margin-top: 14px; display: grid; gap: 8px; }
+.gm-label-static {
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--gm-ink-600);
+}
+
+/* ---------- equipment pick list (publish wizard) ---------- */
+
+.gm-pick-list { display: grid; gap: 8px; margin-top: 14px; }
+.gm-pick-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  background: var(--gm-surface);
+  border: 1.5px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  padding: 11px 13px;
+  cursor: pointer;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-pick-card:hover { border-color: var(--gm-leaf-400); }
+.gm-pick-card.on {
+  border-color: var(--gm-leaf-500);
+  background: var(--gm-mint-50);
+  box-shadow: var(--gm-shadow-sm);
+}
+.gm-pick-card > span:nth-child(2) { flex: 1; display: grid; gap: 2px; }
+.gm-pick-card strong { font-size: .85rem; color: var(--gm-ink-900); }
+.gm-pick-card small { font-size: .72rem; color: var(--gm-ink-500); }
+.gm-pick-card > svg { color: var(--gm-leaf-600); flex: none; }
+
+/* ---------- hire / marketplace ---------- */
+
+.gm-mach-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+.gm-listing-stack { display: grid; gap: 10px; }
+.gm-listing-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  padding: 13px 15px;
+  background: var(--gm-surface);
+}
+.gm-listing-card.is-paused { opacity: .75; }
+.gm-listing-photo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--gm-r-sm);
+  background: linear-gradient(135deg, var(--gm-forest-850), var(--gm-clay-700));
+  color: var(--gm-gold-300);
+  flex: none;
+}
+.gm-listing-photo-lg { width: 58px; height: 58px; }
+.gm-listing-main { flex: 1; min-width: 200px; display: grid; gap: 3px; }
+.gm-listing-main strong { font-size: .88rem; color: var(--gm-ink-900); }
+.gm-listing-main small { font-size: .74rem; color: var(--gm-ink-500); }
+.gm-listing-stats { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 4px; }
+.gm-listing-stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--gm-ink-600);
+}
+.gm-listing-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.gm-listing-detail {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 10px;
+}
+.gm-listing-detail > div { display: grid; gap: 2px; }
+.gm-listing-detail strong { font-size: .95rem; color: var(--gm-ink-900); }
+.gm-listing-detail small { font-size: .76rem; color: var(--gm-ink-500); }
+
+/* contact card */
+.gm-contact-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+  padding: 13px 15px;
+  margin-bottom: 12px;
+}
+.gm-contact-ic {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gm-forest-850);
+  color: var(--gm-lime-200);
+  flex: none;
+}
+.gm-contact-card strong { display: block; font-size: .95rem; color: var(--gm-ink-900); }
+.gm-contact-card small { font-size: .75rem; color: var(--gm-ink-500); }
+
+/* ============================================================================
+   FUEL EFFICIENCY CHART (SVG-free CSS bars)
+   ========================================================================== */
+
+.gm-eff-chart {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+  height: 220px;
+  padding: 10px 6px 0;
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-md);
+}
+.gm-eff-std {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed var(--gm-leaf-600);
+  pointer-events: none;
+}
+.gm-eff-std span {
+  position: absolute;
+  right: 6px;
+  top: -18px;
+  font: 700 .68rem var(--gm-font-mono);
+  color: var(--gm-leaf-700);
+  background: var(--gm-cream-50);
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-xs);
+  padding: 2px 7px;
+}
+.gm-eff-col {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto auto auto;
+  justify-items: center;
+  align-items: end;
+  gap: 4px;
+  height: 100%;
+  z-index: 1;
+}
+.gm-eff-bar {
+  display: block;
+  width: min(72px, 60%);
+  border-radius: var(--gm-r-sm) var(--gm-r-sm) 0 0;
+  min-height: 10px;
+  transition: height var(--gm-t-med) var(--gm-ease);
+}
+.gm-eff-bar.high { background: linear-gradient(180deg, var(--gm-risk-high), var(--gm-clay-700)); }
+.gm-eff-bar.medium { background: linear-gradient(180deg, var(--gm-gold-500), var(--gm-gold-600)); }
+.gm-eff-bar.low { background: linear-gradient(180deg, var(--gm-leaf-500), var(--gm-leaf-600)); }
+.gm-eff-val {
+  position: absolute;
+  top: -6px;
+  font: 800 .9rem var(--gm-font-display);
+  color: var(--gm-ink-800);
+}
+.gm-eff-label {
+  font-size: .76rem;
+  font-weight: 700;
+  color: var(--gm-ink-700);
+  background: var(--gm-cream-50);
+  border: 1px solid var(--gm-line-soft);
+  border-radius: var(--gm-r-xs);
+  padding: 2px 8px;
+}
+.gm-eff-sub { font-size: .68rem; color: var(--gm-ink-500); }
+
+/* ============================================================================
+   RESPONSIVE — stack at 1080 / 640
+   ========================================================================== */
+
+@media (max-width: 1080px) {
+  .gm-mach-overview-grid { grid-template-columns: 1fr; }
+  .gm-mach-grid-2 { grid-template-columns: 1fr; }
+  .gm-mach-page .gm-statgrid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .gm-mach-page .gm-statgrid { grid-template-columns: 1fr; }
+  .gm-mach-hero { flex-direction: column; align-items: stretch; }
+  .gm-mach-search { max-width: 100%; }
+  .gm-dep-result { grid-template-columns: 1fr; }
+  .gm-eff-chart { grid-template-columns: 1fr; height: 260px; }
+  .gm-coords-grid { grid-template-columns: 1fr; }
+  .gm-quickgrid { grid-template-columns: 1fr; }
+  .gm-mach-list-row { flex-wrap: wrap; }
+}
