@@ -262,7 +262,7 @@ function CooperativeManagementPage() {
         ...items,
       ]);
     }
-    toast(message, "success");
+    toast.notify(message, "success");
   };
 
   const memberTotal = Math.max(45, members.length + 35);

@@ -1,0 +1,1136 @@
+/* ============================================================================
+   PAGE 15.3 — TEAM MANAGEMENT & HUMAN RESOURCES  (/app/team)
+   Page-scoped layer. Selectors are prefixed .gm-app (page chrome) and
+   .gm-modal-overlay (dialog interiors). Tokens only — no raw hex/rgb.
+   See docs/MASTER_THEME.md §25 for the class inventory.
+   ========================================================================== */
+
+/* ---------------- shared modal primitives (used by TeamModals) ------------- */
+
+.gm-modal-overlay .gm-deflist {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+}
+.gm-modal-overlay .gm-deflist > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+}
+.gm-modal-overlay .gm-deflist dt {
+  flex: 0 0 150px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gm-ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.gm-modal-overlay .gm-deflist dd {
+  flex: 1;
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--gm-ink-800);
+}
+
+.gm-modal-overlay .gm-card-inset,
+.gm-app .gm-card-inset {
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+  font-size: 0.85rem;
+  color: var(--gm-ink-800);
+}
+
+.gm-modal-overlay .gm-form-err {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gm-clay-700);
+}
+
+.gm-modal-overlay .gm-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gm-modal-overlay .gm-input-sm,
+.gm-app .gm-input-sm {
+  min-height: 34px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.82rem;
+}
+.gm-modal-overlay .gm-input-num {
+  width: 76px;
+  text-align: right;
+}
+
+.gm-modal-overlay .gm-table-sm th,
+.gm-modal-overlay .gm-table-sm td {
+  padding: 0.55rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.gm-app .gm-table-sm th,
+.gm-app .gm-table-sm td {
+  padding: 0.55rem 0.6rem;
+  font-size: 0.82rem;
+}
+
+.gm-modal-overlay .gm-tabs-sm .gm-tab {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.gm-app .num,
+.gm-modal-overlay .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.gm-app .gm-field-grow {
+  flex: 1 1 220px;
+}
+
+/* M-Pesa-style money confirmation (advances, repayments) */
+.gm-modal-overlay .gm-money-confirm {
+  text-align: center;
+  padding: 1rem 1rem 0.4rem;
+  margin-bottom: 0.8rem;
+}
+.gm-modal-overlay .gm-money-amount {
+  font-size: 2rem;
+  line-height: 1.1;
+  color: var(--gm-leaf-700);
+  margin: 0.35rem 0 0.2rem;
+}
+.gm-modal-overlay .gm-money-confirm p {
+  font-size: 0.9rem;
+  color: var(--gm-ink-700);
+  margin: 0.2rem 0;
+}
+
+/* processing spinner state */
+.gm-modal-overlay .gm-processing {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+.gm-modal-overlay .gm-processing p {
+  margin: 0;
+  font-weight: 700;
+  color: var(--gm-ink-800);
+}
+
+/* receipt / success state */
+.gm-modal-overlay .gm-receipt-done,
+.gm-app .gm-receipt-done {
+  text-align: center;
+  padding: 1rem 0.5rem 0.4rem;
+}
+.gm-modal-overlay .gm-receipt-done p,
+.gm-app .gm-receipt-done p {
+  margin: 0.5rem 0 0.15rem;
+  font-size: 1.05rem;
+  color: var(--gm-ink-900);
+}
+.gm-receipt-done-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--gm-leaf-50);
+  color: var(--gm-leaf-600);
+  border: 1px solid var(--gm-leaf-300);
+}
+
+/* ---------------- hero ---------------- */
+
+.gm-app .gm-team-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.2rem, 3vw, 1.9rem);
+  border-radius: var(--gm-r-lg);
+  background: var(--gm-grad-deep);
+  color: var(--gm-cream-50);
+}
+.gm-app .gm-team-hero::after {
+  content: "";
+  position: absolute;
+  right: -9rem;
+  top: -11rem;
+  width: 26rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--gm-white-10);
+  box-shadow:
+    0 0 0 3.5rem var(--gm-white-04),
+    0 0 0 8rem var(--gm-white-06);
+  pointer-events: none;
+}
+.gm-app .gm-team-hero > * {
+  position: relative;
+  z-index: 1;
+}
+.gm-app .gm-team-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, auto);
+  gap: 1.4rem;
+  align-items: start;
+}
+.gm-app .gm-team-hero h1 {
+  font-size: clamp(1.5rem, 3.4vw, 2.1rem);
+  line-height: 1.12;
+  margin: 0;
+}
+.gm-app .gm-team-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.gm-app .gm-team-hero-kpis {
+  margin-top: 1.3rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.gm-app .gm-team-hero-kpi {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-white-06);
+  border: 1px solid var(--gm-white-10);
+}
+.gm-app .gm-team-hero-kpi .gm-mega-icon {
+  background: var(--gm-white-10);
+  color: var(--gm-lime-300);
+}
+.gm-app .gm-team-hero-kpi strong {
+  font-size: 1.15rem;
+  color: var(--gm-cream-50);
+  display: block;
+  line-height: 1.2;
+}
+.gm-app .gm-team-hero-kpi span {
+  font-size: 0.75rem;
+  color: var(--gm-mint-100);
+  display: block;
+}
+.gm-app .gm-team-hero-kpi small {
+  font-size: 0.72rem;
+  color: var(--gm-ink-300);
+  display: block;
+}
+
+/* ---------------- layout grid ---------------- */
+
+.gm-app .gm-team-main {
+  margin-top: 1.2rem;
+  display: grid;
+  gap: 1.2rem;
+}
+.gm-app .gm-team-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+/* ---------------- alerts ---------------- */
+
+.gm-app .gm-team-alerts {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+.gm-app .gm-team-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+  font-size: 0.85rem;
+  color: var(--gm-ink-800);
+}
+.gm-app .gm-team-alert p {
+  margin: 0;
+}
+.gm-app .gm-team-alert-dot {
+  flex: 0 0 9px;
+  width: 9px;
+  height: 9px;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+}
+.gm-app .gm-team-alert.is-warn {
+  background: var(--gm-gold-50);
+  border-color: var(--gm-gold-200);
+}
+.gm-app .gm-team-alert.is-warn .gm-team-alert-dot {
+  background: var(--gm-gold-500);
+}
+.gm-app .gm-team-alert.is-success {
+  background: var(--gm-leaf-50);
+  border-color: var(--gm-leaf-300);
+}
+.gm-app .gm-team-alert.is-success .gm-team-alert-dot {
+  background: var(--gm-leaf-500);
+}
+
+/* ---------------- avatars + money ---------------- */
+
+.gm-app .gm-team-avatar,
+.gm-modal-overlay .gm-team-avatar {
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gm-forest-900);
+  color: var(--gm-lime-200);
+  font-weight: 700;
+  flex: 0 0 auto;
+  font-family: var(--gm-font-display);
+}
+.gm-app .gm-team-avatar-lg {
+  width: 52px;
+  height: 52px;
+  font-size: 1.15rem;
+}
+.gm-app .gm-team-money,
+.gm-modal-overlay .gm-team-money {
+  color: var(--gm-leaf-700);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- overview: watchlist, crew, hires ---------------- */
+
+.gm-app .gm-team-watchlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+.gm-app .gm-team-watch-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.15rem 0.7rem;
+  align-items: start;
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+  cursor: pointer;
+  transition: border-color var(--gm-t-fast) var(--gm-ease), box-shadow var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-team-watch-item:hover {
+  border-color: var(--gm-leaf-400);
+  box-shadow: var(--gm-shadow-sm);
+}
+.gm-app .gm-team-watch-item strong {
+  font-size: 0.88rem;
+  color: var(--gm-ink-900);
+}
+.gm-app .gm-team-watch-item small {
+  grid-column: 2;
+  color: var(--gm-ink-500);
+  font-size: 0.78rem;
+}
+
+.gm-app .gm-team-crew {
+  display: grid;
+  gap: 0.4rem;
+}
+.gm-app .gm-team-crew-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--gm-t-fast) var(--gm-ease);
+}
+.gm-app .gm-team-crew-row:hover {
+  background: var(--gm-mint-50);
+  border-color: var(--gm-line-soft);
+}
+.gm-app .gm-team-hire-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 1px dashed var(--gm-line-soft);
+}
+.gm-app .gm-team-hire-row:last-child {
+  border-bottom: 0;
+}
+.gm-app .gm-team-wallet {
+  font-size: 1.3rem;
+  color: var(--gm-leaf-700);
+}
+
+/* ---------------- recruitment: job cards + chips ---------------- */
+
+.gm-app .gm-team-job {
+  padding: 1.1rem 1.2rem;
+}
+.gm-app .gm-team-job-title {
+  font-size: 1.05rem;
+  line-height: 1.25;
+  margin: 0.2rem 0 0.4rem;
+  color: var(--gm-ink-900);
+}
+.gm-app .gm-team-job-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.2rem;
+  font-size: 0.82rem;
+  color: var(--gm-ink-600);
+}
+.gm-app .gm-team-job-progress {
+  flex: 1;
+}
+.gm-app .gm-team-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+}
+
+.gm-app .gm-team-onb {
+  padding: 1.1rem 1.2rem;
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+}
+
+/* ---------------- attendance methods ---------------- */
+
+.gm-app .gm-team-methods {
+  display: grid;
+  gap: 0.5rem;
+}
+.gm-app .gm-team-method {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+}
+.gm-app .gm-team-method.is-off {
+  opacity: 0.6;
+  background: var(--gm-ink-50);
+}
+.gm-app .gm-team-method strong {
+  font-size: 0.9rem;
+  color: var(--gm-ink-900);
+}
+.gm-app .gm-team-method small {
+  font-size: 0.78rem;
+}
+
+/* ---------------- performance ---------------- */
+
+.gm-app .gm-team-perf-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.gm-app .gm-team-perf-cols {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 1.3fr;
+  gap: 1.2rem;
+}
+.gm-app .gm-team-dist {
+  display: grid;
+  gap: 0.35rem;
+}
+.gm-app .gm-team-dist-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 30px;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+}
+.gm-app .gm-team-dist-label {
+  font-weight: 700;
+  color: var(--gm-gold-600);
+}
+.gm-app .gm-team-dist-num {
+  text-align: right;
+  color: var(--gm-ink-500);
+  font-variant-numeric: tabular-nums;
+}
+
+.gm-app .gm-team-chart {
+  padding: 1rem 1.1rem;
+}
+.gm-app .gm-team-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  font-size: 0.75rem;
+  color: var(--gm-ink-500);
+}
+.gm-app .gm-team-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.gm-app .gm-team-legend-line {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gm-leaf-500);
+}
+.gm-app .gm-team-legend-dash {
+  width: 18px;
+  height: 0;
+  border-top: 2px dashed var(--gm-clay-500);
+}
+.gm-app .gm-team-legend-bar {
+  width: 10px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--gm-mint-100);
+  border: 1px solid var(--gm-line-soft);
+}
+.gm-app .gm-team-trend {
+  width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+}
+.gm-app .gm-team-grid {
+  stroke: var(--gm-line-soft);
+  stroke-width: 1;
+}
+.gm-app .gm-team-gridtext {
+  fill: var(--gm-ink-400);
+  font-size: 9px;
+  font-family: var(--gm-font-body);
+}
+.gm-app .gm-team-trend-bar {
+  fill: var(--gm-mint-100);
+  opacity: 0.9;
+}
+.gm-app .gm-team-trend-avg {
+  fill: none;
+  stroke: var(--gm-clay-500);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+.gm-app .gm-team-trend-line {
+  fill: none;
+  stroke: var(--gm-leaf-500);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.gm-app .gm-team-trend-dot {
+  fill: var(--gm-leaf-600);
+  stroke: var(--gm-card);
+  stroke-width: 1.5;
+}
+
+.gm-app .gm-team-scale {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.45rem;
+}
+.gm-app .gm-team-scale-row {
+  display: grid;
+  grid-template-columns: 44px 130px 1fr;
+  gap: 0.6rem;
+  align-items: baseline;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+}
+.gm-app .gm-team-scale-star {
+  font-weight: 700;
+  color: var(--gm-gold-600);
+  font-family: var(--gm-font-display);
+}
+
+/* ---------------- payroll pipeline ---------------- */
+
+.gm-app .gm-team-pipeline {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+  counter-reset: pipe;
+}
+.gm-app .gm-team-pipe {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: start;
+  padding: 0.7rem 0.75rem;
+  border-radius: var(--gm-r-md);
+  border: 1px dashed var(--gm-line);
+  background: var(--gm-card);
+}
+.gm-app .gm-team-pipe.is-now {
+  border: 1px solid var(--gm-leaf-400);
+  background: var(--gm-leaf-50);
+  box-shadow: var(--gm-shadow-sm);
+}
+.gm-app .gm-team-pipe.is-done {
+  border-color: var(--gm-line-soft);
+  background: var(--gm-mint-50);
+}
+.gm-app .gm-team-pipe.is-todo {
+  opacity: 0.62;
+}
+.gm-app .gm-team-pipe-dot {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--gm-ink-50);
+  color: var(--gm-ink-500);
+  border: 1px solid var(--gm-line-soft);
+}
+.gm-app .gm-team-pipe.is-now .gm-team-pipe-dot {
+  background: var(--gm-leaf-500);
+  color: var(--gm-cream-50);
+  border-color: var(--gm-leaf-600);
+}
+.gm-app .gm-team-pipe.is-done .gm-team-pipe-dot {
+  background: var(--gm-leaf-50);
+  color: var(--gm-leaf-600);
+  border-color: var(--gm-leaf-300);
+}
+.gm-app .gm-team-pipe strong {
+  display: block;
+  font-size: 0.86rem;
+  color: var(--gm-ink-900);
+}
+.gm-app .gm-team-pipe small {
+  display: block;
+  font-size: 0.74rem;
+  line-height: 1.35;
+}
+.gm-app .gm-team-pipeline-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--gm-line-soft);
+  font-size: 0.85rem;
+  color: var(--gm-ink-600);
+}
+.gm-app .gm-team-pipeline-total strong {
+  font-size: 1.35rem;
+  color: var(--gm-leaf-700);
+}
+
+/* payslip table accents */
+.gm-app .gm-team-ps-net {
+  color: var(--gm-leaf-700);
+}
+.gm-app .gm-team-ps-ded td {
+  color: var(--gm-clay-700);
+}
+
+/* batch + receipts */
+.gm-modal-overlay .gm-team-batchlist {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  color: var(--gm-ink-800);
+}
+.gm-app .gm-team-receipts {
+  display: grid;
+  gap: 0.5rem;
+}
+.gm-app .gm-team-receipt {
+  padding: 0.6rem 0.8rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+}
+.gm-app .gm-team-ref {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: var(--gm-r-xs);
+  background: var(--gm-ink-50);
+  color: var(--gm-ink-600);
+  font-family: var(--gm-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+/* SMS bubbles (simulator, payslip SMS) */
+.gm-app .gm-sms,
+.gm-modal-overlay .gm-sms {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0.4rem 0;
+}
+.gm-app .gm-sms-from,
+.gm-modal-overlay .gm-sms-from {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gm-ink-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.gm-app .gm-sms-bubble,
+.gm-modal-overlay .gm-sms-bubble {
+  max-width: 46ch;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--gm-r-md);
+  border-top-left-radius: var(--gm-r-xs);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--gm-ink-800);
+}
+.gm-modal-overlay .gm-sms-out .gm-sms-bubble {
+  margin-left: auto;
+  border-radius: var(--gm-r-md);
+  border-top-right-radius: var(--gm-r-xs);
+  background: var(--gm-leaf-50);
+  border-color: var(--gm-leaf-300);
+}
+.gm-app .gm-team-simpair {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.4rem 0.2rem;
+}
+.gm-app .gm-team-ussd,
+.gm-modal-overlay .gm-team-ussd {
+  padding: 0.8rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-forest-950);
+  color: var(--gm-cream-50);
+  font-family: var(--gm-font-mono);
+  font-size: 0.78rem;
+  line-height: 1.55;
+  white-space: pre;
+  overflow-x: auto;
+  margin: 0;
+}
+.gm-modal-overlay .gm-team-smslist {
+  display: grid;
+  gap: 0.7rem;
+}
+.gm-modal-overlay .gm-team-smscard {
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+}
+
+/* ---------------- advances ---------------- */
+
+.gm-app .gm-team-adv-kpis {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+.gm-app .gm-team-adv {
+  min-width: 200px;
+}
+.gm-app .gm-team-adv .gm-progress {
+  margin-top: 0.3rem;
+}
+
+/* ---------------- directory: filters + crew table ---------------- */
+
+.gm-app .gm-team-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 1rem 0;
+}
+.gm-app .gm-team-crew-table th,
+.gm-app .gm-team-crew-table td {
+  vertical-align: top;
+}
+.gm-app .gm-team-crew-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.gm-app .gm-team-clickrow {
+  cursor: pointer;
+}
+.gm-app .gm-team-clickrow:hover td,
+.gm-app .gm-team-clickrow:hover th {
+  background: var(--gm-mint-50);
+}
+
+/* worker drawer head + activity */
+.gm-modal-overlay .gm-team-wd-head {
+  padding-bottom: 0.9rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--gm-line-soft);
+}
+.gm-modal-overlay .gm-team-wd-note {
+  margin: 0.6rem 0 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-gold-50);
+  border: 1px solid var(--gm-gold-200);
+  font-size: 0.8rem;
+  color: var(--gm-ink-700);
+}
+.gm-modal-overlay .gm-team-activity-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+  font-size: 0.84rem;
+  color: var(--gm-ink-800);
+}
+.gm-modal-overlay .gm-team-activity-row svg {
+  color: var(--gm-leaf-600);
+  flex: 0 0 auto;
+}
+
+/* onboarding steps (modal) */
+.gm-modal-overlay .gm-team-onb-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+.gm-modal-overlay .gm-team-onb-step {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+}
+.gm-modal-overlay .gm-team-onb-step.is-done {
+  background: var(--gm-leaf-50);
+  border-color: var(--gm-leaf-300);
+}
+.gm-modal-overlay .gm-team-onb-step.is-done .gm-team-onb-text {
+  color: var(--gm-ink-500);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.gm-modal-overlay .gm-team-onb-dot {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gm-line);
+  background: var(--gm-card);
+  color: var(--gm-ink-500);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-modal-overlay .gm-team-onb-step.is-done .gm-team-onb-dot {
+  background: var(--gm-leaf-500);
+  border-color: var(--gm-leaf-600);
+  color: var(--gm-cream-50);
+}
+.gm-modal-overlay .gm-team-onb-text {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--gm-ink-800);
+}
+
+/* mark attendance (modal) */
+.gm-modal-overlay .gm-team-attmark {
+  display: grid;
+  gap: 0.55rem;
+}
+.gm-modal-overlay .gm-team-attmark-row {
+  display: grid;
+  grid-template-columns: 150px auto 1fr;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--gm-r-md);
+  border: 1px solid var(--gm-line-soft);
+  background: var(--gm-card);
+  font-size: 0.85rem;
+}
+.gm-modal-overlay .gm-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+.gm-modal-overlay .gm-team-skillpicks {
+  max-width: 420px;
+}
+
+/* star picker (modal) */
+.gm-modal-overlay .gm-team-starpick {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+.gm-modal-overlay .gm-team-star {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--gm-line);
+  cursor: pointer;
+  transition: all var(--gm-t-fast) var(--gm-ease);
+}
+.gm-modal-overlay .gm-team-star.on {
+  color: var(--gm-gold-500);
+  background: var(--gm-gold-50);
+  border-color: var(--gm-gold-300);
+}
+.gm-modal-overlay .gm-team-star:hover {
+  transform: scale(1.08);
+}
+.gm-modal-overlay .gm-team-star-label {
+  margin-left: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gm-ink-700);
+}
+
+/* channel list (check rows in modals) */
+.gm-modal-overlay .gm-team-channel-list {
+  display: grid;
+  gap: 0.4rem;
+}
+.gm-modal-overlay .gm-check-row {
+  align-items: flex-start;
+}
+
+/* contract preview (modal) */
+.gm-modal-overlay .gm-team-contract {
+  padding: 0.9rem 1rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-ink-50);
+  border: 1px solid var(--gm-line-soft);
+  font-family: var(--gm-font-mono);
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: var(--gm-ink-800);
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+/* compliance table rows */
+.gm-app .gm-team-cmp-row {
+  cursor: pointer;
+}
+.gm-app .gm-team-cmp-row:hover th,
+.gm-app .gm-team-cmp-row:hover td {
+  background: var(--gm-mint-50);
+}
+
+/* PPE rows */
+.gm-app .gm-team-ppe-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.25rem;
+  font-size: 0.85rem;
+  color: var(--gm-ink-800);
+  border-bottom: 1px dashed var(--gm-line-soft);
+}
+.gm-app .gm-team-ppe-row:last-child {
+  border-bottom: 0;
+}
+.gm-app .gm-team-ppe-row.is-short {
+  color: var(--gm-clay-700);
+}
+
+/* cost breakdown */
+.gm-app .gm-team-cost {
+  display: grid;
+  gap: 0.7rem;
+}
+.gm-app .gm-team-cost-row .gm-progress {
+  margin-top: 0.3rem;
+}
+
+/* glossary */
+.gm-app .gm-team-glossary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.gm-app .gm-team-glossary-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--gm-r-md);
+  background: var(--gm-mint-50);
+  border: 1px solid var(--gm-line-soft);
+}
+.gm-app .gm-team-glossary-card strong {
+  font-size: 0.9rem;
+  color: var(--gm-forest-900);
+}
+.gm-app .gm-team-glossary-card small {
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+/* attendance log feed */
+.gm-app .gm-team-loglist {
+  display: grid;
+  gap: 0.35rem;
+}
+.gm-app .gm-team-logrow {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--gm-r-sm);
+  background: var(--gm-mint-50);
+  font-size: 0.82rem;
+}
+.gm-app .gm-team-logts {
+  font-family: var(--gm-font-mono);
+  font-size: 0.72rem;
+  color: var(--gm-ink-500);
+  flex: 0 0 74px;
+}
+
+/* FAQ wrapper */
+.gm-app .gm-team-faq {
+  display: grid;
+  gap: 0.4rem;
+}
+
+/* ---------------- responsive ---------------- */
+
+@media (max-width: 1080px) {
+  .gm-app .gm-team-hero-grid {
+    grid-template-columns: 1fr;
+  }
+  .gm-app .gm-team-hero-actions {
+    justify-content: flex-start;
+  }
+  .gm-app .gm-team-hero-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gm-app .gm-team-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .gm-app .gm-team-pipeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gm-app .gm-team-perf-cols {
+    grid-template-columns: 1fr;
+  }
+  .gm-app .gm-team-perf-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .gm-app .gm-team-adv-kpis {
+    grid-template-columns: 1fr;
+  }
+  .gm-modal-overlay .gm-team-attmark-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-team-hero-kpis {
+    grid-template-columns: 1fr;
+  }
+  .gm-app .gm-team-pipeline {
+    grid-template-columns: 1fr;
+  }
+  .gm-app .gm-team-filters .gm-field {
+    flex: 1 1 100%;
+  }
+  .gm-app .gm-team-glossary {
+    grid-template-columns: 1fr;
+  }
+  .gm-app .gm-team-scale-row {
+    grid-template-columns: 40px 1fr;
+  }
+  .gm-app .gm-team-scale-row small {
+    grid-column: 2;
+  }
+  .gm-app .gm-team-crew-table th:nth-child(4),
+  .gm-app .gm-team-crew-table td:nth-child(4),
+  .gm-app .gm-team-crew-table th:nth-child(5),
+  .gm-app .gm-team-crew-table td:nth-child(5) {
+    display: none;
+  }
+  .gm-app .gm-team-logrow {
+    flex-wrap: wrap;
+    gap: 0.3rem 0.7rem;
+  }
+  .gm-modal-overlay .gm-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------------- print ---------------- */
+
+@media print {
+  .gm-app .gm-team-hero,
+  .gm-app .gm-team-hero::after {
+    background: none;
+    color: var(--gm-ink-950);
+  }
+  .gm-app .gm-team-hero-kpi,
+  .gm-app .gm-team-hero-actions,
+  .gm-app .gm-team-alerts,
+  .gm-app .gm-menu-wrap,
+  .gm-app .gm-team-filters {
+    display: none;
+  }
+  .gm-app .gm-team-hero h1 {
+    font-size: 1.4rem;
+  }
+  .gm-app .gm-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .gm-app .gm-team-pipeline {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}

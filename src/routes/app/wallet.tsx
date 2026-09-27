@@ -3,12 +3,13 @@
 
    Blueprint sections implemented
    14.1 Wallet dashboard      14.2 Deposit money (5 rails, live STK flow)
-   14.3 Send money / pay      14.4 Auto-pay management
-   14.5 Transaction history   14.6 Budget allocation
-   14.7 Security & controls
+   14.3 Send money / pay      14.3c Bulk payout (7-step wizard + 5 modals)
+   14.4 Auto-pay management   14.5 Transaction history
+   14.6 Budget allocation     14.7 Security & controls
 
    The page keeps a working ledger in local state: deposits, pays, withdrawals,
-   reversals, budget moves, auto-pay edits and freezes all change the screen.
+   reversals, budget moves, auto-pay edits, bulk batches and freezes all change
+   the screen.
    ========================================================================== */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
@@ -27,6 +28,7 @@ import {
   Share2,
   ShieldCheck,
   Snowflake,
+  Users,
   Wallet as WalletIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -40,6 +42,8 @@ import {
   AddRecipientDialog,
   AutopayEditDialog,
   BudgetDetailDialog,
+  type BulkPayoutResult,
+  BulkPayoutWizard,
   ConfirmWalletDialog,
   DepositWizard,
   FreezeConfirmDialog,
@@ -53,6 +57,7 @@ import {
 import {
   AutopayRuleRow,
   BudgetCard,
+  BulkPayoutCard,
   DepositMethodCard,
   LimitMeter,
   PayTypeCard,
@@ -66,7 +71,7 @@ import {
   WalletKv,
 } from "../../components/app/WalletWidgets";
 import { Pagination } from "../../components/ui/primitives";
-import type { Recipient, Txn, WalletBudget } from "../../data/app/wallet";
+import type { PayoutLine, Recipient, Txn, WalletBudget } from "../../data/app/wallet";
 import {
   AUTOPAY_RULES,
   DEPOSIT_METHODS,
@@ -110,6 +115,21 @@ function csvCell(value: string | number | null | undefined) {
   return `"${String(value ?? "").replaceAll('"', '""')}"`;
 }
 
+/* 14.3c bulk payout — ledger mapping per payee channel & batch purpose. */
+const CHANNEL_METHOD: Record<PayoutLine["channel"], string> = {
+  mpesa: "M-Pesa B2C",
+  bank: "Bank",
+  growmo: "Internal",
+  cash: "Cash record",
+};
+const PURPOSE_CATEGORY: Record<string, string> = {
+  "Labour payout": "Labour",
+  "Supplier invoices": "Inputs",
+  Advances: "Advance",
+  "Co-op shares": "Co-op",
+  "Custom batch": "General",
+};
+
 function WalletPage() {
   const toast = useToast();
   const [view, setView] = useState<WalletView>("overview");
@@ -127,6 +147,7 @@ function WalletPage() {
   const [depositMethod, setDepositMethod] = useState(DEPOSIT_METHODS[0].id);
   const [sendOpen, setSendOpen] = useState(false);
   const [sendPreset, setSendPreset] = useState<{ type?: string; recipient?: string; amount?: number }>({});
+  const [bulkOpen, setBulkOpen] = useState(false);
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [freezeOpen, setFreezeOpen] = useState(false);
   const [payeeOpen, setPayeeOpen] = useState(false);
@@ -161,19 +182,73 @@ function WalletPage() {
     .filter((t) => t.type === "Out" && t.iso.startsWith("2026-10"))
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
-  function pushTxn(row: Omit<Txn, "id" | "iso" | "date" | "balanceAfter"> & { id: string }) {
+  function pushTxn(row: Omit<Txn, "id" | "iso" | "date" | "balanceAfter"> & { id: string; noBalance?: boolean }) {
     setTxns((current) => {
       const nextBalance = current[0] ? current[0].balanceAfter : ctx.availableBalance;
-      const signed = row.type === "In" ? row.amount : -Math.abs(row.amount);
+      const signed = row.noBalance ? 0 : row.type === "In" ? row.amount : -Math.abs(row.amount);
+      const { noBalance: _ignored, ...rest } = row;
       const entry: Txn = {
-        ...row,
-        amount: signed,
+        ...rest,
+        amount: row.type === "Out" ? -Math.abs(row.amount) : row.amount,
         iso: new Date().toISOString().slice(0, 16),
         date: new Date().toLocaleString("en-KE", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }),
         balanceAfter: nextBalance + signed,
       };
       return [entry, ...current];
     });
+  }
+
+  /* 14.3c bulk payout — one wizard run becomes one ledger line per payee. */
+  function handleBulkPayout(result: BulkPayoutResult) {
+    if (result.mode === "cash") {
+      result.lines.forEach((line, i) => {
+        pushTxn({
+          id: `${result.invoiceNo}-${i}`,
+          type: "Out",
+          description: `Cash paid: ${line.name} (${result.purpose})${line.memo ? ` · ${line.memo}` : ""}`,
+          amount: line.amount,
+          method: "Cash record",
+          refNo: result.invoiceNo ?? "INV",
+          status: "Success",
+          category: "Invoice",
+          noBalance: true,
+        });
+      });
+      toast.notify(`Invoice ${result.invoiceNo} issued — ${result.lines.length} payslips created, no wallet movement.`, "success");
+      return;
+    }
+    if (result.mode === "now") {
+      setCtx((current) => ({
+        ...current,
+        availableBalance: Math.max(0, current.availableBalance - result.total),
+        monthSpent: current.monthSpent + result.total,
+        todaySpent: current.todaySpent + result.total,
+      }));
+    } else {
+      setCtx((current) => ({ ...current, pendingOutflows: current.pendingOutflows + result.total }));
+    }
+    const category = PURPOSE_CATEGORY[result.purpose] ?? "General";
+    result.lines.forEach((line, i) => {
+      pushTxn({
+        id: `${result.batchRef}-${i}`,
+        type: "Out",
+        description:
+          result.mode === "scheduled"
+            ? `Scheduled (${result.scheduleLabel}): ${line.name} — ${result.purpose}`
+            : `Batch: ${line.name} — ${result.purpose}${line.memo ? ` · ${line.memo}` : ""}`,
+        amount: line.amount,
+        method: CHANNEL_METHOD[line.channel],
+        refNo: result.lineRefs[i] ?? result.batchRef,
+        status: result.mode === "scheduled" ? "Pending" : "Success",
+        category,
+      });
+    });
+    toast.notify(
+      result.mode === "now"
+        ? `Batch released — ${result.lines.length} payees, ${kes(result.total)}. Each got an SMS receipt.`
+        : `Batch scheduled for ${result.scheduleLabel} — ${result.lines.length} payees, ${kes(result.total)} held.`,
+      "success",
+    );
   }
 
   function goTo(next: WalletView, message: string) {
@@ -214,6 +289,9 @@ function WalletPage() {
               <div className="gm-dropdown gm-finance-menu">
                 <button type="button" onClick={() => { setSendOpen(true); setSendPreset({}); setMenu(false); }}>
                   <ArrowUpRight /> Send money
+                </button>
+                <button type="button" onClick={() => { setBulkOpen(true); setMenu(false); }}>
+                  <Users /> Bulk payout
                 </button>
                 <button type="button" onClick={() => { setDepositOpen(true); setDepositMethod("stk"); setMenu(false); }}>
                   <ArrowDownLeft /> Deposit money
@@ -351,6 +429,9 @@ function WalletPage() {
                     <RecipientCard key={person.id} r={person} onPick={(picked) => { setSendPreset({ recipient: picked.name }); setSendOpen(true); }} />
                   ))}
                 </div>
+                <div className="mt-3">
+                  <BulkPayoutCard compact onOpen={() => setBulkOpen(true)} />
+                </div>
 
                 <DashboardSectionHeader eyebrow="14.6" title="Budget envelopes" subtitle="Ring-fenced money per crop." />
                 <div className="gm-w-budget-grid">
@@ -405,6 +486,9 @@ function WalletPage() {
         {view === "send" ? (
           <div className="mt-3">
             <DashboardSectionHeader eyebrow="14.3" title="Pay workers, suppliers, banks and bills" subtitle="Five rails, one ledger. Payouts write themselves into labour and input records." />
+            <div className="mb-3">
+              <BulkPayoutCard onOpen={() => setBulkOpen(true)} />
+            </div>
             <div className="gm-w-paytype-grid">
               {PAY_TYPES.map((type) => (
                 <PayTypeCard key={type.id} p={type} onPick={(picked) => { setSendPreset({ type: picked.id }); setSendOpen(true); }} />
@@ -710,6 +794,17 @@ function WalletPage() {
           pushTxn({ id: receipt, type: "Out", description: memo ? `Payment: ${to} (${memo})` : `Payment: ${to}`, amount, method: type === "B2C" ? "M-Pesa B2C" : type === "B2B" ? "M-Pesa B2B" : "M-Pesa B2C", refNo: receipt, status: "Success", category: type === "B2C" ? "Labour" : "Inputs" });
           toast.notify(`Paid ${kes(amount)} to ${to} — receipt ${receipt}.`, "success");
         }}
+      />
+
+      <BulkPayoutWizard
+        open={bulkOpen}
+        saved={recipients}
+        budgets={budgets}
+        balance={frozen ? 0 : ctx.availableBalance}
+        dailyLimit={ctx.dailyLimit}
+        todaySpent={ctx.todaySpent}
+        onClose={() => setBulkOpen(false)}
+        onCompleted={handleBulkPayout}
       />
 
       <WithdrawWizard
