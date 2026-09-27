@@ -123,7 +123,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Farm Map",
         desc: "Plots & GPS",
         icon: MapIcon,
-        ready: false,
+        ready: true,
         page: 19,
       },
       {
@@ -131,7 +131,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Seasons",
         desc: "Rotation plans",
         icon: CalendarRange,
-        ready: false,
+        ready: true,
         page: 23,
       },
       {
@@ -139,7 +139,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Nursery",
         desc: "Seeds & seedlings",
         icon: Leaf,
-        ready: false,
+        ready: true,
         page: 25,
       },
       {
@@ -182,6 +182,14 @@ export const APP_NAV: AppNavGroup[] = [
         page: 6,
       },
       {
+        to: "/app/team",
+        label: "Team & HR",
+        desc: "Directory, payroll, compliance",
+        icon: UserPlus,
+        ready: true,
+        page: 15.3,
+      },
+      {
         to: "/app/finance",
         label: "Finance",
         desc: "Budgets & P&L",
@@ -194,7 +202,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Machinery",
         desc: "Equipment log",
         icon: Tractor,
-        ready: false,
+        ready: true,
         page: 20,
       },
       {
@@ -234,7 +242,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Buyers & contracts",
         icon: Store,
         count: 2,
-        ready: false,
+        ready: true,
         page: 21,
       },
       {
@@ -242,7 +250,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Harvest",
         desc: "Grading & storage",
         icon: Warehouse,
-        ready: false,
+        ready: true,
         page: 24,
       },
       {
@@ -251,7 +259,7 @@ export const APP_NAV: AppNavGroup[] = [
         desc: "Group workspace",
         icon: Handshake,
         count: 5,
-        ready: false,
+        ready: true,
         page: 22,
       },
     ],
@@ -289,7 +297,7 @@ export const APP_NAV: AppNavGroup[] = [
         label: "Logs",
         desc: "Activity & logs",
         icon: ShieldCheck,
-        ready: false,
+        ready: true,
         page: 18,
       },
       {
