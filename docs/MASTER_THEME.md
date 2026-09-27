@@ -906,50 +906,19 @@ state changes.
 **Nav:** `src/data/app/nav.ts` — existing item `/app/map` (`page: 19`,
 `MapIcon`) flipped `ready: false → true`; no other shell edits.
 
-## 27. Machinery & equipment layer (page 20 — `/app/machinery`)
+## 27. Page 20 — Machinery & Equipment (`/app/machinery`)
 
-The equipment page reuses the dashboard table system and adds machinery
-specifics in `src/machinery.css` (loaded in `__root.tsx` after `mapCss`).
-All colors are theme tokens; the hero is the clay/forest treatment (the
-farm's "iron" band, distinct from the green farm-map hero).
+Page 20 shipped via PR #9 (merged to `main` from the parallel
+`arena/01a0deb9-growmo` session) **before** this branch's own page-20 build
+could merge. When the two were synced, the trunk implementation won the
+route-file conflict and this branch's duplicate
+(`machinery.tsx` / `MachineryWidgets.tsx` / `MachineryModals.tsx` /
+`data/app/machinery.ts` / `src/machinery.css`) was removed rather than
+replacing a shipped page.
 
-| Area | Classes |
-| --- | --- |
-| Page shell | `.gm-mach-page`, `.gm-mach-hero`(`-title`, `-actions`), `.gm-mach-overview-grid`(`-side`), `.gm-mach-grid-2` |
-| Registry | `.gm-mach-eqname`, `.gm-mach-cat-ic`(`-lg`), `.gm-mach-filters`, `.gm-mach-search`, `.gm-mach-toplist`, `.gm-mach-toprow`/`-topmain`/`-topval` |
-| Drawer/rows | `.gm-mach-head`, `.gm-mach-row`(`-end`, `-click`) — the generic record row used across drawer tabs and reports |
-| Depreciation | `.gm-dep-head`, `.gm-dep-result` (3-up KES KPI tiles) |
-| Wizards | `.gm-chip-picks`/`.gm-chip-pick`(`.on`) (attachments, pay method), `.gm-attach-picks`, `.gm-label-static`, `.gm-pick-list`/`.gm-pick-card`(`.on`) (publish wizard equipment pick) |
-| Hire/marketplace | `.gm-listing-stack`, `.gm-listing-card`(`.is-paused`)/`-photo`(`-lg`)/`-main`/`-stats`/`-actions`/`-detail`, `.gm-contact-card`/`-ic` |
-| Fuel efficiency chart | `.gm-eff-chart` (CSS bars, no SVG), `.gm-eff-std` (dashed standard line), `.gm-eff-col`/`-bar`(`.high/.medium/.low`)/`-val`/`-label`/`-sub` |
-| Reused from other pages | `.gm-facts`, `.gm-field`, `.gm-note-callout`, `.gm-subhead`, `.gm-quickrow`, `.gm-chiprow`, `.gm-muted`, `.gm-method-done/-cta`, `.gm-review-box`, `.gm-upload-box`, `.gm-export-list/-card`, `.gm-soiltest-row`, `.gm-simwork`, `.gm-mpesa*`, `.gm-tabpane`, `.gm-drawer-foot`, `.gm-filter-chips/-chip`, `.gm-table*`, `.gm-avg-row`, `.gm-row-link/-actions` |
-| Destructive | `.gm-btn-danger` (defined in `map.css`, shared) |
-
-Responsive: overview + hire grids 2→1 at 1080px, KPIs 4→2→1, dep-result
-3→1, efficiency chart 2→1 column at 640px, hero stacks.
-
-**Route:** `src/routes/app/machinery.tsx` — 7 tabs via `PlannerSubtabs`:
-overview (KPIs + top-5 assets + alerts + next-5 services + quick actions),
-registry (20.1: 15 items × 24 fields, search + 8 category filter chips,
-8-per-page `Pagination`), maintenance (20.2: 12 tasks, 6 status filter
-chips, mark-done), usage (20.3: log + 3-row analytics), hire (20.4: hire-in
-/hire-out tables, 6-row rate card, marketplace listings with pause/delist),
-fuel (20.5: log + month total + efficiency table + CSS bar chart), assets
-(20.6: 4-row depreciation table + calculator CTA). One discriminated-union
-modal state (`ModalState`, **26 kinds** — see `MachineryModals.tsx`):
-equipment drawer (8 mini-tabs: overview / depreciation / maintenance /
-usage / fuel / hire / insurance / notes), 3-step add-equipment wizard (all
-24 fields), edit, condition/status, attachments multi-select, insurance
-(M-Pesa premium = 1.5% of value), photo, service-done, schedule-task,
-maintenance report, 2-step usage log, usage report, 2-step hire-in
-(M-Pesa pay), 2-step hire-out, hire-receipt (collect M-Pesa/cash), rate
-edit/add, 3-step marketplace publish (live after 1.9 s sim), delist
-(confirm, `gm-btn-danger`), listing detail, 2-step fuel log (M-Pesa pay),
-fuel report, depreciation calculator (straight-line vs 25% declining
-balance, live book + market value), asset report, 3-format export, owner/
-hirer contact (call/SMS). M-Pesa flows: fuel, insurance, hire-in —
-PIN `123456` + simulated STK processing. Live state: listings
-(pause/resume), registry filters, maintenance filter.
-
-**Nav:** `src/data/app/nav.ts` — existing item `/app/machinery` (`page: 20`,
-`Tractor` icon) flipped `ready: false → true`; no other shell edits.
+The `main` implementation is a single-route page (6 tabs: registry,
+maintenance, usage log, hire desk, fuel & energy, asset value) styled with
+Bootstrap utilities plus existing theme classes — notably the planner page's
+`gm-plan-*` components, `gm-check-row`, `gm-dropdown`, `gm-search-field`,
+`gm-btn-mpesa` and `gm-btn-soft`. It adds **no** page CSS file and **no**
+new tokens; nothing here needs documenting beyond this note.

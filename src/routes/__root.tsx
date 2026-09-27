@@ -38,7 +38,6 @@ import logsCss from '../logs.css?url'
 // Page 15.3 team management & HR
 import teamCss from '../team.css?url'
 import mapCss from '../map.css?url'
-import machCss from '../machinery.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -71,7 +70,6 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${logsCss}?v=1` },
       { rel: 'stylesheet', href: `${teamCss}?v=1` },
       { rel: 'stylesheet', href: `${mapCss}?v=1` },
-      { rel: 'stylesheet', href: `${machCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

@@ -1,27 +1,66 @@
 /* ============================================================================
-   PAGE 20 — MACHINERY & EQUIPMENT MANAGEMENT  (/app/machinery)
-
-   Blueprint sections
-   20.1 Equipment registry       20.4 Hire in / hire out
-   20.2 Maintenance scheduler    20.5 Fuel & energy tracking
-   20.3 Usage log + analytics    20.6 Depreciation & asset valuation
-
-   Farm: Mary's Farm, Githunguri, Kiambu. Today: Tue 17/11/2026.
-   Diesel at the Githunguri filling station: KES 195/L.
+   PAGE 20 — MACHINERY & EQUIPMENT MANAGEMENT
+   Kenyan demo data for Mary's Farm, Githunguri, Kiambu. Values are kept in
+   KES and cover assets, maintenance, usage, hire, energy and depreciation.
    ========================================================================== */
 
-export const MACH_CONTEXT = {
-  farm: "Mary's Farm",
-  farmer: "Mary Wanjiku",
-  village: "Githunguri",
-  county: "Kiambu",
-  today: "Tue 17/11/2026",
-  dieselPrice: 195,
-  standardFuelLph: 5, // MF 35 rated consumption
-  operator: "James Mwangi (hired operator · 0722 314 882)",
-};
+export type EquipmentCategory =
+  | "Tractor"
+  | "Implement"
+  | "Irrigation"
+  | "Processing"
+  | "Transport"
+  | "Tool"
+  | "Structure"
+  | "Storage";
 
-export const CATEGORIES = [
+export type EquipmentCondition =
+  | "New"
+  | "Good"
+  | "Fair"
+  | "Poor"
+  | "Under repair";
+export type EquipmentOwnership = "Own" | "Hired" | "Shared" | "Cooperative";
+export type EquipmentStatus =
+  | "Operational"
+  | "Partially deployed"
+  | "Needs servicing"
+  | "Under repair";
+export type MaintenanceState =
+  | "Overdue"
+  | "Upcoming"
+  | "OK"
+  | "Future"
+  | "After use";
+
+export interface EquipmentAsset {
+  id: string;
+  name: string;
+  category: EquipmentCategory;
+  subcategory: string;
+  makeModel: string;
+  year: number;
+  registration?: string;
+  engineNumber?: string;
+  condition: EquipmentCondition;
+  ownership: EquipmentOwnership;
+  purchaseDate: string;
+  purchasePrice: number;
+  currentValue: number;
+  depreciationMethod: "Straight line" | "Declining balance";
+  usefulLife: number;
+  fuel: "Diesel" | "Petrol" | "Electric" | "Solar" | "Manual";
+  fuelUse: string;
+  horsepower?: number;
+  attachments: string[];
+  storage: string;
+  insurance: string;
+  status: EquipmentStatus;
+  notes: string;
+  hoursYear?: number;
+}
+
+export const EQUIPMENT_CATEGORIES: EquipmentCategory[] = [
   "Tractor",
   "Implement",
   "Irrigation",
@@ -30,490 +69,1035 @@ export const CATEGORIES = [
   "Tool",
   "Structure",
   "Storage",
-] as const;
+];
 
-export const SUBCATEGORIES: Record<string, string[]> = {
-  Tractor: ["2WD Tractor", "4WD Tractor", "Walking Tractor"],
-  Implement: ["Disc Plough", "Tine Harrow", "Rotavator", "Seeder", "Bulldozer Blade"],
-  Irrigation: ["Drip Kit", "Solar Pump", "Borehole Pump", "Sprinkler"],
-  Processing: ["Sheller", "Thresher", "Milling Unit", "Grader"],
-  Transport: ["Flatbed Trailer", "Wheelbarrow", "Boda-boda", "Pickup"],
-  Tool: ["Knapsack Sprayer", "Hand Hoe", "Panga", "Spring Balance", "Moisture Meter"],
-  Structure: ["Greenhouse", "Store", "Shade Net", "Drying Shed"],
-  Storage: ["Water Tank", "Silo", "Grain Bin"],
-};
-
-export const CONDITIONS = ["New", "Good", "Fair", "Poor", "Under repair"] as const;
-export const OWNERSHIP = ["Own", "Hired", "Shared", "Cooperative"] as const;
-export const FUEL_TYPES = ["Diesel", "Petrol", "Electric", "Manual"] as const;
-export const DEPR_METHODS = ["Straight line", "Declining balance"] as const;
-export const EQUIP_STATUS = [
-  "Operational",
-  "Partially deployed",
-  "Needs servicing",
-  "Under repair",
-  "In storage",
-] as const;
-
-export interface InsuranceInfo {
-  insured: boolean;
-  policyNo: string;
-  expiry: string;
-  insurer: string;
-}
-
-export interface Equipment {
-  id: string;
-  name: string;
-  category: string;
-  subCategory: string;
-  make: string;
-  year: number; // year of manufacture
-  regNo: string;
-  engineNo: string;
-  condition: string;
-  ownership: string;
-  purchaseDate: string;
-  purchasePrice: number;
-  valueListed: number; // registry "Value (KES)" column
-  marketValue: number;
-  bookValue: number;
-  deprMethod: string;
-  usefulLife: number; // years
-  fuelType: string;
-  fuelLph: number; // litres per hour
-  hp: number;
-  attachments: string[];
-  storage: string;
-  insurance: InsuranceInfo;
-  photo: string;
-  notes: string;
-  status: string;
-  hoursMeter?: number;
-}
-
-export const EQUIPMENT: Equipment[] = [
+export const EQUIPMENT_ASSETS: EquipmentAsset[] = [
   {
-    id: "EQ-001", name: "Massey Ferguson 35", category: "Tractor", subCategory: "2WD Tractor",
-    make: "Massey Ferguson MF 35", year: 1985, regNo: "KAB 123X", engineNo: "MF35-789012",
-    condition: "Fair", ownership: "Own", purchaseDate: "Mar 2020", purchasePrice: 450000,
-    valueListed: 350000, marketValue: 350000, bookValue: 255000,
-    deprMethod: "Straight line", usefulLife: 15, fuelType: "Diesel", fuelLph: 5, hp: 35,
-    attachments: ["Plough", "Harrow", "Trailer", "Rotavator (hired)"],
+    id: "EQ-001",
+    name: "Massey Ferguson 35",
+    category: "Tractor",
+    subcategory: "2WD tractor",
+    makeModel: "Massey Ferguson MF 35",
+    year: 1985,
+    registration: "KAB 123X",
+    engineNumber: "MF35-789012",
+    condition: "Fair",
+    ownership: "Own",
+    purchaseDate: "Mar 2020",
+    purchasePrice: 450000,
+    currentValue: 350000,
+    depreciationMethod: "Straight line",
+    usefulLife: 15,
+    fuel: "Diesel",
+    fuelUse: "5 L/hr",
+    horsepower: 35,
+    attachments: ["Disc plough", "Tine harrow", "Trailer"],
     storage: "Garage at home compound",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "MF 35 in the garage, Nov 2026",
-    notes: "Good condition, needs new battery. Strong for ploughing.",
-    status: "Operational", hoursMeter: 1806,
-  },
-  {
-    id: "EQ-002", name: "Disc plough (3-disc)", category: "Implement", subCategory: "Disc Plough",
-    make: "Massey Ferguson 1273 (3-disc)", year: 2019, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Mar 2020", purchasePrice: 60000,
-    valueListed: 45000, marketValue: 45000, bookValue: 21000,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Manual", fuelLph: 0, hp: 0,
-    attachments: [],
-    storage: "On the MF 35, in the garage",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "3-disc after the Plot 2 ploughing",
-    notes: "Heavy — cuts deep in the clay. Bearings need greasing (overdue).",
+    insurance: "Not insured",
     status: "Operational",
+    notes:
+      "Strong for ploughing; battery terminals need cleaning before long rains.",
+    hoursYear: 85,
   },
   {
-    id: "EQ-003", name: "Harrow (tine)", category: "Implement", subCategory: "Tine Harrow",
-    make: "Local fabrication (12-tine)", year: 2021, regNo: "—", engineNo: "—",
-    condition: "Fair", ownership: "Own", purchaseDate: "Jun 2021", purchasePrice: 30000,
-    valueListed: 25000, marketValue: 25000, bookValue: 11250,
-    deprMethod: "Straight line", usefulLife: 8, fuelType: "Manual", fuelLph: 0, hp: 0,
-    attachments: [],
-    storage: "Hanging in the implement store",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "12-tine harrow by the store",
-    notes: "Smashes clods nicely after ploughing; two tines bent from a rock.",
+    id: "EQ-002",
+    name: "Disc plough (3-disc)",
+    category: "Implement",
+    subcategory: "Mounted plough",
+    makeModel: "Rovic 3-disc",
+    year: 2020,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Mar 2020",
+    purchasePrice: 60000,
+    currentValue: 45000,
+    depreciationMethod: "Straight line",
+    usefulLife: 10,
+    fuel: "Manual",
+    fuelUse: "Tractor-driven",
+    attachments: ["MF 35"],
+    storage: "Garage implement bay",
+    insurance: "Covered with tractor",
     status: "Operational",
+    notes: "Grease bearings before next land preparation.",
+    hoursYear: 32,
   },
   {
-    id: "EQ-004", name: "Trailer 2-tonne", category: "Transport", subCategory: "Flatbed Trailer",
-    make: "Local fabrication (steel flatbed)", year: 2018, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Jan 2018", purchasePrice: 95000,
-    valueListed: 80000, marketValue: 80000, bookValue: 38000,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Manual", fuelLph: 0, hp: 0,
-    attachments: ["Tarpaulin", "Chains"],
-    storage: "Back of the MF 35",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Trailer loaded with manure, 22/10",
-    notes: "Takes 3 trips of manure from the dairy farm. Axle greased Aug 2026.",
+    id: "EQ-003",
+    name: "Harrow (tine)",
+    category: "Implement",
+    subcategory: "Tine harrow",
+    makeModel: "Local fabrication · 12 tine",
+    year: 2020,
+    condition: "Fair",
+    ownership: "Own",
+    purchaseDate: "Mar 2020",
+    purchasePrice: 35000,
+    currentValue: 25000,
+    depreciationMethod: "Straight line",
+    usefulLife: 10,
+    fuel: "Manual",
+    fuelUse: "Tractor-driven",
+    attachments: ["MF 35"],
+    storage: "Garage implement bay",
+    insurance: "Covered with tractor",
     status: "Operational",
+    notes: "Two tines were welded in August; inspect after rocky plots.",
+    hoursYear: 22,
   },
   {
-    id: "EQ-005", name: "Drip irrigation kit (1 acre)", category: "Irrigation", subCategory: "Drip Kit",
-    make: "Netafim 1-acre kit (16 mm mainline)", year: 2025, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Mar 2025", purchasePrice: 48000,
-    valueListed: 35000, marketValue: 35000, bookValue: 33600,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Manual", fuelLph: 0, hp: 0,
-    attachments: ["4 × 400 m drip tape", "Filter", "Valve manifold"],
-    storage: "Deployed on Plot 2 (beds 1–4)",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Drip line on bed 2 after refill",
-    notes: "4 of 5 beds laid; bed 5 goes in after the maize harvest. Flush monthly.",
+    id: "EQ-004",
+    name: "Trailer 2-tonne",
+    category: "Transport",
+    subcategory: "Farm trailer",
+    makeModel: "Lusaka 2T tipper",
+    year: 2020,
+    registration: "T-641",
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Mar 2020",
+    purchasePrice: 100000,
+    currentValue: 80000,
+    depreciationMethod: "Straight line",
+    usefulLife: 12,
+    fuel: "Manual",
+    fuelUse: "Tractor-drawn",
+    attachments: ["MF 35"],
+    storage: "Garage at home compound",
+    insurance: "Covered with tractor",
+    status: "Operational",
+    notes: "Tyres checked weekly; available for family deliveries on Sundays.",
+    hoursYear: 28,
+  },
+  {
+    id: "EQ-005",
+    name: "Drip irrigation kit (1 acre)",
+    category: "Irrigation",
+    subcategory: "Drip lines & filters",
+    makeModel: "Amiran 16 mm kit",
+    year: 2024,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Feb 2024",
+    purchasePrice: 48000,
+    currentValue: 35000,
+    depreciationMethod: "Straight line",
+    usefulLife: 8,
+    fuel: "Solar",
+    fuelUse: "Solar-fed",
+    attachments: ["5,000 L tank", "Solar pump"],
+    storage: "Plot 1 pump shed",
+    insurance: "No separate cover",
     status: "Partially deployed",
+    notes: "0.5 acre is installed on cabbage; flush lines monthly.",
+    hoursYear: 200,
   },
   {
-    id: "EQ-006", name: "Knapsack sprayer × 2", category: "Tool", subCategory: "Knapsack Sprayer",
-    make: "Fuyi 16 L (battery)", year: 2023, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Apr 2023", purchasePrice: 9000,
-    valueListed: 6000, marketValue: 6000, bookValue: 2700,
-    deprMethod: "Straight line", usefulLife: 5, fuelType: "Electric", fuelLph: 0, hp: 0,
-    attachments: ["Nozzles (3 sets)"],
-    storage: "Wall rack in the store",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Both sprayers on the wall rack",
-    notes: "Wash after every use. #1 pump worn — seals due Dec 2026.",
+    id: "EQ-006",
+    name: "Knapsack sprayer × 2",
+    category: "Tool",
+    subcategory: "20 L manual sprayer",
+    makeModel: "Jacto PJH 20",
+    year: 2024,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Jan 2024",
+    purchasePrice: 8000,
+    currentValue: 6000,
+    depreciationMethod: "Straight line",
+    usefulLife: 5,
+    fuel: "Manual",
+    fuelUse: "Manual",
+    attachments: ["Cone nozzle", "Flat fan nozzle"],
+    storage: "Locked chemical store",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "Sprayer 1 assigned to fungicides, Sprayer 2 to insecticides.",
+    hoursYear: 80,
   },
   {
-    id: "EQ-007", name: "Hand hoe × 8", category: "Tool", subCategory: "Hand Hoe",
-    make: "Local (steel)", year: 2019, regNo: "—", engineNo: "—",
-    condition: "Fair", ownership: "Own", purchaseDate: "Jan 2019", purchasePrice: 6000,
-    valueListed: 4000, marketValue: 4000, bookValue: 1500,
-    deprMethod: "Straight line", usefulLife: 8, fuelType: "Manual", fuelLph: 0, hp: 0,
+    id: "EQ-007",
+    name: "Hand hoe × 8",
+    category: "Tool",
+    subcategory: "Jembe",
+    makeModel: "Jua Kali forged hoes",
+    year: 2023,
+    condition: "Fair",
+    ownership: "Own",
+    purchaseDate: "Jun 2023",
+    purchasePrice: 5600,
+    currentValue: 4000,
+    depreciationMethod: "Straight line",
+    usefulLife: 5,
+    fuel: "Manual",
+    fuelUse: "Manual",
     attachments: [],
-    storage: "Tool shed",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Hoes lined up in the shed",
-    notes: "Two handles re-shod 2025. Sharp with the panga stone weekly.",
+    storage: "Tool rack, home store",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "Labelled 1–8 for tool issue register.",
+    hoursYear: 240,
   },
   {
-    id: "EQ-008", name: "Panga (machete) × 4", category: "Tool", subCategory: "Panga",
-    make: "Local (forged)", year: 2020, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Feb 2020", purchasePrice: 4000,
-    valueListed: 2000, marketValue: 2000, bookValue: 1200,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Manual", fuelLph: 0, hp: 0,
+    id: "EQ-008",
+    name: "Panga (machete) × 4",
+    category: "Tool",
+    subcategory: "Cutting tool",
+    makeModel: "Tramontina 18 inch",
+    year: 2023,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Jun 2023",
+    purchasePrice: 2800,
+    currentValue: 2000,
+    depreciationMethod: "Straight line",
+    usefulLife: 4,
+    fuel: "Manual",
+    fuelUse: "Manual",
     attachments: [],
-    storage: "Tool shed",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Pangas on the shed wall",
-    notes: "One per crew member. Keep dry — rust spots in the rainy season.",
+    storage: "Tool rack, home store",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "Sharpen after clearing napier grass; issue with gloves.",
+    hoursYear: 110,
   },
   {
-    id: "EQ-009", name: "Wheelbarrow × 2", category: "Transport", subCategory: "Wheelbarrow",
-    make: "Local (steel, rubber tyre)", year: 2022, regNo: "—", engineNo: "—",
-    condition: "Fair", ownership: "Own", purchaseDate: "May 2022", purchasePrice: 9000,
-    valueListed: 6000, marketValue: 6000, bookValue: 3000,
-    deprMethod: "Straight line", usefulLife: 8, fuelType: "Manual", fuelLph: 0, hp: 0,
+    id: "EQ-009",
+    name: "Wheelbarrow × 2",
+    category: "Transport",
+    subcategory: "One-wheel barrow",
+    makeModel: "Builders 80 L",
+    year: 2022,
+    condition: "Fair",
+    ownership: "Own",
+    purchaseDate: "Oct 2022",
+    purchasePrice: 9000,
+    currentValue: 6000,
+    depreciationMethod: "Straight line",
+    usefulLife: 6,
+    fuel: "Manual",
+    fuelUse: "Manual",
     attachments: [],
-    storage: "Tool shed",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Wheelbarrows by the compost pit",
-    notes: "One tyre needs replacing; used mostly for compost moves.",
+    storage: "Shed beside manure bay",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "One tyre is due for replacement before manure work.",
+    hoursYear: 190,
   },
   {
-    id: "EQ-010", name: "Greenhouse 8m × 30m", category: "Structure", subCategory: "Greenhouse",
-    make: "KenGrid 8m × 30m (polythene)", year: 2023, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Jun 2023", purchasePrice: 250000,
-    valueListed: 250000, marketValue: 200000, bookValue: 146875,
-    deprMethod: "Straight line", usefulLife: 8, fuelType: "Manual", fuelLph: 0, hp: 0,
-    attachments: ["Shade cloth (30%)", "Irrigation line", "Insect net door"],
-    storage: "East of the nursery, permanent",
-    insurance: { insured: true, policyNo: "AFRL/GH/2281", expiry: "05/2027", insurer: "Africlaim" },
-    photo: "Seedling trays inside, 14/11",
-    notes: "Seedlings + early cabbage. Polythene re-tensioned after the October winds.",
+    id: "EQ-010",
+    name: "Greenhouse 8 m × 30 m",
+    category: "Structure",
+    subcategory: "Protected crop house",
+    makeModel: "Amiran tunnel house",
+    year: 2023,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Jun 2023",
+    purchasePrice: 250000,
+    currentValue: 250000,
+    depreciationMethod: "Straight line",
+    usefulLife: 8,
+    fuel: "Manual",
+    fuelUse: "N/A",
+    attachments: ["Drip kit", "Shade net"],
+    storage: "Plot 3, home shamba",
+    insurance: "Structure cover review due",
     status: "Operational",
+    notes:
+      "Ventilation clips replaced in September; tomato nursery planned for January.",
+    hoursYear: 0,
   },
   {
-    id: "EQ-011", name: "Water tank 5,000L", category: "Storage", subCategory: "Water Tank",
-    make: "Poly 5,000 L (elevated)", year: 2024, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Jan 2024", purchasePrice: 22000,
-    valueListed: 15000, marketValue: 15000, bookValue: 13200,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Manual", fuelLph: 0, hp: 0,
-    attachments: ["Tap + overflow", "Fly screen"],
-    storage: "On the brick stand, 90 m south of Plot 2",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Tank at half, 16/11",
-    notes: "Fills from the solar pump + roof. Keeps drip running on dry days.",
+    id: "EQ-011",
+    name: "Water tank 5,000 L",
+    category: "Storage",
+    subcategory: "Plastic water tank",
+    makeModel: "Kentank 5,000 L",
+    year: 2023,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Jun 2023",
+    purchasePrice: 18000,
+    currentValue: 15000,
+    depreciationMethod: "Straight line",
+    usefulLife: 12,
+    fuel: "Manual",
+    fuelUse: "Gravity-fed",
+    attachments: ["Drip kit", "Solar pump"],
+    storage: "Plot 1 tank stand",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "Tank lid is secure; clean before dry-season storage.",
+    hoursYear: 0,
   },
   {
-    id: "EQ-012", name: "Solar water pump", category: "Irrigation", subCategory: "Solar Pump",
-    make: "Wema 1.5 kW (submersible)", year: 2024, regNo: "—", engineNo: "SP15-4471",
-    condition: "Good", ownership: "Own", purchaseDate: "Jan 2024", purchasePrice: 45000,
-    valueListed: 45000, marketValue: 40000, bookValue: 32400,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Electric", fuelLph: 0, hp: 2,
-    attachments: ["6 × 450 W panels", "Inverter box"],
-    storage: "Borehole 90 m south of Plot 2",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Panel array in the morning sun",
-    notes: "Pumps 2,000 L/hr at noon. Connections check overdue since Jul 2026.",
+    id: "EQ-012",
+    name: "Solar water pump",
+    category: "Irrigation",
+    subcategory: "DC surface pump",
+    makeModel: "Futurepump SF2",
+    year: 2024,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Jan 2024",
+    purchasePrice: 52000,
+    currentValue: 45000,
+    depreciationMethod: "Straight line",
+    usefulLife: 10,
+    fuel: "Solar",
+    fuelUse: "0 L/hr",
+    attachments: ["5,000 L tank", "Drip kit"],
+    storage: "Plot 1 pump shed",
+    insurance: "Warranty until Jan 2027",
     status: "Operational",
+    notes: "Clean panels monthly; connection check is overdue.",
+    hoursYear: 200,
   },
   {
-    id: "EQ-013", name: "Maize sheller", category: "Processing", subCategory: "Sheller",
-    make: "Maizepro 4HP (electric)", year: 2021, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Sep 2021", purchasePrice: 35000,
-    valueListed: 25000, marketValue: 25000, bookValue: 8750,
-    deprMethod: "Straight line", usefulLife: 10, fuelType: "Electric", fuelLph: 0, hp: 4,
-    attachments: ["Collection tray"],
-    storage: "Store, east corner",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "Sheller by the grain sacks",
-    notes: "Feed roller worn — service before the December maize harvest.",
+    id: "EQ-013",
+    name: "Maize sheller",
+    category: "Processing",
+    subcategory: "Electric sheller",
+    makeModel: "Rongai MS-1",
+    year: 2022,
+    condition: "Good",
+    ownership: "Shared",
+    purchaseDate: "Aug 2022",
+    purchasePrice: 30000,
+    currentValue: 25000,
+    depreciationMethod: "Straight line",
+    usefulLife: 8,
+    fuel: "Electric",
+    fuelUse: "1.5 kWh/hr",
+    attachments: ["Extension cable"],
+    storage: "Kamau family store",
+    insurance: "Shared asset agreement",
     status: "Needs servicing",
+    notes: "Book belt inspection before December maize harvest.",
+    hoursYear: 42,
   },
   {
-    id: "EQ-014", name: "Spring balance 100kg", category: "Tool", subCategory: "Spring Balance",
-    make: "Local (100 kg hook)", year: 2020, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Aug 2020", purchasePrice: 4000,
-    valueListed: 3000, marketValue: 3000, bookValue: 1500,
-    deprMethod: "Straight line", usefulLife: 8, fuelType: "Manual", fuelLph: 0, hp: 0,
+    id: "EQ-014",
+    name: "Spring balance 100 kg",
+    category: "Tool",
+    subcategory: "Mechanical weighing scale",
+    makeModel: "Salter 100 kg",
+    year: 2025,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Feb 2025",
+    purchasePrice: 3800,
+    currentValue: 3000,
+    depreciationMethod: "Straight line",
+    usefulLife: 8,
+    fuel: "Manual",
+    fuelUse: "Manual",
     attachments: [],
-    storage: "Store — weighing corner",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "On the wall by the scale plate",
-    notes: "Calibrated against 20 kg bags in June 2026.",
+    storage: "Harvest crate store",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "Calibrate against 50 kg fertiliser bag each quarter.",
+    hoursYear: 12,
   },
   {
-    id: "EQ-015", name: "Moisture meter", category: "Tool", subCategory: "Moisture Meter",
-    make: "Wosx 5-in-1 (grain)", year: 2022, regNo: "—", engineNo: "—",
-    condition: "Good", ownership: "Own", purchaseDate: "Oct 2022", purchasePrice: 4500,
-    valueListed: 2500, marketValue: 2500, bookValue: 1125,
-    deprMethod: "Straight line", usefulLife: 6, fuelType: "Electric", fuelLph: 0, hp: 0,
+    id: "EQ-015",
+    name: "Moisture meter",
+    category: "Tool",
+    subcategory: "Grain moisture meter",
+    makeModel: "Wile 55",
+    year: 2025,
+    condition: "Good",
+    ownership: "Own",
+    purchaseDate: "Feb 2025",
+    purchasePrice: 3000,
+    currentValue: 2500,
+    depreciationMethod: "Straight line",
+    usefulLife: 6,
+    fuel: "Electric",
+    fuelUse: "2 × AA batteries",
     attachments: [],
-    storage: "Pocket kit, drying shed",
-    insurance: { insured: false, policyNo: "—", expiry: "—", insurer: "—" },
-    photo: "In the drying-shed kit box",
-    notes: "Sell maize at 13.5% moisture — the co-op dock is 1% per point above.",
+    storage: "Office lockbox",
+    insurance: "Not insured",
     status: "Operational",
+    notes: "Check batteries before harvest inspections.",
+    hoursYear: 8,
   },
 ];
 
-export const EQUIPMENT_TOTAL_VALUE = EQUIPMENT.reduce((s, e) => s + e.valueListed, 0); // 893,500
-
-/* ---------- 20.2 maintenance scheduler ---------- */
-
-export type MaintStatus = "Overdue" | "Upcoming" | "OK" | "Future" | "Every use";
-
-export interface MaintRow {
+export interface MaintenanceTask {
   id: string;
   equipmentId: string;
+  equipment: string;
   service: string;
   frequency: string;
   lastDone: string;
   nextDue: string;
-  cost: number; // 0 = Free
-  assigned: string;
-  status: MaintStatus;
+  estimatedCost: number;
+  assignedTo: string;
+  status: MaintenanceState;
+  checklist: string[];
 }
 
-export const MAINTENANCE: MaintRow[] = [
-  { id: "m1", equipmentId: "EQ-001", service: "Engine oil change", frequency: "Every 200 hrs", lastDone: "Aug 2026 (1,800 hrs)", nextDue: "Oct 2026 (2,000 hrs)", cost: 8000, assigned: "Local mechanic", status: "Overdue" },
-  { id: "m2", equipmentId: "EQ-001", service: "Air filter clean", frequency: "Every 100 hrs", lastDone: "Sep 2026", nextDue: "Nov 2026", cost: 500, assigned: "Self", status: "Upcoming" },
-  { id: "m3", equipmentId: "EQ-001", service: "Tire pressure check", frequency: "Weekly", lastDone: "Oct 24", nextDue: "Oct 31", cost: 0, assigned: "Self", status: "OK" },
-  { id: "m4", equipmentId: "EQ-001", service: "Full service", frequency: "Annually", lastDone: "Mar 2026", nextDue: "Mar 2027", cost: 25000, assigned: "Dealer", status: "Future" },
-  { id: "m5", equipmentId: "EQ-002", service: "Grease bearings", frequency: "Every season", lastDone: "Mar 2026", nextDue: "Oct 2026", cost: 500, assigned: "Self", status: "Overdue" },
-  { id: "m6", equipmentId: "EQ-005", service: "Flush lines", frequency: "Monthly", lastDone: "Oct 1", nextDue: "Nov 1", cost: 0, assigned: "Self", status: "Upcoming" },
-  { id: "m7", equipmentId: "EQ-005", service: "Check for leaks", frequency: "Weekly", lastDone: "Oct 24", nextDue: "Oct 31", cost: 0, assigned: "Self", status: "OK" },
-  { id: "m8", equipmentId: "EQ-006", service: "Wash after use", frequency: "Every use", lastDone: "Last use Oct 20", nextDue: "Next use", cost: 0, assigned: "Self", status: "Every use" },
-  { id: "m9", equipmentId: "EQ-006", service: "Replace seals", frequency: "Every 6 months", lastDone: "Jun 2026", nextDue: "Dec 2026", cost: 500, assigned: "Self", status: "Future" },
-  { id: "m10", equipmentId: "EQ-012", service: "Clean panels", frequency: "Monthly", lastDone: "Oct 1", nextDue: "Nov 1", cost: 0, assigned: "Self", status: "Upcoming" },
-  { id: "m11", equipmentId: "EQ-012", service: "Check connections", frequency: "Quarterly", lastDone: "Jul 2026", nextDue: "Oct 2026", cost: 0, assigned: "Self", status: "Overdue" },
-  { id: "m12", equipmentId: "EQ-013", service: "General service", frequency: "Before harvest season", lastDone: "—", nextDue: "Dec 2026", cost: 3000, assigned: "Mechanic", status: "Future" },
+export const MAINTENANCE_TASKS: MaintenanceTask[] = [
+  {
+    id: "MT-001",
+    equipmentId: "EQ-001",
+    equipment: "MF 35 Tractor",
+    service: "Engine oil change",
+    frequency: "Every 200 hrs",
+    lastDone: "Aug 2026 · 1,800 hrs",
+    nextDue: "Oct 2026 · 2,000 hrs",
+    estimatedCost: 8000,
+    assignedTo: "Karanja Auto Works",
+    status: "Overdue",
+    checklist: [
+      "Drain hot oil",
+      "Replace oil filter",
+      "Check leaks",
+      "Reset hour meter",
+    ],
+  },
+  {
+    id: "MT-002",
+    equipmentId: "EQ-001",
+    equipment: "MF 35 Tractor",
+    service: "Air filter clean",
+    frequency: "Every 100 hrs",
+    lastDone: "Sep 2026",
+    nextDue: "Nov 2026",
+    estimatedCost: 500,
+    assignedTo: "Mary Wanjiku",
+    status: "Upcoming",
+    checklist: ["Remove cover", "Tap dust out", "Inspect seal"],
+  },
+  {
+    id: "MT-003",
+    equipmentId: "EQ-001",
+    equipment: "MF 35 Tractor",
+    service: "Tyre pressure check",
+    frequency: "Weekly",
+    lastDone: "24 Oct 2026",
+    nextDue: "31 Oct 2026",
+    estimatedCost: 0,
+    assignedTo: "Mary Wanjiku",
+    status: "OK",
+    checklist: ["Front tyres", "Rear tyres", "Check slow punctures"],
+  },
+  {
+    id: "MT-004",
+    equipmentId: "EQ-001",
+    equipment: "MF 35 Tractor",
+    service: "Full service",
+    frequency: "Annually",
+    lastDone: "Mar 2026",
+    nextDue: "Mar 2027",
+    estimatedCost: 25000,
+    assignedTo: "Massey dealer",
+    status: "Future",
+    checklist: ["Engine", "Hydraulics", "Brakes", "Electrical"],
+  },
+  {
+    id: "MT-005",
+    equipmentId: "EQ-002",
+    equipment: "Disc plough",
+    service: "Grease bearings",
+    frequency: "Every season",
+    lastDone: "Mar 2026",
+    nextDue: "Oct 2026",
+    estimatedCost: 500,
+    assignedTo: "Mary Wanjiku",
+    status: "Overdue",
+    checklist: ["Clean nipples", "Grease bearings", "Inspect discs"],
+  },
+  {
+    id: "MT-006",
+    equipmentId: "EQ-005",
+    equipment: "Drip kit",
+    service: "Flush lines",
+    frequency: "Monthly",
+    lastDone: "01 Oct 2026",
+    nextDue: "01 Nov 2026",
+    estimatedCost: 0,
+    assignedTo: "John Mwangi",
+    status: "Upcoming",
+    checklist: ["Open end caps", "Flush mainline", "Clean filter"],
+  },
+  {
+    id: "MT-007",
+    equipmentId: "EQ-005",
+    equipment: "Drip kit",
+    service: "Check for leaks",
+    frequency: "Weekly",
+    lastDone: "24 Oct 2026",
+    nextDue: "31 Oct 2026",
+    estimatedCost: 0,
+    assignedTo: "John Mwangi",
+    status: "OK",
+    checklist: ["Walk rows", "Patch leaks", "Record pressure"],
+  },
+  {
+    id: "MT-008",
+    equipmentId: "EQ-006",
+    equipment: "Knapsack sprayer",
+    service: "Wash after use",
+    frequency: "Every use",
+    lastDone: "Last use · 20 Oct",
+    nextDue: "Next spray",
+    estimatedCost: 0,
+    assignedTo: "John Mwangi",
+    status: "After use",
+    checklist: ["Triple rinse", "Clean nozzle", "Dry tank"],
+  },
+  {
+    id: "MT-009",
+    equipmentId: "EQ-006",
+    equipment: "Knapsack sprayer",
+    service: "Replace seals",
+    frequency: "Every 6 months",
+    lastDone: "Jun 2026",
+    nextDue: "Dec 2026",
+    estimatedCost: 500,
+    assignedTo: "Mary Wanjiku",
+    status: "Future",
+    checklist: ["Pump seal", "Hose seal", "Pressure test"],
+  },
+  {
+    id: "MT-010",
+    equipmentId: "EQ-012",
+    equipment: "Solar pump",
+    service: "Clean panels",
+    frequency: "Monthly",
+    lastDone: "01 Oct 2026",
+    nextDue: "01 Nov 2026",
+    estimatedCost: 0,
+    assignedTo: "Mary Wanjiku",
+    status: "Upcoming",
+    checklist: ["Brush dust", "Check shade", "Wipe dry"],
+  },
+  {
+    id: "MT-011",
+    equipmentId: "EQ-012",
+    equipment: "Solar pump",
+    service: "Check connections",
+    frequency: "Quarterly",
+    lastDone: "Jul 2026",
+    nextDue: "Oct 2026",
+    estimatedCost: 0,
+    assignedTo: "SolarPlus Kiambu",
+    status: "Overdue",
+    checklist: ["Inspect cable", "Test voltage", "Tighten terminals"],
+  },
+  {
+    id: "MT-012",
+    equipmentId: "EQ-013",
+    equipment: "Maize sheller",
+    service: "General service",
+    frequency: "Before harvest season",
+    lastDone: "Not yet",
+    nextDue: "Dec 2026",
+    estimatedCost: 3000,
+    assignedTo: "Njoroge Mechanic",
+    status: "Future",
+    checklist: ["Belt tension", "Guard bolts", "Test shelling"],
+  },
 ];
 
-export const MAINT_STATUS_TONE: Record<MaintStatus, "high" | "medium" | "low" | "neutral"> = {
-  Overdue: "high",
-  Upcoming: "medium",
-  OK: "low",
-  Future: "neutral",
-  "Every use": "neutral",
-};
-
-/* ---------- 20.3 usage log + analytics ---------- */
-
-export interface UsageRow {
+export interface UsageLog {
   id: string;
   date: string;
+  equipment: string;
   equipmentId: string;
   activity: string;
+  duration: string;
   hours: number;
-  fuelL: number; // 0 = none
+  fuelLitres: number;
   operator: string;
   plot: string;
   notes: string;
 }
 
-export const USAGE_LOG: UsageRow[] = [
-  { id: "u1", date: "Oct 20", equipmentId: "EQ-001", activity: "Ploughing Plot 2 (MF 35 + Disc plough)", hours: 3, fuelL: 15, operator: "James (hired operator)", plot: "Plot 2", notes: "2 passes" },
-  { id: "u2", date: "Oct 21", equipmentId: "EQ-001", activity: "Harrowing Plot 2 (MF 35 + Harrow)", hours: 2, fuelL: 10, operator: "James (hired operator)", plot: "Plot 2", notes: "1 pass" },
-  { id: "u3", date: "Oct 22", equipmentId: "EQ-001", activity: "Transport manure (MF 35 + Trailer)", hours: 1, fuelL: 5, operator: "James (hired operator)", plot: "Plot 1", notes: "3 trips from dairy farm" },
-  { id: "u4", date: "Oct 24", equipmentId: "EQ-006", activity: "Spray Mancozeb on cabbage (Knapsack sprayer #1)", hours: 2, fuelL: 0, operator: "John Mwangi", plot: "Plot 1", notes: "Mixed 100L" },
-  { id: "u5", date: "Oct 25", equipmentId: "EQ-007", activity: "Weeding cabbage (Hand hoes ×4)", hours: 8, fuelL: 0, operator: "Workers", plot: "Plot 1", notes: "—" },
-];
-
-export interface UsageAnalyticsRow {
-  equipmentId: string;
-  label: string;
-  hoursMonth: string;
-  hoursYear: string;
-  fuelCost: number;
-  fuelNote: string;
-  maintCost: number;
-  costHour: number;
-  revenue: string;
-}
-
-export const USAGE_ANALYTICS: UsageAnalyticsRow[] = [
-  { equipmentId: "EQ-001", label: "MF 35 Tractor", hoursMonth: "12", hoursYear: "85", fuelCost: 51000, fuelNote: "510 L × KES 100", maintCost: 15000, costHour: 776, revenue: "Ploughing services: KES 120,000" },
-  { equipmentId: "EQ-005", label: "Drip kit", hoursMonth: "40 (irrigation)", hoursYear: "200", fuelCost: 0, fuelNote: "solar", maintCost: 2000, costHour: 10, revenue: "Irrigated crops: KES 400,000" },
-  { equipmentId: "EQ-006", label: "Knapsack sprayers", hoursMonth: "15", hoursYear: "80", fuelCost: 0, fuelNote: "—", maintCost: 1000, costHour: 13, revenue: "— (support function)" },
-];
-
-/* ---------- 20.4 hire in / hire out ---------- */
-
-export interface HireInRow {
-  id: string;
-  date: string;
-  equipment: string;
-  owner: string;
-  ownerPhone: string;
-  rate: string;
-  duration: string;
-  totalCost: number;
-  purpose: string;
-  paid: "M-Pesa" | "Pending" | "Cash";
-}
-
-export const HIRE_IN: HireInRow[] = [
-  { id: "hi1", date: "Oct 15", equipment: "Tractor + rotavator", owner: "Kariuki Farms", ownerPhone: "0722 508 441", rate: "KES 4,500/acre", duration: "1 acre, 3 hrs", totalCost: 4500, purpose: "Land prep Plot 1", paid: "M-Pesa" },
-  { id: "hi2", date: "Nov 5", equipment: "Sprayer boom (tractor-mounted)", owner: "AgriHire Kiambu", ownerPhone: "0711 260 903", rate: "KES 3,000/day", duration: "1 day", totalCost: 3000, purpose: "Spray cabbage", paid: "Pending" },
-];
-
-export interface HireOutRow {
-  id: string;
-  date: string;
-  equipmentId: string;
-  hirer: string;
-  hirerPhone: string;
-  rate: string;
-  duration: string;
-  income: number;
-  paid: "M-Pesa" | "Cash" | "Family, no charge";
-  status: "Completed" | "Pending" | "In progress";
-}
-
-export const HIRE_OUT: HireOutRow[] = [
-  { id: "ho1", date: "Sep 10", equipmentId: "EQ-001", hirer: "Neighbor: Kamau", hirerPhone: "0733 902 118", rate: "KES 3,500/acre", duration: "2 acres, 5 hrs", income: 7000, paid: "Cash", status: "Completed" },
-  { id: "ho2", date: "Sep 15", equipmentId: "EQ-004", hirer: "Githunguri School", hirerPhone: "0709 144 260", rate: "KES 2,000/hr", duration: "3 hrs", income: 6000, paid: "M-Pesa", status: "Completed" },
-  { id: "ho3", date: "Oct 5", equipmentId: "EQ-004", hirer: "Mary's sister (Lucy)", hirerPhone: "0728 331 507", rate: "KES 1,500/trip", duration: "2 trips", income: 3000, paid: "Family, no charge", status: "Completed" },
-];
-
-export interface RateCardRow {
-  id: string;
-  equipmentId: string;
-  label: string;
-  rateType: string;
-  rate: number;
-  minHire: string;
-  includes: string;
-  location: string;
-}
-
-export const RATE_CARD: RateCardRow[] = [
-  { id: "rc1", equipmentId: "EQ-001", label: "MF 35 Tractor", rateType: "Per hour", rate: 2000, minHire: "2 hours", includes: "Operator + fuel", location: "My farm or within 10 km" },
-  { id: "rc2", equipmentId: "EQ-001", label: "MF 35 + Plough", rateType: "Per acre", rate: 3500, minHire: "0.5 acre", includes: "Operator + fuel", location: "Within 10 km" },
-  { id: "rc3", equipmentId: "EQ-001", label: "MF 35 + Trailer", rateType: "Per trip", rate: 1500, minHire: "1 trip", includes: "Operator + fuel", location: "Within 10 km" },
-  { id: "rc4", equipmentId: "EQ-004", label: "Trailer only", rateType: "Per day", rate: 1000, minHire: "1 day", includes: "—", location: "Self-collect" },
-  { id: "rc5", equipmentId: "EQ-006", label: "Knapsack sprayer", rateType: "Per day", rate: 200, minHire: "1 day", includes: "—", location: "Self-collect" },
-  { id: "rc6", equipmentId: "EQ-005", label: "Drip kit (1 acre)", rateType: "Per season", rate: 5000, minHire: "1 season", includes: "Installation + removal", location: "My farm only" },
-];
-
-/* ---------- 20.5 fuel & energy ---------- */
-
-export interface FuelRow {
-  id: string;
-  date: string;
-  fuelType: string;
-  litres: number;
-  pricePerL: number;
-  total: number;
-  equipmentId: string;
-  receipt: string;
-}
-
-export const FUEL_LOG: FuelRow[] = [
-  { id: "f1", date: "Oct 20", fuelType: "Diesel", litres: 20, pricePerL: 195, total: 3900, equipmentId: "EQ-001", receipt: "Receipt photographed" },
-  { id: "f2", date: "Oct 21", fuelType: "Diesel", litres: 10, pricePerL: 195, total: 1950, equipmentId: "EQ-001", receipt: "—" },
-  { id: "f3", date: "Oct 22", fuelType: "Diesel", litres: 5, pricePerL: 195, total: 975, equipmentId: "EQ-001", receipt: "—" },
-];
-
-export const FUEL_MONTH_TOTAL = { litres: 35, total: 6825, month: "October" };
-
-export interface FuelEffRow {
-  period: string;
-  litres: number;
-  hours: number;
-  lph: string;
-  costPerHour: number;
-  vsStd: string;
-  tone: "high" | "medium" | "low";
-}
-
-export const FUEL_EFFICIENCY: FuelEffRow[] = [
-  { period: "September", litres: 48, hours: 9, lph: "5.33", costPerHour: 1064, vsStd: "7% above — within tolerance", tone: "medium" },
-  { period: "October", litres: 35, hours: 6, lph: "5.83", costPerHour: 1138, vsStd: "17% above normal — check engine", tone: "high" },
-];
-
-/* ---------- 20.6 depreciation & asset valuation ---------- */
-
-export interface DepRow {
-  equipmentId: string;
-  name: string;
-  purchasePrice: number;
-  purchaseDate: string;
-  usefulLife: number;
-  annualDep: number;
-  ageYears: string;
-  marketValue: number;
-  bookValue: number;
-}
-
-export const DEPRECIATION: DepRow[] = [
-  { equipmentId: "EQ-001", name: "MF 35 Tractor", purchasePrice: 450000, purchaseDate: "Mar 2020", usefulLife: 15, annualDep: 30000, ageYears: "6.5", marketValue: 350000, bookValue: 255000 },
-  { equipmentId: "EQ-002", name: "Disc plough", purchasePrice: 60000, purchaseDate: "Mar 2020", usefulLife: 10, annualDep: 6000, ageYears: "6.5", marketValue: 45000, bookValue: 21000 },
-  { equipmentId: "EQ-010", name: "Greenhouse", purchasePrice: 250000, purchaseDate: "Jun 2023", usefulLife: 8, annualDep: 31250, ageYears: "3.3", marketValue: 200000, bookValue: 146875 },
-  { equipmentId: "EQ-012", name: "Solar pump", purchasePrice: 45000, purchaseDate: "Jan 2024", usefulLife: 10, annualDep: 4500, ageYears: "2.8", marketValue: 40000, bookValue: 32400 },
-];
-
-/* ---------- marketplace listings (20.4 publish) ---------- */
-
-export interface MarketListing {
-  id: string;
-  equipmentId: string;
-  title: string;
-  rate: string;
-  listed: string;
-  status: "Active" | "Paused";
-  views: number;
-  bookings: number;
-  photo: string;
-}
-
-export const MARKET_LISTINGS: MarketListing[] = [
+export const USAGE_LOGS: UsageLog[] = [
   {
-    id: "ML-01", equipmentId: "EQ-001", title: "MF 35 + 3-disc plough — ploughing by the acre",
-    rate: "KES 3,500/acre · operator + fuel", listed: "02/10/2026", status: "Active",
-    views: 14, bookings: 2, photo: "MF 35 with plough, Kariuki road",
+    id: "UL-001",
+    date: "20 Oct 2026",
+    equipment: "MF 35 + Disc plough",
+    equipmentId: "EQ-001",
+    activity: "Ploughing Plot 2",
+    duration: "3 hrs",
+    hours: 3,
+    fuelLitres: 15,
+    operator: "James Kariuki",
+    plot: "Plot 2 · Upper field",
+    notes: "Two passes on 0.8 acre.",
+  },
+  {
+    id: "UL-002",
+    date: "21 Oct 2026",
+    equipment: "MF 35 + Harrow",
+    equipmentId: "EQ-001",
+    activity: "Harrowing Plot 2",
+    duration: "2 hrs",
+    hours: 2,
+    fuelLitres: 10,
+    operator: "James Kariuki",
+    plot: "Plot 2 · Upper field",
+    notes: "One pass; soil was moist but workable.",
+  },
+  {
+    id: "UL-003",
+    date: "22 Oct 2026",
+    equipment: "MF 35 + Trailer",
+    equipmentId: "EQ-001",
+    activity: "Transport manure",
+    duration: "1 hr",
+    hours: 1,
+    fuelLitres: 5,
+    operator: "James Kariuki",
+    plot: "Plot 1 · Home shamba",
+    notes: "Three trips from Githunguri dairy farm.",
+  },
+  {
+    id: "UL-004",
+    date: "24 Oct 2026",
+    equipment: "Knapsack sprayer #1",
+    equipmentId: "EQ-006",
+    activity: "Spray Mancozeb on cabbage",
+    duration: "2 hrs",
+    hours: 2,
+    fuelLitres: 0,
+    operator: "John Mwangi",
+    plot: "Plot 1 · Cabbage",
+    notes: "Mixed 100 L; PPE issued and returned.",
+  },
+  {
+    id: "UL-005",
+    date: "25 Oct 2026",
+    equipment: "Hand hoes × 4",
+    equipmentId: "EQ-007",
+    activity: "Weeding cabbage",
+    duration: "8 worker-hrs",
+    hours: 8,
+    fuelLitres: 0,
+    operator: "Field team",
+    plot: "Plot 1 · Cabbage",
+    notes: "Four workers, two hours each.",
+  },
+  {
+    id: "UL-006",
+    date: "26 Oct 2026",
+    equipment: "Solar pump + drip kit",
+    equipmentId: "EQ-012",
+    activity: "Supplementary irrigation",
+    duration: "4 hrs",
+    hours: 4,
+    fuelLitres: 0,
+    operator: "Mary Wanjiku",
+    plot: "Plot 1 · Cabbage",
+    notes: "Tank refilled before midday.",
+  },
+  {
+    id: "UL-007",
+    date: "27 Oct 2026",
+    equipment: "Wheelbarrow #2",
+    equipmentId: "EQ-009",
+    activity: "Move compost",
+    duration: "3 hrs",
+    hours: 3,
+    fuelLitres: 0,
+    operator: "Beatrice Wanjiru",
+    plot: "Greenhouse",
+    notes: "Six barrows of finished compost.",
+  },
+  {
+    id: "UL-008",
+    date: "28 Oct 2026",
+    equipment: "MF 35 + Trailer",
+    equipmentId: "EQ-001",
+    activity: "Deliver cabbage crates",
+    duration: "1.5 hrs",
+    hours: 1.5,
+    fuelLitres: 8,
+    operator: "James Kariuki",
+    plot: "Market route",
+    notes: "Githunguri to Kiambu collection point.",
+  },
+  {
+    id: "UL-009",
+    date: "29 Oct 2026",
+    equipment: "Spring balance",
+    equipmentId: "EQ-014",
+    activity: "Weigh graded kale",
+    duration: "1 hr",
+    hours: 1,
+    fuelLitres: 0,
+    operator: "Mary Wanjiku",
+    plot: "Pack shade",
+    notes: "Calibration check passed with 50 kg bag.",
+  },
+  {
+    id: "UL-010",
+    date: "30 Oct 2026",
+    equipment: "Panga × 2",
+    equipmentId: "EQ-008",
+    activity: "Clear drainage line",
+    duration: "3 worker-hrs",
+    hours: 3,
+    fuelLitres: 0,
+    operator: "Field team",
+    plot: "Plot 3 edge",
+    notes: "Removed grass to keep water moving.",
   },
 ];
 
-/* ---------- page alerts ---------- */
-
-export const MACH_ALERTS = [
-  { id: "ma1", tone: "warn" as const, text: "3 maintenance tasks overdue — MF 35 oil change (2,000 hrs), disc plough bearings, solar pump connections. Do them before the December ploughing." },
-  { id: "ma2", tone: "warn" as const, text: "October fuel running 17% above the 5 L/hr standard (5.83 L/hr, KES 1,138/hr) — have the engine checked at the local mechanic." },
-  { id: "ma3", tone: "info" as const, text: "Sprayer boom hire-out (AgriHire Kiambu, 05/11) — KES 3,000 still pending. Call 0711 260 903 to collect." },
-  { id: "ma4", tone: "success" as const, text: "MF 35 + plough listed on the GrowMO marketplace since 02/10 — 14 views, 2 bookings this season (KES 13,000 earned)." },
+export const USAGE_ANALYTICS = [
+  {
+    id: "EQ-001",
+    equipment: "MF 35 Tractor",
+    monthHours: "12",
+    yearHours: "85",
+    fuelCost: 51000,
+    maintenanceCost: 15000,
+    costHour: 776,
+    revenue: "Ploughing services · KES 120,000",
+  },
+  {
+    id: "EQ-005",
+    equipment: "Drip kit",
+    monthHours: "40 irrigation hrs",
+    yearHours: "200",
+    fuelCost: 0,
+    maintenanceCost: 2000,
+    costHour: 10,
+    revenue: "Irrigated crops · KES 400,000",
+  },
+  {
+    id: "EQ-006",
+    equipment: "Knapsack sprayers",
+    monthHours: "15",
+    yearHours: "80",
+    fuelCost: 0,
+    maintenanceCost: 1000,
+    costHour: 13,
+    revenue: "Support function",
+  },
 ];
+
+export interface HireRecord {
+  id: string;
+  date: string;
+  direction: "In" | "Out";
+  equipment: string;
+  person: string;
+  phone: string;
+  rate: string;
+  duration: string;
+  total: number;
+  purpose: string;
+  payment: string;
+  status: "Completed" | "Pending" | "Family";
+}
+
+export const HIRE_RECORDS: HireRecord[] = [
+  {
+    id: "HI-001",
+    date: "15 Oct 2026",
+    direction: "In",
+    equipment: "Tractor + rotavator",
+    person: "Kariuki Farms",
+    phone: "0722 458 711",
+    rate: "KES 4,500/acre",
+    duration: "1 acre · 3 hrs",
+    total: 4500,
+    purpose: "Land prep · Plot 1",
+    payment: "M-Pesa",
+    status: "Completed",
+  },
+  {
+    id: "HI-002",
+    date: "05 Nov 2026",
+    direction: "In",
+    equipment: "Sprayer boom (tractor-mounted)",
+    person: "AgriHire Kiambu",
+    phone: "0718 330 221",
+    rate: "KES 3,000/day",
+    duration: "1 day",
+    total: 3000,
+    purpose: "Spray cabbage",
+    payment: "Pending",
+    status: "Pending",
+  },
+  {
+    id: "HO-001",
+    date: "10 Sep 2026",
+    direction: "Out",
+    equipment: "MF 35 + plough",
+    person: "Kamau · neighbour",
+    phone: "0708 517 094",
+    rate: "KES 3,500/acre",
+    duration: "2 acres · 5 hrs",
+    total: 7000,
+    purpose: "Land prep",
+    payment: "Cash",
+    status: "Completed",
+  },
+  {
+    id: "HO-002",
+    date: "15 Sep 2026",
+    direction: "Out",
+    equipment: "MF 35 + trailer",
+    person: "Githunguri School",
+    phone: "0791 624 300",
+    rate: "KES 2,000/hr",
+    duration: "3 hrs",
+    total: 6000,
+    purpose: "Move desks",
+    payment: "M-Pesa",
+    status: "Completed",
+  },
+  {
+    id: "HO-003",
+    date: "05 Oct 2026",
+    direction: "Out",
+    equipment: "Trailer",
+    person: "Mary's sister",
+    phone: "0714 902 118",
+    rate: "KES 1,500/trip",
+    duration: "2 trips",
+    total: 0,
+    purpose: "Family delivery",
+    payment: "No charge",
+    status: "Family",
+  },
+];
+
+export interface HireRate {
+  id: string;
+  equipment: string;
+  rateType: string;
+  rate: number;
+  unit: string;
+  minimum: string;
+  includes: string;
+  location: string;
+  published: boolean;
+}
+
+export const HIRE_RATES: HireRate[] = [
+  {
+    id: "RC-001",
+    equipment: "MF 35 Tractor",
+    rateType: "Per hour",
+    rate: 2000,
+    unit: "/ hour",
+    minimum: "2 hours",
+    includes: "Operator + fuel",
+    location: "Farm or within 10 km",
+    published: true,
+  },
+  {
+    id: "RC-002",
+    equipment: "MF 35 + Plough",
+    rateType: "Per acre",
+    rate: 3500,
+    unit: "/ acre",
+    minimum: "0.5 acre",
+    includes: "Operator + fuel",
+    location: "Within 10 km",
+    published: true,
+  },
+  {
+    id: "RC-003",
+    equipment: "MF 35 + Trailer",
+    rateType: "Per trip",
+    rate: 1500,
+    unit: "/ trip",
+    minimum: "1 trip",
+    includes: "Operator + fuel",
+    location: "Within 10 km",
+    published: true,
+  },
+  {
+    id: "RC-004",
+    equipment: "Trailer only",
+    rateType: "Per day",
+    rate: 1000,
+    unit: "/ day",
+    minimum: "1 day",
+    includes: "Self-collect",
+    location: "Githunguri",
+    published: false,
+  },
+  {
+    id: "RC-005",
+    equipment: "Knapsack sprayer",
+    rateType: "Per day",
+    rate: 200,
+    unit: "/ day",
+    minimum: "1 day",
+    includes: "Clean tank",
+    location: "Self-collect",
+    published: false,
+  },
+  {
+    id: "RC-006",
+    equipment: "Drip kit (1 acre)",
+    rateType: "Per season",
+    rate: 5000,
+    unit: "/ season",
+    minimum: "1 season",
+    includes: "Install + removal",
+    location: "Mary's Farm only",
+    published: false,
+  },
+];
+
+export interface FuelEntry {
+  id: string;
+  date: string;
+  fuelType: string;
+  quantity: number;
+  pricePerLitre: number;
+  total: number;
+  equipment: string;
+  receipt: string;
+}
+
+export const FUEL_ENTRIES: FuelEntry[] = [
+  {
+    id: "FE-001",
+    date: "20 Oct 2026",
+    fuelType: "Diesel",
+    quantity: 20,
+    pricePerLitre: 195,
+    total: 3900,
+    equipment: "MF 35",
+    receipt: "RCPT-8931",
+  },
+  {
+    id: "FE-002",
+    date: "21 Oct 2026",
+    fuelType: "Diesel",
+    quantity: 10,
+    pricePerLitre: 195,
+    total: 1950,
+    equipment: "MF 35",
+    receipt: "No receipt",
+  },
+  {
+    id: "FE-003",
+    date: "22 Oct 2026",
+    fuelType: "Diesel",
+    quantity: 5,
+    pricePerLitre: 195,
+    total: 975,
+    equipment: "MF 35",
+    receipt: "No receipt",
+  },
+  {
+    id: "FE-004",
+    date: "28 Oct 2026",
+    fuelType: "Diesel",
+    quantity: 8,
+    pricePerLitre: 195,
+    total: 1560,
+    equipment: "MF 35",
+    receipt: "RCPT-8978",
+  },
+];
+
+export interface ValuationRow {
+  id: string;
+  equipment: string;
+  purchasePrice: number;
+  purchaseDate: string;
+  usefulLife: string;
+  annualDepreciation: number;
+  currentAge: string;
+  currentValue: number;
+  bookValue: number;
+}
+
+export const VALUATION_ROWS: ValuationRow[] = [
+  {
+    id: "EQ-001",
+    equipment: "MF 35 Tractor",
+    purchasePrice: 450000,
+    purchaseDate: "Mar 2020",
+    usefulLife: "15 yrs",
+    annualDepreciation: 30000,
+    currentAge: "6.5 yrs",
+    currentValue: 350000,
+    bookValue: 255000,
+  },
+  {
+    id: "EQ-002",
+    equipment: "Disc plough",
+    purchasePrice: 60000,
+    purchaseDate: "Mar 2020",
+    usefulLife: "10 yrs",
+    annualDepreciation: 6000,
+    currentAge: "6.5 yrs",
+    currentValue: 45000,
+    bookValue: 21000,
+  },
+  {
+    id: "EQ-010",
+    equipment: "Greenhouse",
+    purchasePrice: 250000,
+    purchaseDate: "Jun 2023",
+    usefulLife: "8 yrs",
+    annualDepreciation: 31250,
+    currentAge: "3.3 yrs",
+    currentValue: 200000,
+    bookValue: 146875,
+  },
+  {
+    id: "EQ-012",
+    equipment: "Solar pump",
+    purchasePrice: 52000,
+    purchaseDate: "Jan 2024",
+    usefulLife: "10 yrs",
+    annualDepreciation: 5200,
+    currentAge: "2.8 yrs",
+    currentValue: 45000,
+    bookValue: 37440,
+  },
+];
+
+export const MACHINERY_CONTEXT = {
+  farm: "Mary's Farm",
+  place: "Githunguri, Kiambu County",
+  asOf: "30 Oct 2026",
+  totalValue: EQUIPMENT_ASSETS.reduce(
+    (sum, asset) => sum + asset.currentValue,
+    0,
+  ),
+  operational: EQUIPMENT_ASSETS.filter(
+    (asset) => asset.status === "Operational",
+  ).length,
+  maintenanceDue: MAINTENANCE_TASKS.filter((task) => task.status === "Overdue")
+    .length,
+  hireIncome: HIRE_RECORDS.filter((hire) => hire.direction === "Out").reduce(
+    (sum, hire) => sum + hire.total,
+    0,
+  ),
+  fuelTotal: FUEL_ENTRIES.reduce((sum, fuel) => sum + fuel.total, 0),
+};
+
+export function equipmentTone(
+  status: EquipmentStatus,
+): "low" | "medium" | "high" {
+  if (status === "Operational") return "low";
+  if (status === "Needs servicing" || status === "Under repair") return "high";
+  return "medium";
+}
+
+export function maintenanceTone(
+  status: MaintenanceState,
+): "low" | "medium" | "high" | "neutral" {
+  if (status === "Overdue") return "high";
+  if (status === "Upcoming") return "medium";
+  if (status === "OK") return "low";
+  return "neutral";
+}

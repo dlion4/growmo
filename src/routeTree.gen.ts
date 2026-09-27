@@ -17,18 +17,23 @@ import { Route as AppAdvisorRouteImport } from './routes/app/advisor'
 import { Route as AppAnalyticsRouteImport } from './routes/app/analytics'
 import { Route as AppChannelsRouteImport } from './routes/app/channels'
 import { Route as AppCommunityRouteImport } from './routes/app/community'
+import { Route as AppCooperativeRouteImport } from './routes/app/cooperative'
 import { Route as AppCropsRouteImport } from './routes/app/crops'
 import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
 import { Route as AppFinanceRouteImport } from './routes/app/finance'
+import { Route as AppHarvestRouteImport } from './routes/app/harvest'
 import { Route as AppInventoryRouteImport } from './routes/app/inventory'
 import { Route as AppLabourRouteImport } from './routes/app/labour'
 import { Route as AppLogsRouteImport } from './routes/app/logs'
 import { Route as AppMachineryRouteImport } from './routes/app/machinery'
 import { Route as AppMapRouteImport } from './routes/app/map'
 import { Route as AppMarketRouteImport } from './routes/app/market'
+import { Route as AppNurseryRouteImport } from './routes/app/nursery'
 import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
+import { Route as AppOrdersRouteImport } from './routes/app/orders'
 import { Route as AppPlannerRouteImport } from './routes/app/planner'
 import { Route as AppRecordsRouteImport } from './routes/app/records'
+import { Route as AppSeasonsRouteImport } from './routes/app/seasons'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppSoilRouteImport } from './routes/app/soil'
 import { Route as AppTeamRouteImport } from './routes/app/team'
@@ -90,6 +95,11 @@ const AppCommunityRoute = AppCommunityRouteImport.update({
   path: '/app/community',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppCooperativeRoute = AppCooperativeRouteImport.update({
+  id: '/app/cooperative',
+  path: '/app/cooperative',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppCropsRoute = AppCropsRouteImport.update({
   id: '/app/crops',
   path: '/app/crops',
@@ -103,6 +113,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
 const AppFinanceRoute = AppFinanceRouteImport.update({
   id: '/app/finance',
   path: '/app/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppHarvestRoute = AppHarvestRouteImport.update({
+  id: '/app/harvest',
+  path: '/app/harvest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppInventoryRoute = AppInventoryRouteImport.update({
@@ -135,9 +150,19 @@ const AppMarketRoute = AppMarketRouteImport.update({
   path: '/app/market',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppNurseryRoute = AppNurseryRouteImport.update({
+  id: '/app/nursery',
+  path: '/app/nursery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppOnboardingRoute = AppOnboardingRouteImport.update({
   id: '/app/onboarding',
   path: '/app/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppOrdersRoute = AppOrdersRouteImport.update({
+  id: '/app/orders',
+  path: '/app/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppPlannerRoute = AppPlannerRouteImport.update({
@@ -148,6 +173,11 @@ const AppPlannerRoute = AppPlannerRouteImport.update({
 const AppRecordsRoute = AppRecordsRouteImport.update({
   id: '/app/records',
   path: '/app/records',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppSeasonsRoute = AppSeasonsRouteImport.update({
+  id: '/app/seasons',
+  path: '/app/seasons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
@@ -259,18 +289,23 @@ export interface FileRoutesByFullPath {
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/channels': typeof AppChannelsRoute
   '/app/community': typeof AppCommunityRoute
+  '/app/cooperative': typeof AppCooperativeRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
+  '/app/harvest': typeof AppHarvestRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/logs': typeof AppLogsRoute
   '/app/machinery': typeof AppMachineryRoute
   '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
+  '/app/nursery': typeof AppNurseryRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/orders': typeof AppOrdersRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
+  '/app/seasons': typeof AppSeasonsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
   '/app/team': typeof AppTeamRoute
@@ -301,18 +336,23 @@ export interface FileRoutesByTo {
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/channels': typeof AppChannelsRoute
   '/app/community': typeof AppCommunityRoute
+  '/app/cooperative': typeof AppCooperativeRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
+  '/app/harvest': typeof AppHarvestRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/logs': typeof AppLogsRoute
   '/app/machinery': typeof AppMachineryRoute
   '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
+  '/app/nursery': typeof AppNurseryRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/orders': typeof AppOrdersRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
+  '/app/seasons': typeof AppSeasonsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
   '/app/team': typeof AppTeamRoute
@@ -344,18 +384,23 @@ export interface FileRoutesById {
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/channels': typeof AppChannelsRoute
   '/app/community': typeof AppCommunityRoute
+  '/app/cooperative': typeof AppCooperativeRoute
   '/app/crops': typeof AppCropsRoute
   '/app/dashboard': typeof AppDashboardRoute
   '/app/finance': typeof AppFinanceRoute
+  '/app/harvest': typeof AppHarvestRoute
   '/app/inventory': typeof AppInventoryRoute
   '/app/labour': typeof AppLabourRoute
   '/app/logs': typeof AppLogsRoute
   '/app/machinery': typeof AppMachineryRoute
   '/app/map': typeof AppMapRoute
   '/app/market': typeof AppMarketRoute
+  '/app/nursery': typeof AppNurseryRoute
   '/app/onboarding': typeof AppOnboardingRoute
+  '/app/orders': typeof AppOrdersRoute
   '/app/planner': typeof AppPlannerRoute
   '/app/records': typeof AppRecordsRoute
+  '/app/seasons': typeof AppSeasonsRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/soil': typeof AppSoilRoute
   '/app/team': typeof AppTeamRoute
@@ -388,18 +433,23 @@ export interface FileRouteTypes {
     | '/app/analytics'
     | '/app/channels'
     | '/app/community'
+    | '/app/cooperative'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
+    | '/app/harvest'
     | '/app/inventory'
     | '/app/labour'
     | '/app/logs'
     | '/app/machinery'
     | '/app/map'
     | '/app/market'
+    | '/app/nursery'
     | '/app/onboarding'
+    | '/app/orders'
     | '/app/planner'
     | '/app/records'
+    | '/app/seasons'
     | '/app/settings'
     | '/app/soil'
     | '/app/team'
@@ -430,18 +480,23 @@ export interface FileRouteTypes {
     | '/app/analytics'
     | '/app/channels'
     | '/app/community'
+    | '/app/cooperative'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
+    | '/app/harvest'
     | '/app/inventory'
     | '/app/labour'
     | '/app/logs'
     | '/app/machinery'
     | '/app/map'
     | '/app/market'
+    | '/app/nursery'
     | '/app/onboarding'
+    | '/app/orders'
     | '/app/planner'
     | '/app/records'
+    | '/app/seasons'
     | '/app/settings'
     | '/app/soil'
     | '/app/team'
@@ -472,18 +527,23 @@ export interface FileRouteTypes {
     | '/app/analytics'
     | '/app/channels'
     | '/app/community'
+    | '/app/cooperative'
     | '/app/crops'
     | '/app/dashboard'
     | '/app/finance'
+    | '/app/harvest'
     | '/app/inventory'
     | '/app/labour'
     | '/app/logs'
     | '/app/machinery'
     | '/app/map'
     | '/app/market'
+    | '/app/nursery'
     | '/app/onboarding'
+    | '/app/orders'
     | '/app/planner'
     | '/app/records'
+    | '/app/seasons'
     | '/app/settings'
     | '/app/soil'
     | '/app/team'
@@ -515,18 +575,23 @@ export interface RootRouteChildren {
   AppAnalyticsRoute: typeof AppAnalyticsRoute
   AppChannelsRoute: typeof AppChannelsRoute
   AppCommunityRoute: typeof AppCommunityRoute
+  AppCooperativeRoute: typeof AppCooperativeRoute
   AppCropsRoute: typeof AppCropsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppFinanceRoute: typeof AppFinanceRoute
+  AppHarvestRoute: typeof AppHarvestRoute
   AppInventoryRoute: typeof AppInventoryRoute
   AppLabourRoute: typeof AppLabourRoute
   AppLogsRoute: typeof AppLogsRoute
   AppMachineryRoute: typeof AppMachineryRoute
   AppMapRoute: typeof AppMapRoute
   AppMarketRoute: typeof AppMarketRoute
+  AppNurseryRoute: typeof AppNurseryRoute
   AppOnboardingRoute: typeof AppOnboardingRoute
+  AppOrdersRoute: typeof AppOrdersRoute
   AppPlannerRoute: typeof AppPlannerRoute
   AppRecordsRoute: typeof AppRecordsRoute
+  AppSeasonsRoute: typeof AppSeasonsRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppSoilRoute: typeof AppSoilRoute
   AppTeamRoute: typeof AppTeamRoute
@@ -608,6 +673,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/cooperative': {
+      id: '/app/cooperative'
+      path: '/app/cooperative'
+      fullPath: '/app/cooperative'
+      preLoaderRoute: typeof AppCooperativeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/crops': {
       id: '/app/crops'
       path: '/app/crops'
@@ -627,6 +699,13 @@ declare module '@tanstack/react-router' {
       path: '/app/finance'
       fullPath: '/app/finance'
       preLoaderRoute: typeof AppFinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/harvest': {
+      id: '/app/harvest'
+      path: '/app/harvest'
+      fullPath: '/app/harvest'
+      preLoaderRoute: typeof AppHarvestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/inventory': {
@@ -671,11 +750,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMarketRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/nursery': {
+      id: '/app/nursery'
+      path: '/app/nursery'
+      fullPath: '/app/nursery'
+      preLoaderRoute: typeof AppNurseryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/onboarding': {
       id: '/app/onboarding'
       path: '/app/onboarding'
       fullPath: '/app/onboarding'
       preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/orders': {
+      id: '/app/orders'
+      path: '/app/orders'
+      fullPath: '/app/orders'
+      preLoaderRoute: typeof AppOrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/planner': {
@@ -690,6 +783,13 @@ declare module '@tanstack/react-router' {
       path: '/app/records'
       fullPath: '/app/records'
       preLoaderRoute: typeof AppRecordsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app/seasons': {
+      id: '/app/seasons'
+      path: '/app/seasons'
+      fullPath: '/app/seasons'
+      preLoaderRoute: typeof AppSeasonsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/settings': {
@@ -843,18 +943,23 @@ const rootRouteChildren: RootRouteChildren = {
   AppAnalyticsRoute: AppAnalyticsRoute,
   AppChannelsRoute: AppChannelsRoute,
   AppCommunityRoute: AppCommunityRoute,
+  AppCooperativeRoute: AppCooperativeRoute,
   AppCropsRoute: AppCropsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppFinanceRoute: AppFinanceRoute,
+  AppHarvestRoute: AppHarvestRoute,
   AppInventoryRoute: AppInventoryRoute,
   AppLabourRoute: AppLabourRoute,
   AppLogsRoute: AppLogsRoute,
   AppMachineryRoute: AppMachineryRoute,
   AppMapRoute: AppMapRoute,
   AppMarketRoute: AppMarketRoute,
+  AppNurseryRoute: AppNurseryRoute,
   AppOnboardingRoute: AppOnboardingRoute,
+  AppOrdersRoute: AppOrdersRoute,
   AppPlannerRoute: AppPlannerRoute,
   AppRecordsRoute: AppRecordsRoute,
+  AppSeasonsRoute: AppSeasonsRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppSoilRoute: AppSoilRoute,
   AppTeamRoute: AppTeamRoute,
@@ -880,12 +985,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
