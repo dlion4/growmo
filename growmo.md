@@ -7,7 +7,7 @@ Here's the massively advanced GrowMO blueprint — expanded from 16 to **28 page
 
 ---
 
-## PAGE 1: Onboarding & Farm Profile (Enhanced)
+## PAGE  1: Onboarding & Farm Profile (Enhanced)
 
 **Purpose:** Multi-step intelligent onboarding that captures everything needed to personalize the entire platform — from soil to market.
 
@@ -123,7 +123,7 @@ System auto-classifies based on GPS + altitude + rainfall data:
 
 ---
 
-## PAGE 2: Dashboard Home (Enhanced)
+## PAGE  2: Dashboard Home (Enhanced)
 
 **Purpose:** The farmer's daily command center — everything at a glance without scrolling endlessly.
 
@@ -234,7 +234,7 @@ Maize      [==PLANT==][===VEG===][TASS][HARV]
 
 ---
 
-## PAGE 3: Crop Planner & Variety Selector (Enhanced)
+## PAGE  3: Crop Planner & Variety Selector (Enhanced)
 
 **Purpose:** The farmer's pre-planting decision engine — choose the right crop, variety, and planting window with full cost/revenue projections.
 
@@ -344,7 +344,7 @@ Tapping opens a confirmation sheet:
 
 ---
 
-## PAGE 4: Crop Management & Growth Tracker (Enhanced)
+## PAGE  4: Crop Management & Growth Tracker (Enhanced)
 
 **Purpose:** The living dashboard for each active crop — from soil to harvest. Fully modular so a cabbage farmer sees different widgets than a maize farmer.
 
@@ -565,7 +565,7 @@ Updates weekly as conditions change.
 
 ---
 
-## PAGE 5: Inputs & Inventory Management (Enhanced)
+## PAGE  5: Inputs & Inventory Management (Enhanced)
 
 **Purpose:** Complete input supply chain management — from knowing what to buy, to tracking stock, to recording application.
 
@@ -685,7 +685,7 @@ Updates weekly as conditions change.
 
 ---
 
-## PAGE 6: Labor Management & Payroll (Enhanced)
+## PAGE  6: Labor Management & Payroll (Enhanced)
 
 **Purpose:** Complete labour lifecycle — from hiring to paying, with M-Pesa integration and cost forecasting.
 
@@ -820,7 +820,7 @@ When a task is scheduled:
 
 ---
 
-## PAGE 7: Financial Management & Budgeting (Enhanced)
+## PAGE  7: Financial Management & Budgeting (Enhanced)
 
 **Purpose:** The farmer's complete financial command center — budgeting, expense tracking, income, cash flow, and profitability.
 
@@ -977,7 +977,7 @@ If farmer has multiple crops:
 
 ---
 
-## PAGE 8: Weather & Climate Intelligence (Enhanced)
+## PAGE  8: Weather & Climate Intelligence (Enhanced)
 
 **Purpose:** Hyper-local weather data with crop-specific impact analysis and seasonal predictions.
 
@@ -1112,7 +1112,7 @@ If farmer has multiple crops:
 
 ---
 
-## PAGE 9: AI Advisor & Predictive Engine (Enhanced)
+## PAGE  9: AI Advisor & Predictive Engine (Enhanced)
 
 **Purpose:** The farmer's personal agronomist — always available, always learning, always optimizing.
 
@@ -1273,7 +1273,7 @@ Unaweza piga picha na kutuma kwa uchambuzi zaidi?"
 
 ---
 
-## PAGE 10: Market & Sales (Enhanced)
+## PAGE  10: Market & Sales (Enhanced)
 
 **Purpose:** End-to-end market access — from knowing prices to closing sales to delivering produce.
 
@@ -1391,7 +1391,7 @@ KES/head
 
 ---
 
-## PAGE 11: Analytics & Reporting (Enhanced)
+## PAGE  11: Analytics & Reporting (Enhanced)
 
 **Purpose:** Deep insights into farm performance through charts, KPIs, and exportable reports.
 
@@ -1494,7 +1494,7 @@ KES/head
 
 ---
 
-## PAGE 12: Records, Traceability & Compliance (Enhanced)
+## PAGE  12: Records, Traceability & Compliance (Enhanced)
 
 **Purpose:** Digital farm record-keeping that meets Kenyan and international standards.
 
@@ -1576,7 +1576,7 @@ KES/head
 
 ---
 
-## PAGE 13: Community, Learning & Benchmarking (Enhanced)
+## PAGE  13: Community, Learning & Benchmarking (Enhanced)
 
 **Purpose:** Social learning, extension content, and peer comparison.
 
@@ -1653,7 +1653,7 @@ KES/head
 
 ---
 
-## PAGE 14: Payments, Wallet & Mobile Money (Enhanced)
+## PAGE  14: Payments, Wallet & Mobile Money (Enhanced)
 
 **Purpose:** Complete financial transactions hub with M-Pesa Daraja integration.
 
@@ -1728,7 +1728,7 @@ KES/head
 
 ---
 
-## PAGE 15: Settings, Team & Permissions (Enhanced)
+## PAGE  15: Settings, Team & Permissions (Enhanced)
 
 **Purpose:** Account management, team collaboration, and data control.
 
@@ -1816,7 +1816,7 @@ Edit all plot details, add/remove plots, update soil data, change farm name.
 
 ---
 
-## PAGE 16: Mobile, Offline, USSD & SMS Channels (Enhanced)
+## PAGE  16: Mobile, Offline, USSD & SMS Channels (Enhanced)
 
 **Purpose:** Ensure every farmer can access GrowMO regardless of device or connectivity.
 
@@ -1902,7 +1902,7 @@ GrowMO: Hiyo ni Fall Armyworm. Fanya hivi:
 
 ---
 
-## PAGE 17: Soil Health & Testing Management (NEW)
+## PAGE  17: Soil Health & Testing Management (NEW)
 
 **Purpose:** Track soil health, manage soil tests, and get fertilizer recommendations based on actual soil data.
 
