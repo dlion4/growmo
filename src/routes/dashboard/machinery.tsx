@@ -53,6 +53,13 @@ import {
   ServiceTaskRow,
 } from "../../components/dashboard/pages/MachineryWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   EQUIPMENT_ASSETS,
@@ -116,6 +123,7 @@ function downloadReport(rows: string[][]) {
 function MachineryPage() {
   const toast = useToast();
   const [view, setView] = useState<MachineryView>("registry");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [assets, setAssets] = useState(EQUIPMENT_ASSETS);
   const [maintenance, setMaintenance] = useState(MAINTENANCE_TASKS);
   const [fuelEntries, setFuelEntries] = useState(FUEL_ENTRIES);
@@ -364,6 +372,16 @@ function MachineryPage() {
     { id: "valuation" as const, label: "Asset value", icon: <TrendingDown /> },
   ];
 
+  const machineryReports: Record<MachineryView, ReportDefinition> = {
+    registry: createReport({ id: "machinery-registry", title: "Equipment registry", filename: "growmo-equipment-registry", description: "Current live farm machinery and equipment register.", rows: filteredAssets }),
+    maintenance: createReport({ id: "machinery-maintenance", title: "Maintenance schedule", filename: "growmo-maintenance-schedule", description: "Current maintenance tasks using the selected status filter.", rows: filteredMaintenance }),
+    usage: createReport({ id: "machinery-usage-log", title: "Equipment usage log", filename: "growmo-equipment-usage-log", description: "Current equipment usage records using the active search.", rows: filteredUsage }),
+    hire: createReport({ id: "machinery-hire-desk", title: "Equipment hire register", filename: "growmo-equipment-hire-register", description: "Current machinery hire-in and hire-out records.", rows: hires }),
+    fuel: createReport({ id: "machinery-fuel-log", title: "Fuel and energy log", filename: "growmo-fuel-and-energy-log", description: "Current fuel and energy entries for farm equipment.", rows: fuelEntries }),
+    valuation: createReport({ id: "machinery-valuation", title: "Asset valuation register", filename: "growmo-asset-valuation-register", description: "Current machinery valuation and depreciation record.", rows: VALUATION_ROWS }),
+  };
+  const activeReport = machineryReports[view];
+
   return (
     <main className="gm-app-inner">
       <Reveal>
@@ -466,6 +484,7 @@ function MachineryPage() {
           label="Machinery workspace"
         />
       </div>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "registry" ? (
         <RegistrySection
@@ -714,6 +733,7 @@ function MachineryPage() {
         {selectedHire ? <HireDrawer hire={selectedHire} /> : null}
       </DashboardDrawer>
 
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <MachineryModalHub
         active={modal}
         asset={selectedAsset}

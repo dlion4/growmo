@@ -132,6 +132,12 @@ import {
   recordTotals,
 } from "../../data/app/records";
 import { kes } from "../../data/site";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import { useToast } from "../../store/toast";
 import { Toggle } from "../../components/auth/controls";
@@ -1727,6 +1733,7 @@ function settingsTimeLabel() {
 function RecordsPage() {
   const toast = useToast();
   const [view, setView] = useState<RecordView>("diary");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [diary, setDiary] = useState<DiaryEntry[]>(DIARY_ENTRIES);
   const [sprays, setSprays] = useState<SprayRecord[]>(SPRAY_RECORDS);
   const [purchases, setPurchases] = useState<PurchaseRecord[]>(PURCHASES);
@@ -1805,6 +1812,17 @@ function RecordsPage() {
     setView(next);
     toast.notify(message, "info");
   };
+
+  const recordsReports: Record<RecordView, ReportDefinition> = {
+    diary: createReport({ id: "records-diary", title: "Farm diary", filename: "growmo-farm-diary", description: "Current live farm diary entries.", rows: diary }),
+    spray: createReport({ id: "records-spray", title: "Spray record", filename: "growmo-spray-record", description: "Current live crop-protection spray records.", rows: sprays }),
+    purchases: createReport({ id: "records-purchases", title: "Purchase register", filename: "growmo-purchase-register", description: "Current input and farm purchase records.", rows: purchases }),
+    batches: createReport({ id: "records-batches", title: "Harvest batch register", filename: "growmo-harvest-batch-register", description: "Current traceable harvest batch records.", rows: batches }),
+    certification: createReport({ id: "records-certification", title: "Certification register", filename: "growmo-certification-register", description: "Current certifications and compliance status.", rows: certs }),
+    soil: createReport({ id: "records-soil-tests", title: "Soil test record", filename: "growmo-soil-test-record", description: "Current recorded soil test samples and results.", rows: samples }),
+    compliance: createReport({ id: "records-compliance", title: "Compliance gaps", filename: "growmo-compliance-gaps", description: "Current compliance gaps requiring follow-up.", rows: gaps }),
+  };
+  const activeReport = recordsReports[view];
 
   return (
     <main className="gm-app-page gm-records-page">
@@ -1942,6 +1960,7 @@ function RecordsPage() {
             ]}
           />
         </div>
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         {view === "diary" ? (
           <DiarySection
@@ -2702,6 +2721,7 @@ function RecordsPage() {
         }}
       />
 
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <div className="gm-card p-3 mt-4">
         <div className="row g-3 align-items-center">
           <div className="col-lg-9">

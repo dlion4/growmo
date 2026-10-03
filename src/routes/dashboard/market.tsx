@@ -78,6 +78,12 @@ import {
   TrendDialog,
   TrendPointDialog,
 } from "../../components/dashboard/pages/MarketModals";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   BUYERS,
@@ -144,6 +150,7 @@ function MarketPage() {
   const toast = useToast();
   const totals = useMemo(() => marketTotals(), []);
   const [section, setSection] = useState<MarketSection>("prices");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [drawer, setDrawer] = useState<"activity" | "sale-receipt" | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -242,6 +249,17 @@ function MarketPage() {
     toast.notify(`Application sent to ${c.company}`, "success");
   };
 
+  const marketReports: Record<MarketSection, ReportDefinition> = {
+    prices: createReport({ id: "market-live-prices", title: "Live market prices", filename: "growmo-live-market-prices", description: "Current crop prices across tracked Kenyan markets.", rows: CROP_PRICES }),
+    trends: createReport({ id: "market-price-trends", title: "Market price trends", filename: "growmo-market-price-trends", description: "Current cabbage price-trend history.", rows: CABBAGE_MARIKITI_12M }),
+    best: createReport({ id: "market-recommendations", title: "Best-market recommendations", filename: "growmo-best-market-recommendations", description: "Current market recommendations for planned sales.", rows: CABBAGE_MARKET_RECS }),
+    buyers: createReport({ id: "market-buyers", title: "Buyer directory", filename: "growmo-buyer-directory", description: "Current farm buyer directory using active buyer filters.", rows: filteredBuyers }),
+    planner: createReport({ id: "market-harvest-planner", title: "Harvest sales planner", filename: "growmo-harvest-sales-planner", description: "Current harvest sales scenarios and market plans.", rows: SALES_SCENARIOS }),
+    sales: createReport({ id: "market-sales-log", title: "Sales record", filename: "growmo-sales-record", description: "Current live farm sales log.", rows: sales }),
+    contracts: createReport({ id: "market-contracts", title: "Market contracts", filename: "growmo-market-contracts", description: "Current live market contracts and application state.", rows: contracts }),
+  };
+  const activeReport = marketReports[section];
+
   return (
     <div className="gm-app-page">
       <MarketHero score={MARKET_CONTEXT.marketScore} ytd={totals.salesYtd} target={MARKET_CONTEXT.salesTarget} topMarket={MARKET_CONTEXT.topMarket}>
@@ -292,6 +310,7 @@ function MarketPage() {
           ))}
         </div>
       </Reveal>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {/* ==================================== 10.1 PRICES ==================================== */}
       {section === "prices" ? (
@@ -657,6 +676,7 @@ function MarketPage() {
       />
 
       <div style={{ height: "3rem" }} />
+    <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
     </div>
   );
 }

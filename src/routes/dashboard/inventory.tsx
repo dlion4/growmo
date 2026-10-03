@@ -87,6 +87,13 @@ import {
 } from "../../components/dashboard/pages/InventoryWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
+import {
   Dialog,
   OtpInput,
   PinPad,
@@ -295,6 +302,7 @@ function InputsInventoryPage() {
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [rowMenu, setRowMenu] = useState<string | null>(null);
 
   /* ---------------- selections ---------------- */
@@ -364,6 +372,16 @@ function InputsInventoryPage() {
     },
   ]);
   const [alerts, setAlerts] = useState<AlertSettings>(ALERT_DEFAULTS);
+
+  const inventoryReports: Record<View, ReportDefinition> = {
+    catalog: createReport({ id: "inventory-catalog", title: "Input catalog", filename: "growmo-input-catalog", description: "Farm input catalog for seed, nutrition and crop-protection decisions.", rows: INPUT_CATALOG }),
+    stock: createReport({ id: "inventory-stock", title: "Farm inventory register", filename: "growmo-farm-inventory-register", description: "Current live inventory quantities and stock status.", rows: stock }),
+    purchase: createReport({ id: "inventory-purchase-list", title: "AI purchase list", filename: "growmo-ai-purchase-list", description: "Current purchase recommendations using the selected planning horizon.", rows: purchases }),
+    application: createReport({ id: "inventory-applications", title: "Input application log", filename: "growmo-input-application-log", description: "Current live field application records.", rows: applications }),
+    suppliers: createReport({ id: "inventory-suppliers", title: "Input supplier directory", filename: "growmo-input-supplier-directory", description: "Current farm supplier records and purchase sources.", rows: suppliers }),
+    analytics: createReport({ id: "inventory-price-analytics", title: "Input price analytics", filename: "growmo-input-price-analytics", description: "Current input price trends and buying analytics.", rows: PRICE_TRENDS }),
+  };
+  const activeReport = inventoryReports[view];
 
   /* close the shell's own overlays whenever this page opens one */
   useEffect(() => {
@@ -803,6 +821,7 @@ function InputsInventoryPage() {
           },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "catalog" ? (
         <CatalogView
@@ -1983,6 +2002,8 @@ function InputsInventoryPage() {
           onClose={() => setModal(null)}
         />
       </Dialog>
+
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
 
       {/* 23 — how the AI purchase list works */}
       <Dialog

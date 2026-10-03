@@ -37,8 +37,14 @@ function toReportValue(value: unknown): ReportValue {
   ) {
     return value;
   }
-  if (Array.isArray(value)) return value.join(" · ");
-  return String(value);
+  if (Array.isArray(value)) {
+    return value
+      .map((item) =>
+        typeof item === "object" && item !== null ? JSON.stringify(item) : String(item),
+      )
+      .join(" · ");
+  }
+  return JSON.stringify(value);
 }
 
 /**
@@ -58,18 +64,27 @@ export function createReport<T extends object>({
   filename: string;
   description: string;
   rows: readonly T[];
-  columns: readonly (keyof T & string)[];
+  columns?: readonly (keyof T & string)[];
 }): ReportDefinition {
+  const reportColumns =
+    columns ??
+    (rows[0]
+      ? (Object.keys(rows[0]).filter((key) => key !== "id") as (keyof T & string)[])
+      : []);
+
   return {
     id,
     title,
     filename,
     description,
-    columns: columns.map((key) => ({ key, label: reportColumnLabel(key) })),
+    columns: reportColumns.map((key) => ({
+      key,
+      label: reportColumnLabel(key),
+    })),
     rows: rows.map(
       (row) =>
         Object.fromEntries(
-          columns.map((key) => [key, toReportValue(row[key])]),
+          reportColumns.map((key) => [key, toReportValue(row[key])]),
         ) as ReportRow,
     ),
   };

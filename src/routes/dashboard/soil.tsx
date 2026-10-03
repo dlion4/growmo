@@ -114,6 +114,12 @@ import {
   TrendPointDialog,
   type TrendPoint,
 } from "../../components/dashboard/pages/SoilModals";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   COMPOST_BATCHES,
@@ -2772,6 +2778,7 @@ function SoilPage() {
   const toast = useToast();
   const navigate = useNavigate();
   const [view, setView] = useState<SoilView>("scheduler");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [menu, setMenu] = useState(false);
@@ -3116,6 +3123,19 @@ function SoilPage() {
     openModal("sampling");
   };
 
+  const soilReports: Record<SoilView, ReportDefinition> = {
+    scheduler: createReport({ id: "soil-test-scheduler", title: "Soil test scheduler", filename: "growmo-soil-test-scheduler", description: "Current field soil-test schedule and plot status.", rows: plots }),
+    results: createReport({ id: "soil-results", title: "Soil results dashboard", filename: "growmo-soil-results-dashboard", description: "Current soil parameter results and interpretation.", rows: SOIL_PARAMETERS }),
+    program: createReport({ id: "soil-fertilizer-program", title: "Fertilizer program", filename: "growmo-soil-fertilizer-program", description: "Current live fertilizer program and application state.", rows: program }),
+    history: createReport({ id: "soil-history", title: "Soil history and trend", filename: "growmo-soil-history-and-trend", description: "Current recorded soil-test history and trend data.", rows: history }),
+    sampling: createReport({ id: "soil-sampling-guide", title: "Soil sampling guide", filename: "growmo-soil-sampling-guide", description: "Current field sampling steps and kit guidance.", rows: SAMPLING_STEPS }),
+    labs: createReport({ id: "soil-labs", title: "Soil laboratory directory", filename: "growmo-soil-laboratory-directory", description: "Current soil lab directory and testing services.", rows: SOIL_LABS }),
+    plan: createReport({ id: "soil-improvement-plan", title: "Soil improvement plan", filename: "growmo-soil-improvement-plan", description: "Current soil improvement practices and status.", rows: practices }),
+    moisture: createReport({ id: "soil-moisture", title: "Soil moisture record", filename: "growmo-soil-moisture-record", description: "Current weekly moisture and irrigation record.", rows: weeks }),
+    records: createReport({ id: "soil-orders", title: "Soil orders and records", filename: "growmo-soil-orders-and-records", description: "Current live soil orders and related records.", rows: orders }),
+  };
+  const activeReport = soilReports[view];
+
   /* --------------------------------------------------------------- render */
 
   return (
@@ -3294,6 +3314,7 @@ function SoilPage() {
             ]}
           />
         </div>
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         {plans.length > 0 ? (
           <div className="gm-card p-3 mt-3">
@@ -4131,6 +4152,7 @@ function SoilPage() {
         onExported={exportSoil}
       />
 
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <SoilSettingsDialog
         open={modal === "settings"}
         onClose={closeModal}
