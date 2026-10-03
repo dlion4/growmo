@@ -42,6 +42,11 @@ import {
   DashboardSectionHeader,
   StatusChip,
 } from "../../components/dashboard/pages/DashboardWidgets";
+import {
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
   type TeamModalState,
@@ -126,6 +131,7 @@ type TeamView =
 function TeamPage() {
   const toast = useToast();
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [view, setView] = useState<TeamView>("overview");
   const [modal, setModal] = useState<TeamModalState>({ kind: "none" });
   const [rowMenu, setRowMenu] = useState("");
@@ -239,6 +245,215 @@ function TeamPage() {
     else setView("payroll");
   };
 
+  const teamReports: Record<TeamView, ReportDefinition> = {
+    overview: {
+      id: "team-hr-overview",
+      title: "Team & HR overview",
+      filename: "growmo-team-hr-overview",
+      description: "A live summary of crew capacity, payroll, attendance, compliance and advances for the current payroll week.",
+      columns: [
+        { key: "area", label: "Area" },
+        { key: "record", label: "Record" },
+        { key: "value", label: "Current value" },
+      ],
+      rows: [
+        { area: "Crew", record: "Active workers", value: activeCount },
+        { area: "Crew", record: "Directory records", value: workers.length },
+        { area: "Payroll", record: "This week's payroll", value: kes(Math.round(payrollTotal)) },
+        { area: "Payroll", record: "Payroll stage", value: stageLabel },
+        { area: "Attendance", record: "October attendance", value: "93%" },
+        { area: "Performance", record: "Average rating", value: `${avgRating}★` },
+        { area: "Money", record: "Advances outstanding", value: kes(outstanding) },
+        { area: "Compliance", record: "Requirements met", value: `${compliance.filter((row) => row.status === "Met").length}/${compliance.length}` },
+      ],
+    },
+    directory: {
+      id: "team-worker-directory",
+      title: "Team worker directory",
+      filename: "growmo-team-worker-directory",
+      description: "Current worker records using the active directory search, employment-type and status filters.",
+      columns: [
+        { key: "worker", label: "Worker" },
+        { key: "contact", label: "Contact" },
+        { key: "employment", label: "Employment" },
+        { key: "rate", label: "Rate" },
+        { key: "attendance", label: "Attendance" },
+        { key: "rating", label: "Rating" },
+        { key: "status", label: "Status" },
+      ],
+      rows: filteredWorkers.map((worker) => ({
+        worker: `${worker.name} · ${worker.id}`,
+        contact: `${worker.phone} · ${worker.village}`,
+        employment: worker.empType,
+        rate: `${kes(worker.dailyRate)}/day · ${worker.payFreq}`,
+        attendance: `${worker.attendancePct}%`,
+        rating: `${worker.rating}★ · ${worker.tasksDone} tasks`,
+        status: worker.status,
+      })),
+    },
+    recruitment: {
+      id: "team-recruitment-pipeline",
+      title: "Recruitment & onboarding pipeline",
+      filename: "growmo-team-recruitment-pipeline",
+      description: "Open job posts, applicant stages and onboarding progress for the current hiring cycle.",
+      columns: [
+        { key: "area", label: "Area" },
+        { key: "person", label: "Post / applicant" },
+        { key: "detail", label: "Detail" },
+        { key: "status", label: "Status" },
+      ],
+      rows: [
+        ...posts.map((post) => ({
+          area: "Job post",
+          person: `${post.title} · ${post.id}`,
+          detail: `${post.needed} needed · ${post.hired} hired · ${post.rate} · closes ${post.closes}`,
+          status: post.status,
+        })),
+        ...applicants.map((applicant) => ({
+          area: "Applicant",
+          person: `${applicant.name} · ${applicant.id}`,
+          detail: `${applicant.job} · ${applicant.village} · ${applicant.skills.join(", ")}`,
+          status: applicant.stage === "Onboarding" ? `${applicant.stage} · ${Math.min(onb[applicant.id] ?? 0, ONBOARDING_STEPS.length)}/${ONBOARDING_STEPS.length}` : applicant.stage,
+        })),
+      ],
+    },
+    attendance: {
+      id: "team-attendance-register",
+      title: "Team attendance register",
+      filename: "growmo-team-attendance-register",
+      description: "Today's check-in register and October attendance summary, including overtime hours.",
+      columns: [
+        { key: "period", label: "Period" },
+        { key: "worker", label: "Worker" },
+        { key: "detail", label: "Attendance detail" },
+        { key: "status", label: "Status" },
+      ],
+      rows: [
+        ...ATTENDANCE_TODAY.map((row) => ({
+          period: "Today",
+          worker: row.worker,
+          detail: `${row.checkIn}–${row.checkOut} · ${row.task}`,
+          status: row.status,
+        })),
+        ...ATTENDANCE_MONTH.map((row) => ({
+          period: "October",
+          worker: row.worker,
+          detail: `${row.present} present · ${row.absent} absent · ${row.late} late · ${row.overtime} OT hours`,
+          status: `${row.pct}% attendance`,
+        })),
+      ],
+    },
+    performance: {
+      id: "team-performance-ledger",
+      title: "Team performance ledger",
+      filename: "growmo-team-performance-ledger",
+      description: `Task-rating history and current performance context for ${perfWorker}.`,
+      columns: [
+        { key: "worker", label: "Worker" },
+        { key: "task", label: "Task / plot" },
+        { key: "date", label: "Date" },
+        { key: "rating", label: "Rating" },
+        { key: "outcome", label: "Outcome" },
+      ],
+      rows: TASK_RATINGS.map((rating) => ({
+        worker: rating.worker,
+        task: `${rating.task} · ${rating.plot}`,
+        date: rating.date,
+        rating: `${rating.stars}★`,
+        outcome: rating.rework ? "Rework required" : "Clean completion",
+      })),
+    },
+    payroll: {
+      id: "team-weekly-payroll",
+      title: "Team weekly payroll",
+      filename: "growmo-team-weekly-payroll",
+      description: `${TEAM_CONTEXT.week} payroll with basic pay, overtime, piece rates, deductions and net pay.`,
+      columns: [
+        { key: "worker", label: "Worker" },
+        { key: "days", label: "Days" },
+        { key: "basic", label: "Basic" },
+        { key: "overtime", label: "Overtime" },
+        { key: "piece", label: "Piece rate" },
+        { key: "deductions", label: "Deductions" },
+        { key: "net", label: "Net pay" },
+      ],
+      rows: lines.map((line) => ({
+        worker: `${line.worker} · ${line.workerId}`,
+        days: line.daysWorked,
+        basic: kes(line.basic),
+        overtime: line.otPay ? `${kes(line.otPay)} · ${line.otHours} h` : "—",
+        piece: line.piece ? kes(line.piece) : "—",
+        deductions: kes(line.absenceDed + line.advanceDed + line.otherDed),
+        net: kes(payslipNet(line)),
+      })),
+    },
+    advances: {
+      id: "team-advances-ledger",
+      title: "Team advances & deductions ledger",
+      filename: "growmo-team-advances-ledger",
+      description: "Named worker advances, deductions, repayment arrangements and outstanding balances.",
+      columns: [
+        { key: "record", label: "Record" },
+        { key: "worker", label: "Worker" },
+        { key: "type", label: "Type" },
+        { key: "amount", label: "Amount" },
+        { key: "date", label: "Date" },
+        { key: "reason", label: "Reason" },
+        { key: "repayment", label: "Repayment" },
+        { key: "status", label: "Status" },
+      ],
+      rows: advances.map((advance) => ({
+        record: advance.id,
+        worker: advance.worker,
+        type: advance.type,
+        amount: kes(advance.amount),
+        date: advance.date,
+        reason: advance.reason,
+        repayment: advance.plan,
+        status: advance.status,
+      })),
+    },
+    compliance: {
+      id: "team-compliance-register",
+      title: "Team labour compliance register",
+      filename: "growmo-team-labour-compliance",
+      description: "Kenyan labour obligations, the evidence GrowMO tracks and their current farm status.",
+      columns: [
+        { key: "requirement", label: "Requirement" },
+        { key: "tracking", label: "How GrowMO tracks it" },
+        { key: "status", label: "Status" },
+        { key: "note", label: "Note" },
+      ],
+      rows: compliance.map((row) => ({
+        requirement: row.requirement,
+        tracking: row.tracking,
+        status: row.status,
+        note: row.note,
+      })),
+    },
+    analytics: {
+      id: "team-labour-analytics",
+      title: "Team labour analytics",
+      filename: "growmo-team-labour-analytics",
+      description: "This month versus last month and the Kiambu county benchmark where one is available.",
+      columns: [
+        { key: "metric", label: "Measure" },
+        { key: "current", label: "This month" },
+        { key: "previous", label: "Last month" },
+        { key: "change", label: "Change" },
+        { key: "county", label: "County average" },
+      ],
+      rows: ANALYTICS.map((row) => ({
+        metric: row.metric,
+        current: row.current,
+        previous: row.previous,
+        change: row.change,
+        county: row.county,
+      })),
+    },
+  };
+  const activeReport = teamReports[view];
+
   return (
     <main className="gm-app-page gm-team-page">
       <div className="gm-container py-4">
@@ -274,10 +489,10 @@ function TeamPage() {
                   type="button"
                   onClick={() => {
                     setMenu(false);
-                    setModal({ kind: "export" });
+                    setReportPreview(activeReport);
                   }}
                 >
-                  <Download /> Export team records
+                  <Download /> Preview team records
                 </button>
                 <button
                   type="button"
@@ -302,10 +517,10 @@ function TeamPage() {
                   type="button"
                   onClick={() => {
                     setMenu(false);
-                    window.print();
+                    setReportPreview(activeReport);
                   }}
                 >
-                  <Printer /> Print current view
+                  <Printer /> Print / download current report
                 </button>
               </div>
             ) : null}
@@ -389,6 +604,8 @@ function TeamPage() {
             ]}
           />
         </div>
+
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         <div className="gm-team-main">
           {view === "overview" ? (
@@ -500,6 +717,8 @@ function TeamPage() {
 
           {view === "analytics" ? <AnalyticsTab setModal={setModal} /> : null}
         </div>
+
+        <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
 
         <TeamModals
           modal={modal}

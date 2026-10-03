@@ -184,6 +184,32 @@ export function ReportTools({
   );
 }
 
+export function ReportActionBar({
+  report,
+  onPreview,
+}: {
+  report: ReportDefinition;
+  onPreview: (report: ReportDefinition) => void;
+}) {
+  return (
+    <section className="gm-card p-3 mt-3">
+      <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <span className="gm-eyebrow">
+            <FileText /> Live report controls
+          </span>
+          <strong className="d-block mt-1">{report.title}</strong>
+          <small className="text-muted">
+            {report.rows.length} record{report.rows.length === 1 ? "" : "s"}{" "}
+            ready to preview, print or download.
+          </small>
+        </div>
+        <ReportTools report={report} onPreview={onPreview} />
+      </div>
+    </section>
+  );
+}
+
 export function ReportPreviewDrawer({
   report,
   onClose,
