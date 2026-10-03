@@ -2,25 +2,43 @@
    PAGE 6 WORKFLOWS — worker, task, attendance, payroll and settings dialogs
    ========================================================================== */
 import {
+  Banknote,
+  Briefcase,
+  CalendarDays,
+  CalendarRange,
   CheckCircle2,
   ChevronRight,
+  CircleDollarSign,
+  Crown,
   FileText,
+  HardHat,
   ImagePlus,
   Info,
+  Landmark,
   LoaderCircle,
+  MapPin,
   MessageSquare,
+  ShieldCheck,
   Smartphone,
   Sparkles,
+  Sun,
+  UserCheck,
+  UserCog,
+  UserRound,
   WalletCards,
   Wrench,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type {
   AttendanceRecord,
   AttendanceStatus,
+  EmploymentType,
   LabourSettings,
   LabourTask,
+  PayCadence,
+  PayDestination,
   PaymentStatus,
   PayrollPayment,
   RateType,
@@ -28,17 +46,112 @@ import type {
   TaskType,
   Worker,
   WorkerStatus,
-} from "../../data/app/labour";
+} from "../../../data/app/labour";
 import {
-  PAYMENT_FREQUENCIES,
+  EMPLOYMENT_TYPES,
+  FARM_AREAS,
+  PAY_CADENCES,
+  PAY_DESTINATIONS,
   REQUIRED_TOOLS,
   TASK_TEMPLATES,
   TASK_TYPES,
   WORKER_SKILLS,
-} from "../../data/app/labour";
-import { kes } from "../../data/site";
-import { Dialog, OtpInput, PinPad, Stepper, Toggle } from "../auth/controls";
+} from "../../../data/app/labour";
+import { kes } from "../../../data/site";
+import { Dialog, OtpInput, PinPad, Stepper, Toggle } from "../../auth/controls";
 import { StatusChip, WizardActions } from "./DashboardWidgets";
+
+/* --- wizard metadata: employment types, pay cadence & payout destinations -- */
+const EMPLOYMENT_TYPE_ICONS: Record<EmploymentType, LucideIcon> = {
+  Supervisor: UserCog,
+  Manager: Crown,
+  Master: HardHat,
+  Employee: UserRound,
+  Casual: UserCheck,
+  Contractor: Landmark,
+};
+
+const EMPLOYMENT_TYPE_BLURB: Record<EmploymentType, string> = {
+  Supervisor: "Oversees crews, checks quality and approves completed work.",
+  Manager: "Runs the farm day to day — approves payroll and schedules.",
+  Master: "Senior hand who trains others and leads the tricky jobs.",
+  Employee: "Permanent worker on the recurring farm schedule.",
+  Casual: "Called in on peak days and paid as they work.",
+  Contractor: "External crew hired per contract or specific job.",
+};
+
+const PAY_CADENCE_META: Record<
+  PayCadence,
+  {
+    icon: LucideIcon;
+    suffix: string;
+    amountLabel: string;
+    hint: string;
+    lands: string;
+  }
+> = {
+  Daily: {
+    icon: Sun,
+    suffix: "/day",
+    amountLabel: "Amount per day (KES)",
+    hint: "Released at the end of every working day.",
+    lands: "at the end of each working day",
+  },
+  Weekly: {
+    icon: CalendarDays,
+    suffix: "/week",
+    amountLabel: "Amount per week (KES)",
+    hint: "Released every week on the agreed payday.",
+    lands: "every week on the agreed payday",
+  },
+  Monthly: {
+    icon: CalendarRange,
+    suffix: "/month",
+    amountLabel: "Amount per month (KES)",
+    hint: "Paid as a monthly salary on the agreed date.",
+    lands: "as a monthly salary on the agreed date",
+  },
+  "End of task": {
+    icon: CheckCircle2,
+    suffix: "/task",
+    amountLabel: "Amount per task (KES)",
+    hint: "Released once the task is marked complete.",
+    lands: "once the task is marked complete",
+  },
+};
+
+const PAY_DESTINATION_META: Record<
+  PayDestination,
+  {
+    icon: LucideIcon;
+    blurb: string;
+    accountLabel: string;
+    placeholder: string;
+    hint: string;
+  }
+> = {
+  "M-Pesa wallet": {
+    icon: Smartphone,
+    blurb: "Straight to their Safaricom line",
+    accountLabel: "M-Pesa number",
+    placeholder: "07XX XXX XXX",
+    hint: "Must be the registered Safaricom number or the payout bounces.",
+  },
+  "Bank transfer": {
+    icon: Landmark,
+    blurb: "Best for salaried roles",
+    accountLabel: "Bank · account number",
+    placeholder: "e.g. KCB · 1179 4432 001",
+    hint: "Bank details stay on the record and appear in the payroll run.",
+  },
+  "Cash at office": {
+    icon: Banknote,
+    blurb: "Signed out of the cash book",
+    accountLabel: "Collection note",
+    placeholder: "e.g. Collect Fridays at the farm office",
+    hint: "Log every cash payout in the payroll cash book for audit.",
+  },
+};
 import { LabourInsight } from "./LabourWidgets";
 
 function Field({
@@ -186,7 +299,7 @@ export function WorkerWizard({
 }) {
   const [step, setStep] = useState(0);
   const [worker, setWorker] = useState<Worker>(emptyWorker);
-  const steps = ["Profile", "Skills & rate", "Confirm"];
+  const steps = ["Profile", "Pay & skills", "Confirm"];
 
   useEffect(() => {
     if (!open) return;
@@ -217,7 +330,7 @@ export function WorkerWizard({
     step === 0
       ? Boolean(worker.name && worker.phone && worker.nationalId)
       : step === 1
-        ? worker.skills.length > 0
+        ? worker.skills.length > 0 && worker.payAmount > 0
         : true;
 
   return (
@@ -232,119 +345,313 @@ export function WorkerWizard({
       desc="Keep the phone, M-Pesa name and agreed rate together so every payment is auditable."
       wide
     >
-      <Stepper steps={steps} current={step} />
-      {step === 0 ? (
-        <div className="row g-3 mt-1">
-          <Field label="Full name" className="col-md-7">
-            <TextInput
-              value={worker.name}
-              placeholder="e.g. Beatrice Wanjiru"
-              onChange={(value) => update("name", value)}
-            />
-          </Field>
-          <Field
-            label="Worker ID"
-            className="col-md-5"
-            hint="Generated IDs remain stable for payroll history."
-          >
-            <TextInput
-              value={worker.id}
-              onChange={(value) => update("id", value.toUpperCase())}
-            />
-          </Field>
-          <Field label="Kenyan phone" className="col-md-6">
-            <TextInput
-              value={worker.phone}
-              placeholder="07XX XXX XXX"
-              onChange={(value) => update("phone", value)}
-            />
-          </Field>
-          <Field label="National ID" className="col-md-6">
-            <TextInput
-              value={worker.nationalId}
-              placeholder="8 digit ID number"
-              onChange={(value) => update("nationalId", value)}
-            />
-          </Field>
-          <Field
-            label="M-Pesa registered name"
-            className="col-md-6"
-            hint="Must match the Safaricom account name."
-          >
-            <TextInput
-              value={worker.mpesaName}
-              placeholder="Name as shown on M-Pesa"
-              onChange={(value) => update("mpesaName", value)}
-            />
-          </Field>
-          <Field label="Village / ward" className="col-md-6">
-            <TextInput
-              value={worker.village}
-              onChange={(value) => update("village", value)}
-            />
-          </Field>
-          <Field label="Emergency contact" className="col-md-6">
-            <TextInput
-              value={worker.emergencyContact}
-              placeholder="Name · phone"
-              onChange={(value) => update("emergencyContact", value)}
-            />
-          </Field>
-          <Field label="Directory status" className="col-md-6">
-            <SelectInput
-              value={worker.status}
-              onChange={(value) => update("status", value as WorkerStatus)}
-              options={["active", "on-leave", "inactive"]}
-            />
-          </Field>
+      <div className="gm-ww2">
+        <div className="gm-ww2-progress" aria-hidden="true">
+          <span className="gm-ww2-progress-fill" style={{ width: `${((step + 1) / steps.length) * 100}%` }} />
         </div>
-      ) : null}
-      {step === 1 ? (
-        <div className="mt-1">
-          <div className="row g-3">
-            <Field label="Agreed daily rate (KES)" className="col-md-6">
-              <TextInput
-                type="number"
-                value={worker.dailyRate}
-                onChange={(value) => update("dailyRate", Number(value))}
-              />
-            </Field>
-            <Field label="Pay preference" className="col-md-6">
-              <SelectInput
-                value={worker.frequency}
-                onChange={(value) =>
-                  update("frequency", value as Worker["frequency"])
-                }
-                options={[...PAYMENT_FREQUENCIES]}
-              />
-            </Field>
-          </div>
-          <span className="gm-field-label mt-3 d-block">
-            Skills on this farm
-          </span>
-          <div className="row g-2 mt-1">
-            {WORKER_SKILLS.map((skill) => (
-              <div className="col-sm-6 col-lg-4" key={skill}>
-                <CheckOption
-                  checked={worker.skills.includes(skill)}
-                  onChange={() => toggleSkill(skill)}
-                  label={skill}
-                />
+        <Stepper steps={steps} current={step} />
+        {step === 0 ? (
+          <div className="gm-ww2-step" key="step-0">
+            <section className="gm-ww2-group">
+              <header className="gm-ww2-group-head">
+                <span className="gm-ww2-group-icon">
+                  <UserRound width={15} height={15} />
+                </span>
+                <div>
+                  <strong>Identity</strong>
+                  <small>The name that appears on schedules and payslips</small>
+                </div>
+              </header>
+              <div className="row g-3">
+                <Field label="Full name" className="col-md-7">
+                  <TextInput
+                    value={worker.name}
+                    placeholder="e.g. Beatrice Wanjiru"
+                    onChange={(value) => update("name", value)}
+                  />
+                </Field>
+                <Field
+                  label="Worker ID"
+                  className="col-md-5"
+                  hint="Generated IDs remain stable for payroll history."
+                >
+                  <TextInput
+                    value={worker.id}
+                    onChange={(value) => update("id", value.toUpperCase())}
+                  />
+                </Field>
               </div>
-            ))}
+            </section>
+
+            <section className="gm-ww2-group">
+              <header className="gm-ww2-group-head">
+                <span className="gm-ww2-group-icon">
+                  <Smartphone width={15} height={15} />
+                </span>
+                <div>
+                  <strong>Contact &amp; M-Pesa verification</strong>
+                  <small>Payments only succeed when these three agree</small>
+                </div>
+              </header>
+              <div className="row g-3">
+                <Field label="Kenyan phone" className="col-md-6">
+                  <TextInput
+                    value={worker.phone}
+                    placeholder="07XX XXX XXX"
+                    onChange={(value) => update("phone", value)}
+                  />
+                </Field>
+                <Field label="National ID" className="col-md-6">
+                  <TextInput
+                    value={worker.nationalId}
+                    placeholder="8 digit ID number"
+                    onChange={(value) => update("nationalId", value)}
+                  />
+                </Field>
+                <Field label="M-Pesa registered name" className="col-12">
+                  <TextInput
+                    value={worker.mpesaName}
+                    placeholder="Name as shown on M-Pesa"
+                    onChange={(value) => update("mpesaName", value)}
+                  />
+                </Field>
+              </div>
+              <p className="gm-ww2-note">
+                <ShieldCheck width={14} height={14} />
+                Must match the Safaricom account name exactly — otherwise the payout bounces back to the wallet.
+              </p>
+            </section>
+
+            <section className="gm-ww2-group">
+              <header className="gm-ww2-group-head">
+                <span className="gm-ww2-group-icon">
+                  <Briefcase width={15} height={15} />
+                </span>
+                <div>
+                  <strong>Employment &amp; placement</strong>
+                  <small>Their role level and the area of the farm they cover</small>
+                </div>
+              </header>
+              <span className="gm-ww2-label">Type of employment</span>
+              <div className="gm-ww2-tabs" role="tablist" aria-label="Employment type">
+                {EMPLOYMENT_TYPES.map((type) => {
+                  const TypeIcon = EMPLOYMENT_TYPE_ICONS[type];
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      role="tab"
+                      aria-selected={worker.employmentType === type}
+                      className={`gm-ww2-tab ${worker.employmentType === type ? "is-on" : ""}`}
+                      onClick={() => update("employmentType", type)}
+                    >
+                      <TypeIcon width={14} height={14} />
+                      {type}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="gm-ww2-tab-hint">
+                {EMPLOYMENT_TYPE_BLURB[worker.employmentType]}
+              </p>
+              <div className="row g-3">
+                <Field
+                  label="Farm allocated"
+                  className="col-md-6"
+                  hint="Tasks and attendance are filtered to this area."
+                >
+                  <SelectInput
+                    value={worker.farmArea}
+                    onChange={(value) => update("farmArea", value)}
+                    options={[...FARM_AREAS]}
+                  />
+                </Field>
+                <Field label="Village / ward" className="col-md-6">
+                  <TextInput
+                    value={worker.village}
+                    onChange={(value) => update("village", value)}
+                  />
+                </Field>
+                <Field label="Emergency contact" className="col-md-6">
+                  <TextInput
+                    value={worker.emergencyContact}
+                    placeholder="Name · phone"
+                    onChange={(value) => update("emergencyContact", value)}
+                  />
+                </Field>
+                <Field label="Directory status" className="col-md-6">
+                  <SelectInput
+                    value={worker.status}
+                    onChange={(value) => update("status", value as WorkerStatus)}
+                    options={["active", "on-leave", "inactive"]}
+                  />
+                </Field>
+              </div>
+            </section>
           </div>
-          <Field label="Notes for Mary" className="mt-3">
-            <textarea
-              className="gm-input"
-              rows={3}
-              value={worker.notes}
-              onChange={(event) => update("notes", event.target.value)}
-            />
-          </Field>
-        </div>
-      ) : null}
-      {step === 2 ? (
-        <div className="mt-1">
+        ) : null}
+        {step === 1 ? (
+          <div className="gm-ww2-step" key="step-1">
+            <section className="gm-ww2-group">
+              <header className="gm-ww2-group-head">
+                <span className="gm-ww2-group-icon">
+                  <WalletCards width={15} height={15} />
+                </span>
+                <div>
+                  <strong>Pay structure</strong>
+                  <small>How much they earn and when the money is released</small>
+                </div>
+              </header>
+              <span className="gm-ww2-label">How often are they paid?</span>
+              <div className="gm-ww2-tabs" role="tablist" aria-label="Pay cadence">
+                {PAY_CADENCES.map((cadence) => {
+                  const CadenceIcon = PAY_CADENCE_META[cadence].icon;
+                  return (
+                    <button
+                      key={cadence}
+                      type="button"
+                      role="tab"
+                      aria-selected={worker.payCadence === cadence}
+                      className={`gm-ww2-tab ${worker.payCadence === cadence ? "is-on" : ""}`}
+                      onClick={() => update("payCadence", cadence)}
+                    >
+                      <CadenceIcon width={14} height={14} />
+                      {cadence}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="row g-3">
+                <Field
+                  label={PAY_CADENCE_META[worker.payCadence].amountLabel}
+                  className="col-md-6"
+                  hint={PAY_CADENCE_META[worker.payCadence].hint}
+                >
+                  <TextInput
+                    type="number"
+                    value={worker.payAmount}
+                    onChange={(value) => update("payAmount", Number(value))}
+                  />
+                </Field>
+                <Field
+                  label="Agreed daily rate (KES)"
+                  className="col-md-6"
+                  hint="Prices one-off tasks and overtime hours."
+                >
+                  <TextInput
+                    type="number"
+                    value={worker.dailyRate}
+                    onChange={(value) => update("dailyRate", Number(value))}
+                  />
+                </Field>
+              </div>
+              <p className="gm-ww2-pay-preview">
+                <CircleDollarSign width={17} height={17} />
+                <span>
+                  <strong>
+                    {kes(worker.payAmount)}
+                    {PAY_CADENCE_META[worker.payCadence].suffix}
+                  </strong>
+                  <small>
+                    Money lands {PAY_CADENCE_META[worker.payCadence].lands}
+                  </small>
+                </span>
+                <em className="gm-ww2-pay-tag">{worker.employmentType}</em>
+              </p>
+            </section>
+
+            <section className="gm-ww2-group">
+              <header className="gm-ww2-group-head">
+                <span className="gm-ww2-group-icon">
+                  <Smartphone width={15} height={15} />
+                </span>
+                <div>
+                  <strong>Payout destination</strong>
+                  <small>Where they collect the money each payday</small>
+                </div>
+              </header>
+              <div
+                className="gm-ww2-dest"
+                role="radiogroup"
+                aria-label="Payout destination"
+              >
+                {PAY_DESTINATIONS.map((destination) => {
+                  const DestIcon = PAY_DESTINATION_META[destination].icon;
+                  const active = worker.payDestination === destination;
+                  return (
+                    <button
+                      key={destination}
+                      type="button"
+                      role="radio"
+                      aria-checked={active}
+                      className={`gm-ww2-dest-card ${active ? "is-on" : ""}`}
+                      onClick={() => update("payDestination", destination)}
+                    >
+                      <span className="gm-ww2-dest-icon">
+                        <DestIcon width={16} height={16} />
+                      </span>
+                      <span>
+                        <strong>{destination}</strong>
+                        <small>{PAY_DESTINATION_META[destination].blurb}</small>
+                      </span>
+                      {active ? (
+                        <CheckCircle2
+                          width={15}
+                          height={15}
+                          className="gm-ww2-dest-check"
+                        />
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+              <Field
+                label={PAY_DESTINATION_META[worker.payDestination].accountLabel}
+                hint={PAY_DESTINATION_META[worker.payDestination].hint}
+              >
+                <TextInput
+                  value={worker.payAccount}
+                  placeholder={
+                    PAY_DESTINATION_META[worker.payDestination].placeholder
+                  }
+                  onChange={(value) => update("payAccount", value)}
+                />
+              </Field>
+            </section>
+            <section className="gm-ww2-group">
+              <header className="gm-ww2-group-head">
+                <span className="gm-ww2-group-icon">
+                  <Wrench width={15} height={15} />
+                </span>
+                <div>
+                  <strong>Skills on this farm</strong>
+                  <small>Pick everything they can do — tasks match on these</small>
+                </div>
+              </header>
+              <div className="row g-2">
+                {WORKER_SKILLS.map((skill) => (
+                  <div className="col-sm-6 col-lg-4" key={skill}>
+                    <CheckOption
+                      checked={worker.skills.includes(skill)}
+                      onChange={() => toggleSkill(skill)}
+                      label={skill}
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
+            <Field label="Notes for Mary">
+              <textarea
+                className="gm-input"
+                rows={3}
+                value={worker.notes}
+                onChange={(event) => update("notes", event.target.value)}
+              />
+            </Field>
+          </div>
+        ) : null}
+        {step === 2 ? (
+          <div className="gm-ww2-step" key="step-2">
           <div className="gm-plan-detail-hero">
             <WorkerAvatar worker={worker} />
             <div style={{ flex: 1 }}>
@@ -360,14 +667,27 @@ export function WorkerWizard({
           </div>
           <div className="gm-plan-facts mt-3">
             <span>
+              <Briefcase />
+              <small>Role</small>
+              <strong>{worker.employmentType}</strong>
+            </span>
+            <span>
+              <MapPin />
+              <small>Farm allocated</small>
+              <strong>{worker.farmArea}</strong>
+            </span>
+            <span>
               <WalletCards />
-              <small>Daily rate</small>
-              <strong>{kes(worker.dailyRate)}</strong>
+              <small>Pay</small>
+              <strong>
+                {kes(worker.payAmount)}
+                {PAY_CADENCE_META[worker.payCadence].suffix}
+              </strong>
             </span>
             <span>
               <Smartphone />
-              <small>Payment</small>
-              <strong>{worker.frequency} · M-Pesa</strong>
+              <small>Payout</small>
+              <strong>{worker.payDestination}</strong>
             </span>
             <span>
               <Wrench />
@@ -392,8 +712,9 @@ export function WorkerWizard({
               </small>
             </span>
           </div>
-        </div>
-      ) : null}
+          </div>
+        ) : null}
+      </div>
       <WizardActions
         step={step}
         last={steps.length - 1}
@@ -620,7 +941,8 @@ export function TaskWizard({
                       <strong>{worker.name}</strong>
                       <small>
                         {worker.id} · {worker.skills.slice(0, 2).join(" · ")} ·{" "}
-                        {kes(worker.dailyRate)}/day
+                        {kes(worker.payAmount)}
+                        {PAY_CADENCE_META[worker.payCadence].suffix}
                       </small>
                     </span>
                     <small>
@@ -1277,6 +1599,38 @@ export function AttendanceWizard({
                     ),
                   )}
                 </div>
+                <div className="gm-time-btn-group mt-3">
+                  <button
+                    type="button"
+                    className="gm-time-btn"
+                    onClick={() =>
+                      setDraft((current) =>
+                        current.map((item) =>
+                          item.id === record.id
+                            ? { ...item, actualHours: 4 }
+                            : item,
+                        ),
+                      )
+                    }
+                  >
+                    HALF DAY
+                  </button>
+                  <button
+                    type="button"
+                    className="gm-time-btn gm-time-btn-full"
+                    onClick={() =>
+                      setDraft((current) =>
+                        current.map((item) =>
+                          item.id === record.id
+                            ? { ...item, actualHours: 8 }
+                            : item,
+                        ),
+                      )
+                    }
+                  >
+                    FULL DAY
+                  </button>
+                </div>
                 <Field label="Actual hours" className="mt-3">
                   <TextInput
                     type="number"
@@ -1431,126 +1785,122 @@ export function PaymentWizard({
       dismissable={!processing}
       wide
     >
-      <Stepper steps={steps} current={step} />
-      {step === 0 ? (
-        <div className="mt-1">
-          <div className="gm-plan-total">
-            <div>
+      <div className="gm-payment-modal">
+        <Stepper steps={steps} current={step} />
+        {step === 0 ? (
+          <div className="mt-1">
+            <div className="gm-plan-total">
+              <div>
+                <span>
+                  {payments.length} payment{payments.length === 1 ? "" : "s"}
+                </span>
+                <strong className="font-display">{kes(total)}</strong>
+              </div>
+              <div className="text-end">
+                <span>From</span>
+                <strong className="d-block">GrowMO wallet</strong>
+              </div>
+            </div>
+            <div className="mt-3">
+              {payments.map((payment) => (
+                <PaymentStatusRow key={payment.id} payment={payment} />
+              ))}
+            </div>
+          </div>
+        ) : null}
+        {step === 1 ? (
+          <div className="mt-1">
+            <div className="gm-check-row">
+              <Smartphone />
               <span>
-                {payments.length} payment{payments.length === 1 ? "" : "s"}
+                <strong>OTP sent to Mary's phone</strong>
+                <small>
+                  Use the demo code 123456 to verify this payroll batch.
+                </small>
               </span>
-              <strong className="font-display">{kes(total)}</strong>
+              <StatusChip label="SMS sent" tone="low" />
             </div>
-            <div className="text-end">
-              <span>From</span>
-              <strong className="d-block">GrowMO wallet</strong>
+            <div className="mt-3">
+              <OtpInput
+                value={otp}
+                onChange={setOtp}
+                label="Enter 6-digit verification code"
+              />
             </div>
           </div>
-          <div className="mt-3">
-            {payments.map((payment) => (
-              <PaymentStatusRow key={payment.id} payment={payment} />
-            ))}
+        ) : null}
+        {step === 2 ? (
+          <div className="gm-payment-pin-section">
+            <div className="gm-payment-pin-label">
+              Enter wallet PIN to confirm {kes(total)} payment
+            </div>
+            <div className="gm-payment-pin-hint">
+              The PIN is local to this simulation. It is never stored.
+            </div>
+            {processing ? (
+              <div className="py-4">
+                <LoaderCircle className="gm-spin" />
+                <strong className="d-block mt-2">
+                  Confirming M-Pesa payment…
+                </strong>
+                <small className="text-muted">
+                  Updating payroll and receipt records.
+                </small>
+              </div>
+            ) : (
+              <PinPad
+                onComplete={completePin}
+                actionLabel={`Pay ${kes(total)} securely`}
+              />
+            )}
           </div>
-        </div>
-      ) : null}
-      {step === 1 ? (
-        <div className="mt-1">
-          <div className="gm-check-row">
-            <Smartphone />
-            <span>
-              <strong>OTP sent to Mary's phone</strong>
-              <small>
-                Use the demo code 123456 to verify this payroll batch.
-              </small>
-            </span>
-            <StatusChip label="SMS sent" tone="low" />
-          </div>
-          <div className="mt-3">
-            <OtpInput
-              value={otp}
-              onChange={setOtp}
-              label="Enter 6-digit verification code"
+        ) : null}
+        {step === 3 ? (
+          <div className="mt-1 text-center">
+            <CheckCircle2
+              style={{ color: "var(--gm-leaf-600)", width: 54, height: 54 }}
             />
-          </div>
-        </div>
-      ) : null}
-      {step === 2 ? (
-        <div className="mt-1 text-center">
-          <h3 className="font-display">Enter wallet PIN</h3>
-          <p className="text-muted">
-            The PIN is local to this simulation. It is never stored.
-          </p>
-          {processing ? (
-            <div className="py-4">
-              <LoaderCircle className="gm-spin" />
-              <strong className="d-block mt-2">
-                Confirming M-Pesa payment…
-              </strong>
-              <small className="text-muted">
-                Updating payroll and receipt records.
-              </small>
+            <span className="gm-eyebrow d-block mt-2">Payment complete</span>
+            <h3 className="font-display">M-Pesa receipt {receipt}</h3>
+            <p className="text-muted">
+              {kes(total)} has moved from pending to paid. Worker records and the
+              payroll activity feed are updated.
+            </p>
+            <div className="gm-plan-payment-receipt text-start mt-3">
+              <div>
+                <span>Receipt</span>
+                <strong>{receipt}</strong>
+              </div>
+              <div>
+                <span>Workers</span>
+                <strong>
+                  {payments
+                    .map((payment) => payment.workerName.split(" ")[0])
+                    .join(", ")}
+                </strong>
+              </div>
+              <div>
+                <span>Time</span>
+                <strong>
+                  {new Date().toLocaleString("en-KE", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </strong>
+              </div>
             </div>
-          ) : (
-            <PinPad
-              onComplete={completePin}
-              actionLabel={`Pay ${kes(total)} securely`}
-            />
-          )}
-        </div>
-      ) : null}
-      {step === 3 ? (
-        <div className="mt-1 text-center">
-          <CheckCircle2
-            style={{ color: "var(--gm-leaf-600)", width: 54, height: 54 }}
-          />
-          <span className="gm-eyebrow d-block mt-2">Payment complete</span>
-          <h3 className="font-display">M-Pesa receipt {receipt}</h3>
-          <p className="text-muted">
-            {kes(total)} has moved from pending to paid. Worker records and the
-            payroll activity feed are updated.
-          </p>
-          <div className="gm-plan-payment-receipt text-start mt-3">
-            <div>
-              <span>Receipt</span>
-              <strong>{receipt}</strong>
-            </div>
-            <div>
-              <span>Workers</span>
-              <strong>
-                {payments
-                  .map((payment) => payment.workerName.split(" ")[0])
-                  .join(", ")}
-              </strong>
-            </div>
-            <div>
-              <span>Time</span>
-              <strong>
-                {new Date().toLocaleString("en-KE", {
-                  dateStyle: "medium",
-                  timeStyle: "short",
-                })}
-              </strong>
+            <div className="gm-payment-actions">
+              <button
+                type="button"
+                className="gm-payment-close"
+                onClick={onClose}
+              >
+                Done
+              </button>
             </div>
           </div>
-          <button
-            type="button"
-            className="gm-btn gm-btn-lime mt-3"
-            onClick={onClose}
-          >
-            Done
-          </button>
-        </div>
-      ) : null}
-      {step < 2 ? (
-        <WizardActions
-          step={step}
-          last={2}
-          onBack={() => setStep((current) => Math.max(0, current - 1))}
-          onNext={() => setStep((current) => current + 1)}
-          nextDisabled={step === 1 && otp.length < 6}
-          nextLabel={step === 1 ? "Continue to PIN" : "Continue"}
-        />
-      ) : null}
+        ) : null}
+      </div>
     </Dialog>
   );
 }

@@ -151,7 +151,7 @@ function HubPage() {
                 <button
                   className="gm-btn gm-btn-sm"
                   style={{ flex: 1 }}
-                  onClick={() => { navigate({ to: "/app/onboarding" }); }}
+                  onClick={() => { navigate({ to: "/dashboard/onboarding" }); }}
                 >
                   Enter <ChevronRight width={14} height={14} />
                 </button>
@@ -183,7 +183,7 @@ function HubPage() {
                     ))}
                   </div>
                 </div>
-                <button className="gm-btn gm-btn-block" onClick={() => { navigate({ to: "/app/onboarding" }); }}>
+                <button className="gm-btn gm-btn-block" onClick={() => { navigate({ to: "/dashboard/onboarding" }); }}>
                   Enter {preview.name} <ArrowRight />
                 </button>
               </>

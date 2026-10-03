@@ -8,6 +8,41 @@
 export type WorkerStatus = "active" | "on-leave" | "inactive";
 export type PaymentFrequency = "Daily" | "Weekly" | "End of task";
 export type RateType = "Daily rate" | "Piece rate";
+export type EmploymentType =
+  | "Supervisor"
+  | "Manager"
+  | "Master"
+  | "Employee"
+  | "Casual"
+  | "Contractor";
+export const EMPLOYMENT_TYPES: EmploymentType[] = [
+  "Supervisor",
+  "Manager",
+  "Master",
+  "Employee",
+  "Casual",
+  "Contractor",
+];
+export type PayCadence = "Daily" | "Weekly" | "Monthly" | "End of task";
+export const PAY_CADENCES: PayCadence[] = [
+  "Daily",
+  "Weekly",
+  "Monthly",
+  "End of task",
+];
+export type PayDestination = "M-Pesa wallet" | "Bank transfer" | "Cash at office";
+export const PAY_DESTINATIONS: PayDestination[] = [
+  "M-Pesa wallet",
+  "Bank transfer",
+  "Cash at office",
+];
+export const FARM_AREAS = [
+  "Whole farm",
+  "Shamba ya nyumba",
+  "Shamba ya bondeni",
+  "Nyuma ya boma",
+  "Chini ya mti",
+] as const;
 export type TaskType =
   | "Weeding"
   | "Planting"
@@ -81,6 +116,12 @@ export interface Worker {
   nationalId: string;
   village: string;
   county: string;
+  employmentType: EmploymentType;
+  farmArea: string;
+  payCadence: PayCadence;
+  payAmount: number;
+  payDestination: PayDestination;
+  payAccount: string;
   skills: string[];
   dailyRate: number;
   pieceRates: PieceRate[];
@@ -105,6 +146,12 @@ export const WORKERS: Worker[] = [
     nationalId: "12345678",
     village: "Githunguri",
     county: "Kiambu",
+    employmentType: "Employee",
+    farmArea: "Shamba ya nyumba",
+    payCadence: "Weekly",
+    payAmount: 3000,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0712 345 678",
     skills: ["Weeding", "Transplanting", "Spraying", "Harvesting"],
     dailyRate: 500,
     pieceRates: [
@@ -131,6 +178,12 @@ export const WORKERS: Worker[] = [
     nationalId: "23456789",
     village: "Kanjuku",
     county: "Kiambu",
+    employmentType: "Casual",
+    farmArea: "Shamba ya bondeni",
+    payCadence: "Daily",
+    payAmount: 450,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0733 901 221",
     skills: ["Weeding", "Land prep", "Irrigation", "Transport"],
     dailyRate: 550,
     pieceRates: [{ task: "Maize weeding", amount: 1700, unit: "acre" }],
@@ -153,6 +206,12 @@ export const WORKERS: Worker[] = [
     nationalId: "34567890",
     village: "Ikinu",
     county: "Kiambu",
+    employmentType: "Supervisor",
+    farmArea: "Whole farm",
+    payCadence: "Monthly",
+    payAmount: 22000,
+    payDestination: "Bank transfer",
+    payAccount: "KCB · 1179 4432 001",
     skills: ["Transplanting", "Nursery care", "Harvesting", "Sorting"],
     dailyRate: 500,
     pieceRates: [{ task: "Tomato harvesting", amount: 450, unit: "crate" }],
@@ -175,6 +234,12 @@ export const WORKERS: Worker[] = [
     nationalId: "45678901",
     village: "Rware",
     county: "Kiambu",
+    employmentType: "Casual",
+    farmArea: "Nyuma ya boma",
+    payCadence: "Daily",
+    payAmount: 400,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0712 555 123",
     skills: ["Spraying", "Fertilizer application", "Irrigation"],
     dailyRate: 600,
     pieceRates: [{ task: "Spraying", amount: 700, unit: "acre" }],
@@ -197,6 +262,12 @@ export const WORKERS: Worker[] = [
     nationalId: "56789012",
     village: "Kigumo-ini",
     county: "Kiambu",
+    employmentType: "Employee",
+    farmArea: "Shamba ya bondeni",
+    payCadence: "Weekly",
+    payAmount: 2700,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0723 456 789",
     skills: ["Weeding", "Harvesting", "Sorting", "Nursery care"],
     dailyRate: 500,
     pieceRates: [{ task: "Cabbage harvesting", amount: 2, unit: "head" }],
@@ -219,6 +290,12 @@ export const WORKERS: Worker[] = [
     nationalId: "67890123",
     village: "Kiaibabu",
     county: "Kiambu",
+    employmentType: "Contractor",
+    farmArea: "Shamba ya bondeni",
+    payCadence: "End of task",
+    payAmount: 18000,
+    payDestination: "Bank transfer",
+    payAccount: "Equity · 0220 1977 331",
     skills: ["Land prep", "Planting", "Transport"],
     dailyRate: 650,
     pieceRates: [{ task: "Maize planting", amount: 900, unit: "acre" }],
@@ -241,6 +318,12 @@ export const WORKERS: Worker[] = [
     nationalId: "78901234",
     village: "Githiga",
     county: "Kiambu",
+    employmentType: "Employee",
+    farmArea: "Chini ya mti",
+    payCadence: "Weekly",
+    payAmount: 2700,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0745 678 901",
     skills: ["Greenhouse", "Irrigation", "Transplanting", "Harvesting"],
     dailyRate: 550,
     pieceRates: [{ task: "Tomato harvesting", amount: 450, unit: "crate" }],
@@ -263,6 +346,12 @@ export const WORKERS: Worker[] = [
     nationalId: "89012345",
     village: "Kahawa",
     county: "Kiambu",
+    employmentType: "Casual",
+    farmArea: "Shamba ya nyumba",
+    payCadence: "Daily",
+    payAmount: 450,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0755 987 654",
     skills: ["Transport", "Harvesting", "Loading"],
     dailyRate: 700,
     pieceRates: [{ task: "Crate loading", amount: 80, unit: "crate" }],
@@ -285,6 +374,12 @@ export const WORKERS: Worker[] = [
     nationalId: "90123456",
     village: "Ngewa",
     county: "Kiambu",
+    employmentType: "Master",
+    farmArea: "Whole farm",
+    payCadence: "Monthly",
+    payAmount: 35000,
+    payDestination: "Bank transfer",
+    payAccount: "Co-op Bank · 0113 0044 829",
     skills: ["Weeding", "Nursery care", "Sorting"],
     dailyRate: 480,
     pieceRates: [{ task: "Seedling transplanting", amount: 1, unit: "tray" }],
@@ -307,6 +402,12 @@ export const WORKERS: Worker[] = [
     nationalId: "01234567",
     village: "Tigoni",
     county: "Kiambu",
+    employmentType: "Employee",
+    farmArea: "Nyuma ya boma",
+    payCadence: "Weekly",
+    payAmount: 2700,
+    payDestination: "M-Pesa wallet",
+    payAccount: "0712 345 678",
     skills: ["Ploughing", "Land prep", "Fertilizer application"],
     dailyRate: 600,
     pieceRates: [{ task: "Manure spreading", amount: 1000, unit: "acre" }],

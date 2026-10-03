@@ -48,8 +48,8 @@ import {
   type Session,
   TIER_SETUPS,
   VELOCITY_LIMITS,
-} from "../../data/app/logs";
-import { Dialog, OtpInput, PinPad, Stepper, Toggle } from "../auth/controls";
+} from "../../../data/app/logs";
+import { Dialog, OtpInput, PinPad, Stepper, Toggle } from "../../auth/controls";
 import { StatusChip, WizardActions } from "./DashboardWidgets";
 import {
   LevelChip,

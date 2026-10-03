@@ -12,34 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AppIndexRouteImport } from './routes/app/index'
-import { Route as AppAdvisorRouteImport } from './routes/app/advisor'
-import { Route as AppAnalyticsRouteImport } from './routes/app/analytics'
-import { Route as AppChannelsRouteImport } from './routes/app/channels'
-import { Route as AppCommunityRouteImport } from './routes/app/community'
-import { Route as AppCooperativeRouteImport } from './routes/app/cooperative'
-import { Route as AppCropsRouteImport } from './routes/app/crops'
-import { Route as AppDashboardRouteImport } from './routes/app/dashboard'
-import { Route as AppFinanceRouteImport } from './routes/app/finance'
-import { Route as AppHarvestRouteImport } from './routes/app/harvest'
-import { Route as AppInventoryRouteImport } from './routes/app/inventory'
-import { Route as AppLabourRouteImport } from './routes/app/labour'
-import { Route as AppLogsRouteImport } from './routes/app/logs'
-import { Route as AppMachineryRouteImport } from './routes/app/machinery'
-import { Route as AppMapRouteImport } from './routes/app/map'
-import { Route as AppMarketRouteImport } from './routes/app/market'
-import { Route as AppNurseryRouteImport } from './routes/app/nursery'
-import { Route as AppOnboardingRouteImport } from './routes/app/onboarding'
-import { Route as AppOrdersRouteImport } from './routes/app/orders'
-import { Route as AppPlannerRouteImport } from './routes/app/planner'
-import { Route as AppRecordsRouteImport } from './routes/app/records'
-import { Route as AppSeasonsRouteImport } from './routes/app/seasons'
-import { Route as AppSettingsRouteImport } from './routes/app/settings'
-import { Route as AppSoilRouteImport } from './routes/app/soil'
-import { Route as AppTeamRouteImport } from './routes/app/team'
-import { Route as AppWalletRouteImport } from './routes/app/wallet'
-import { Route as AppWeatherRouteImport } from './routes/app/weather'
-import { Route as AppWeatherProRouteImport } from './routes/app/weather-pro'
 import { Route as AuthIndexRouteImport } from './routes/auth/index'
 import { Route as AuthAccountStatusRouteImport } from './routes/auth/account-status'
 import { Route as AuthHubRouteImport } from './routes/auth/hub'
@@ -50,6 +22,34 @@ import { Route as AuthPasskeysRouteImport } from './routes/auth/passkeys'
 import { Route as AuthRecoveryRouteImport } from './routes/auth/recovery'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthSecurityRouteImport } from './routes/auth/security'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAdvisorRouteImport } from './routes/dashboard/advisor'
+import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
+import { Route as DashboardChannelsRouteImport } from './routes/dashboard/channels'
+import { Route as DashboardCommunityRouteImport } from './routes/dashboard/community'
+import { Route as DashboardCooperativeRouteImport } from './routes/dashboard/cooperative'
+import { Route as DashboardCropsRouteImport } from './routes/dashboard/crops'
+import { Route as DashboardDashboardRouteImport } from './routes/dashboard/dashboard'
+import { Route as DashboardFinanceRouteImport } from './routes/dashboard/finance'
+import { Route as DashboardHarvestRouteImport } from './routes/dashboard/harvest'
+import { Route as DashboardInventoryRouteImport } from './routes/dashboard/inventory'
+import { Route as DashboardLabourRouteImport } from './routes/dashboard/labour'
+import { Route as DashboardLogsRouteImport } from './routes/dashboard/logs'
+import { Route as DashboardMachineryRouteImport } from './routes/dashboard/machinery'
+import { Route as DashboardMapRouteImport } from './routes/dashboard/map'
+import { Route as DashboardMarketRouteImport } from './routes/dashboard/market'
+import { Route as DashboardNurseryRouteImport } from './routes/dashboard/nursery'
+import { Route as DashboardOnboardingRouteImport } from './routes/dashboard/onboarding'
+import { Route as DashboardOrdersRouteImport } from './routes/dashboard/orders'
+import { Route as DashboardPlannerRouteImport } from './routes/dashboard/planner'
+import { Route as DashboardRecordsRouteImport } from './routes/dashboard/records'
+import { Route as DashboardSeasonsRouteImport } from './routes/dashboard/seasons'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardSoilRouteImport } from './routes/dashboard/soil'
+import { Route as DashboardTeamRouteImport } from './routes/dashboard/team'
+import { Route as DashboardWalletRouteImport } from './routes/dashboard/wallet'
+import { Route as DashboardWeatherRouteImport } from './routes/dashboard/weather'
+import { Route as DashboardWeatherProRouteImport } from './routes/dashboard/weather-pro'
 import { Route as ServicesIndexRouteImport } from './routes/services/index'
 import { Route as ServicesSlugRouteImport } from './routes/services/$slug'
 import { Route as ShopIndexRouteImport } from './routes/shop/index'
@@ -68,146 +68,6 @@ const AboutRoute = AboutRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/app/',
-  path: '/app/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppAdvisorRoute = AppAdvisorRouteImport.update({
-  id: '/app/advisor',
-  path: '/app/advisor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
-  id: '/app/analytics',
-  path: '/app/analytics',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppChannelsRoute = AppChannelsRouteImport.update({
-  id: '/app/channels',
-  path: '/app/channels',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppCommunityRoute = AppCommunityRouteImport.update({
-  id: '/app/community',
-  path: '/app/community',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppCooperativeRoute = AppCooperativeRouteImport.update({
-  id: '/app/cooperative',
-  path: '/app/cooperative',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppCropsRoute = AppCropsRouteImport.update({
-  id: '/app/crops',
-  path: '/app/crops',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/app/dashboard',
-  path: '/app/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppFinanceRoute = AppFinanceRouteImport.update({
-  id: '/app/finance',
-  path: '/app/finance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppHarvestRoute = AppHarvestRouteImport.update({
-  id: '/app/harvest',
-  path: '/app/harvest',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppInventoryRoute = AppInventoryRouteImport.update({
-  id: '/app/inventory',
-  path: '/app/inventory',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppLabourRoute = AppLabourRouteImport.update({
-  id: '/app/labour',
-  path: '/app/labour',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppLogsRoute = AppLogsRouteImport.update({
-  id: '/app/logs',
-  path: '/app/logs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppMachineryRoute = AppMachineryRouteImport.update({
-  id: '/app/machinery',
-  path: '/app/machinery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppMapRoute = AppMapRouteImport.update({
-  id: '/app/map',
-  path: '/app/map',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppMarketRoute = AppMarketRouteImport.update({
-  id: '/app/market',
-  path: '/app/market',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppNurseryRoute = AppNurseryRouteImport.update({
-  id: '/app/nursery',
-  path: '/app/nursery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppOnboardingRoute = AppOnboardingRouteImport.update({
-  id: '/app/onboarding',
-  path: '/app/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppOrdersRoute = AppOrdersRouteImport.update({
-  id: '/app/orders',
-  path: '/app/orders',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppPlannerRoute = AppPlannerRouteImport.update({
-  id: '/app/planner',
-  path: '/app/planner',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRecordsRoute = AppRecordsRouteImport.update({
-  id: '/app/records',
-  path: '/app/records',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppSeasonsRoute = AppSeasonsRouteImport.update({
-  id: '/app/seasons',
-  path: '/app/seasons',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppSettingsRoute = AppSettingsRouteImport.update({
-  id: '/app/settings',
-  path: '/app/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppSoilRoute = AppSoilRouteImport.update({
-  id: '/app/soil',
-  path: '/app/soil',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppTeamRoute = AppTeamRouteImport.update({
-  id: '/app/team',
-  path: '/app/team',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppWalletRoute = AppWalletRouteImport.update({
-  id: '/app/wallet',
-  path: '/app/wallet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppWeatherRoute = AppWeatherRouteImport.update({
-  id: '/app/weather',
-  path: '/app/weather',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppWeatherProRoute = AppWeatherProRouteImport.update({
-  id: '/app/weather-pro',
-  path: '/app/weather-pro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthIndexRoute = AuthIndexRouteImport.update({
@@ -260,6 +120,146 @@ const AuthSecurityRoute = AuthSecurityRouteImport.update({
   path: '/auth/security',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAdvisorRoute = DashboardAdvisorRouteImport.update({
+  id: '/dashboard/advisor',
+  path: '/dashboard/advisor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/dashboard/analytics',
+  path: '/dashboard/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardChannelsRoute = DashboardChannelsRouteImport.update({
+  id: '/dashboard/channels',
+  path: '/dashboard/channels',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardCommunityRoute = DashboardCommunityRouteImport.update({
+  id: '/dashboard/community',
+  path: '/dashboard/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardCooperativeRoute = DashboardCooperativeRouteImport.update({
+  id: '/dashboard/cooperative',
+  path: '/dashboard/cooperative',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardCropsRoute = DashboardCropsRouteImport.update({
+  id: '/dashboard/crops',
+  path: '/dashboard/crops',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardDashboardRoute = DashboardDashboardRouteImport.update({
+  id: '/dashboard/dashboard',
+  path: '/dashboard/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardFinanceRoute = DashboardFinanceRouteImport.update({
+  id: '/dashboard/finance',
+  path: '/dashboard/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardHarvestRoute = DashboardHarvestRouteImport.update({
+  id: '/dashboard/harvest',
+  path: '/dashboard/harvest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardInventoryRoute = DashboardInventoryRouteImport.update({
+  id: '/dashboard/inventory',
+  path: '/dashboard/inventory',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardLabourRoute = DashboardLabourRouteImport.update({
+  id: '/dashboard/labour',
+  path: '/dashboard/labour',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardLogsRoute = DashboardLogsRouteImport.update({
+  id: '/dashboard/logs',
+  path: '/dashboard/logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardMachineryRoute = DashboardMachineryRouteImport.update({
+  id: '/dashboard/machinery',
+  path: '/dashboard/machinery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardMapRoute = DashboardMapRouteImport.update({
+  id: '/dashboard/map',
+  path: '/dashboard/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardMarketRoute = DashboardMarketRouteImport.update({
+  id: '/dashboard/market',
+  path: '/dashboard/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardNurseryRoute = DashboardNurseryRouteImport.update({
+  id: '/dashboard/nursery',
+  path: '/dashboard/nursery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardOnboardingRoute = DashboardOnboardingRouteImport.update({
+  id: '/dashboard/onboarding',
+  path: '/dashboard/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardOrdersRoute = DashboardOrdersRouteImport.update({
+  id: '/dashboard/orders',
+  path: '/dashboard/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardPlannerRoute = DashboardPlannerRouteImport.update({
+  id: '/dashboard/planner',
+  path: '/dashboard/planner',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRecordsRoute = DashboardRecordsRouteImport.update({
+  id: '/dashboard/records',
+  path: '/dashboard/records',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSeasonsRoute = DashboardSeasonsRouteImport.update({
+  id: '/dashboard/seasons',
+  path: '/dashboard/seasons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/dashboard/settings',
+  path: '/dashboard/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardSoilRoute = DashboardSoilRouteImport.update({
+  id: '/dashboard/soil',
+  path: '/dashboard/soil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardTeamRoute = DashboardTeamRouteImport.update({
+  id: '/dashboard/team',
+  path: '/dashboard/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardWalletRoute = DashboardWalletRouteImport.update({
+  id: '/dashboard/wallet',
+  path: '/dashboard/wallet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardWeatherRoute = DashboardWeatherRouteImport.update({
+  id: '/dashboard/weather',
+  path: '/dashboard/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardWeatherProRoute = DashboardWeatherProRouteImport.update({
+  id: '/dashboard/weather-pro',
+  path: '/dashboard/weather-pro',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesIndexRoute = ServicesIndexRouteImport.update({
   id: '/services/',
   path: '/services/',
@@ -285,33 +285,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/app/advisor': typeof AppAdvisorRoute
-  '/app/analytics': typeof AppAnalyticsRoute
-  '/app/channels': typeof AppChannelsRoute
-  '/app/community': typeof AppCommunityRoute
-  '/app/cooperative': typeof AppCooperativeRoute
-  '/app/crops': typeof AppCropsRoute
-  '/app/dashboard': typeof AppDashboardRoute
-  '/app/finance': typeof AppFinanceRoute
-  '/app/harvest': typeof AppHarvestRoute
-  '/app/inventory': typeof AppInventoryRoute
-  '/app/labour': typeof AppLabourRoute
-  '/app/logs': typeof AppLogsRoute
-  '/app/machinery': typeof AppMachineryRoute
-  '/app/map': typeof AppMapRoute
-  '/app/market': typeof AppMarketRoute
-  '/app/nursery': typeof AppNurseryRoute
-  '/app/onboarding': typeof AppOnboardingRoute
-  '/app/orders': typeof AppOrdersRoute
-  '/app/planner': typeof AppPlannerRoute
-  '/app/records': typeof AppRecordsRoute
-  '/app/seasons': typeof AppSeasonsRoute
-  '/app/settings': typeof AppSettingsRoute
-  '/app/soil': typeof AppSoilRoute
-  '/app/team': typeof AppTeamRoute
-  '/app/wallet': typeof AppWalletRoute
-  '/app/weather': typeof AppWeatherRoute
-  '/app/weather-pro': typeof AppWeatherProRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -321,10 +294,37 @@ export interface FileRoutesByFullPath {
   '/auth/recovery': typeof AuthRecoveryRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/security': typeof AuthSecurityRoute
+  '/dashboard/advisor': typeof DashboardAdvisorRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/channels': typeof DashboardChannelsRoute
+  '/dashboard/community': typeof DashboardCommunityRoute
+  '/dashboard/cooperative': typeof DashboardCooperativeRoute
+  '/dashboard/crops': typeof DashboardCropsRoute
+  '/dashboard/dashboard': typeof DashboardDashboardRoute
+  '/dashboard/finance': typeof DashboardFinanceRoute
+  '/dashboard/harvest': typeof DashboardHarvestRoute
+  '/dashboard/inventory': typeof DashboardInventoryRoute
+  '/dashboard/labour': typeof DashboardLabourRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/machinery': typeof DashboardMachineryRoute
+  '/dashboard/map': typeof DashboardMapRoute
+  '/dashboard/market': typeof DashboardMarketRoute
+  '/dashboard/nursery': typeof DashboardNurseryRoute
+  '/dashboard/onboarding': typeof DashboardOnboardingRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
+  '/dashboard/planner': typeof DashboardPlannerRoute
+  '/dashboard/records': typeof DashboardRecordsRoute
+  '/dashboard/seasons': typeof DashboardSeasonsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/soil': typeof DashboardSoilRoute
+  '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
+  '/dashboard/weather': typeof DashboardWeatherRoute
+  '/dashboard/weather-pro': typeof DashboardWeatherProRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
-  '/app/': typeof AppIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
 }
@@ -332,33 +332,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/app/advisor': typeof AppAdvisorRoute
-  '/app/analytics': typeof AppAnalyticsRoute
-  '/app/channels': typeof AppChannelsRoute
-  '/app/community': typeof AppCommunityRoute
-  '/app/cooperative': typeof AppCooperativeRoute
-  '/app/crops': typeof AppCropsRoute
-  '/app/dashboard': typeof AppDashboardRoute
-  '/app/finance': typeof AppFinanceRoute
-  '/app/harvest': typeof AppHarvestRoute
-  '/app/inventory': typeof AppInventoryRoute
-  '/app/labour': typeof AppLabourRoute
-  '/app/logs': typeof AppLogsRoute
-  '/app/machinery': typeof AppMachineryRoute
-  '/app/map': typeof AppMapRoute
-  '/app/market': typeof AppMarketRoute
-  '/app/nursery': typeof AppNurseryRoute
-  '/app/onboarding': typeof AppOnboardingRoute
-  '/app/orders': typeof AppOrdersRoute
-  '/app/planner': typeof AppPlannerRoute
-  '/app/records': typeof AppRecordsRoute
-  '/app/seasons': typeof AppSeasonsRoute
-  '/app/settings': typeof AppSettingsRoute
-  '/app/soil': typeof AppSoilRoute
-  '/app/team': typeof AppTeamRoute
-  '/app/wallet': typeof AppWalletRoute
-  '/app/weather': typeof AppWeatherRoute
-  '/app/weather-pro': typeof AppWeatherProRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -368,10 +341,37 @@ export interface FileRoutesByTo {
   '/auth/recovery': typeof AuthRecoveryRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/security': typeof AuthSecurityRoute
+  '/dashboard/advisor': typeof DashboardAdvisorRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/channels': typeof DashboardChannelsRoute
+  '/dashboard/community': typeof DashboardCommunityRoute
+  '/dashboard/cooperative': typeof DashboardCooperativeRoute
+  '/dashboard/crops': typeof DashboardCropsRoute
+  '/dashboard/dashboard': typeof DashboardDashboardRoute
+  '/dashboard/finance': typeof DashboardFinanceRoute
+  '/dashboard/harvest': typeof DashboardHarvestRoute
+  '/dashboard/inventory': typeof DashboardInventoryRoute
+  '/dashboard/labour': typeof DashboardLabourRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/machinery': typeof DashboardMachineryRoute
+  '/dashboard/map': typeof DashboardMapRoute
+  '/dashboard/market': typeof DashboardMarketRoute
+  '/dashboard/nursery': typeof DashboardNurseryRoute
+  '/dashboard/onboarding': typeof DashboardOnboardingRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
+  '/dashboard/planner': typeof DashboardPlannerRoute
+  '/dashboard/records': typeof DashboardRecordsRoute
+  '/dashboard/seasons': typeof DashboardSeasonsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/soil': typeof DashboardSoilRoute
+  '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
+  '/dashboard/weather': typeof DashboardWeatherRoute
+  '/dashboard/weather-pro': typeof DashboardWeatherProRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
-  '/app': typeof AppIndexRoute
   '/auth': typeof AuthIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/services': typeof ServicesIndexRoute
   '/shop': typeof ShopIndexRoute
 }
@@ -380,33 +380,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
-  '/app/advisor': typeof AppAdvisorRoute
-  '/app/analytics': typeof AppAnalyticsRoute
-  '/app/channels': typeof AppChannelsRoute
-  '/app/community': typeof AppCommunityRoute
-  '/app/cooperative': typeof AppCooperativeRoute
-  '/app/crops': typeof AppCropsRoute
-  '/app/dashboard': typeof AppDashboardRoute
-  '/app/finance': typeof AppFinanceRoute
-  '/app/harvest': typeof AppHarvestRoute
-  '/app/inventory': typeof AppInventoryRoute
-  '/app/labour': typeof AppLabourRoute
-  '/app/logs': typeof AppLogsRoute
-  '/app/machinery': typeof AppMachineryRoute
-  '/app/map': typeof AppMapRoute
-  '/app/market': typeof AppMarketRoute
-  '/app/nursery': typeof AppNurseryRoute
-  '/app/onboarding': typeof AppOnboardingRoute
-  '/app/orders': typeof AppOrdersRoute
-  '/app/planner': typeof AppPlannerRoute
-  '/app/records': typeof AppRecordsRoute
-  '/app/seasons': typeof AppSeasonsRoute
-  '/app/settings': typeof AppSettingsRoute
-  '/app/soil': typeof AppSoilRoute
-  '/app/team': typeof AppTeamRoute
-  '/app/wallet': typeof AppWalletRoute
-  '/app/weather': typeof AppWeatherRoute
-  '/app/weather-pro': typeof AppWeatherProRoute
   '/auth/account-status': typeof AuthAccountStatusRoute
   '/auth/hub': typeof AuthHubRoute
   '/auth/identity': typeof AuthIdentityRoute
@@ -416,10 +389,37 @@ export interface FileRoutesById {
   '/auth/recovery': typeof AuthRecoveryRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/security': typeof AuthSecurityRoute
+  '/dashboard/advisor': typeof DashboardAdvisorRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/channels': typeof DashboardChannelsRoute
+  '/dashboard/community': typeof DashboardCommunityRoute
+  '/dashboard/cooperative': typeof DashboardCooperativeRoute
+  '/dashboard/crops': typeof DashboardCropsRoute
+  '/dashboard/dashboard': typeof DashboardDashboardRoute
+  '/dashboard/finance': typeof DashboardFinanceRoute
+  '/dashboard/harvest': typeof DashboardHarvestRoute
+  '/dashboard/inventory': typeof DashboardInventoryRoute
+  '/dashboard/labour': typeof DashboardLabourRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/machinery': typeof DashboardMachineryRoute
+  '/dashboard/map': typeof DashboardMapRoute
+  '/dashboard/market': typeof DashboardMarketRoute
+  '/dashboard/nursery': typeof DashboardNurseryRoute
+  '/dashboard/onboarding': typeof DashboardOnboardingRoute
+  '/dashboard/orders': typeof DashboardOrdersRoute
+  '/dashboard/planner': typeof DashboardPlannerRoute
+  '/dashboard/records': typeof DashboardRecordsRoute
+  '/dashboard/seasons': typeof DashboardSeasonsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/soil': typeof DashboardSoilRoute
+  '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/wallet': typeof DashboardWalletRoute
+  '/dashboard/weather': typeof DashboardWeatherRoute
+  '/dashboard/weather-pro': typeof DashboardWeatherProRoute
   '/services/$slug': typeof ServicesSlugRoute
   '/shop/$slug': typeof ShopSlugRoute
-  '/app/': typeof AppIndexRoute
   '/auth/': typeof AuthIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/services/': typeof ServicesIndexRoute
   '/shop/': typeof ShopIndexRoute
 }
@@ -429,33 +429,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/app/advisor'
-    | '/app/analytics'
-    | '/app/channels'
-    | '/app/community'
-    | '/app/cooperative'
-    | '/app/crops'
-    | '/app/dashboard'
-    | '/app/finance'
-    | '/app/harvest'
-    | '/app/inventory'
-    | '/app/labour'
-    | '/app/logs'
-    | '/app/machinery'
-    | '/app/map'
-    | '/app/market'
-    | '/app/nursery'
-    | '/app/onboarding'
-    | '/app/orders'
-    | '/app/planner'
-    | '/app/records'
-    | '/app/seasons'
-    | '/app/settings'
-    | '/app/soil'
-    | '/app/team'
-    | '/app/wallet'
-    | '/app/weather'
-    | '/app/weather-pro'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -465,10 +438,37 @@ export interface FileRouteTypes {
     | '/auth/recovery'
     | '/auth/register'
     | '/auth/security'
+    | '/dashboard/advisor'
+    | '/dashboard/analytics'
+    | '/dashboard/channels'
+    | '/dashboard/community'
+    | '/dashboard/cooperative'
+    | '/dashboard/crops'
+    | '/dashboard/dashboard'
+    | '/dashboard/finance'
+    | '/dashboard/harvest'
+    | '/dashboard/inventory'
+    | '/dashboard/labour'
+    | '/dashboard/logs'
+    | '/dashboard/machinery'
+    | '/dashboard/map'
+    | '/dashboard/market'
+    | '/dashboard/nursery'
+    | '/dashboard/onboarding'
+    | '/dashboard/orders'
+    | '/dashboard/planner'
+    | '/dashboard/records'
+    | '/dashboard/seasons'
+    | '/dashboard/settings'
+    | '/dashboard/soil'
+    | '/dashboard/team'
+    | '/dashboard/wallet'
+    | '/dashboard/weather'
+    | '/dashboard/weather-pro'
     | '/services/$slug'
     | '/shop/$slug'
-    | '/app/'
     | '/auth/'
+    | '/dashboard/'
     | '/services/'
     | '/shop/'
   fileRoutesByTo: FileRoutesByTo
@@ -476,33 +476,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/app/advisor'
-    | '/app/analytics'
-    | '/app/channels'
-    | '/app/community'
-    | '/app/cooperative'
-    | '/app/crops'
-    | '/app/dashboard'
-    | '/app/finance'
-    | '/app/harvest'
-    | '/app/inventory'
-    | '/app/labour'
-    | '/app/logs'
-    | '/app/machinery'
-    | '/app/map'
-    | '/app/market'
-    | '/app/nursery'
-    | '/app/onboarding'
-    | '/app/orders'
-    | '/app/planner'
-    | '/app/records'
-    | '/app/seasons'
-    | '/app/settings'
-    | '/app/soil'
-    | '/app/team'
-    | '/app/wallet'
-    | '/app/weather'
-    | '/app/weather-pro'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -512,10 +485,37 @@ export interface FileRouteTypes {
     | '/auth/recovery'
     | '/auth/register'
     | '/auth/security'
+    | '/dashboard/advisor'
+    | '/dashboard/analytics'
+    | '/dashboard/channels'
+    | '/dashboard/community'
+    | '/dashboard/cooperative'
+    | '/dashboard/crops'
+    | '/dashboard/dashboard'
+    | '/dashboard/finance'
+    | '/dashboard/harvest'
+    | '/dashboard/inventory'
+    | '/dashboard/labour'
+    | '/dashboard/logs'
+    | '/dashboard/machinery'
+    | '/dashboard/map'
+    | '/dashboard/market'
+    | '/dashboard/nursery'
+    | '/dashboard/onboarding'
+    | '/dashboard/orders'
+    | '/dashboard/planner'
+    | '/dashboard/records'
+    | '/dashboard/seasons'
+    | '/dashboard/settings'
+    | '/dashboard/soil'
+    | '/dashboard/team'
+    | '/dashboard/wallet'
+    | '/dashboard/weather'
+    | '/dashboard/weather-pro'
     | '/services/$slug'
     | '/shop/$slug'
-    | '/app'
     | '/auth'
+    | '/dashboard'
     | '/services'
     | '/shop'
   id:
@@ -523,33 +523,6 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
-    | '/app/advisor'
-    | '/app/analytics'
-    | '/app/channels'
-    | '/app/community'
-    | '/app/cooperative'
-    | '/app/crops'
-    | '/app/dashboard'
-    | '/app/finance'
-    | '/app/harvest'
-    | '/app/inventory'
-    | '/app/labour'
-    | '/app/logs'
-    | '/app/machinery'
-    | '/app/map'
-    | '/app/market'
-    | '/app/nursery'
-    | '/app/onboarding'
-    | '/app/orders'
-    | '/app/planner'
-    | '/app/records'
-    | '/app/seasons'
-    | '/app/settings'
-    | '/app/soil'
-    | '/app/team'
-    | '/app/wallet'
-    | '/app/weather'
-    | '/app/weather-pro'
     | '/auth/account-status'
     | '/auth/hub'
     | '/auth/identity'
@@ -559,10 +532,37 @@ export interface FileRouteTypes {
     | '/auth/recovery'
     | '/auth/register'
     | '/auth/security'
+    | '/dashboard/advisor'
+    | '/dashboard/analytics'
+    | '/dashboard/channels'
+    | '/dashboard/community'
+    | '/dashboard/cooperative'
+    | '/dashboard/crops'
+    | '/dashboard/dashboard'
+    | '/dashboard/finance'
+    | '/dashboard/harvest'
+    | '/dashboard/inventory'
+    | '/dashboard/labour'
+    | '/dashboard/logs'
+    | '/dashboard/machinery'
+    | '/dashboard/map'
+    | '/dashboard/market'
+    | '/dashboard/nursery'
+    | '/dashboard/onboarding'
+    | '/dashboard/orders'
+    | '/dashboard/planner'
+    | '/dashboard/records'
+    | '/dashboard/seasons'
+    | '/dashboard/settings'
+    | '/dashboard/soil'
+    | '/dashboard/team'
+    | '/dashboard/wallet'
+    | '/dashboard/weather'
+    | '/dashboard/weather-pro'
     | '/services/$slug'
     | '/shop/$slug'
-    | '/app/'
     | '/auth/'
+    | '/dashboard/'
     | '/services/'
     | '/shop/'
   fileRoutesById: FileRoutesById
@@ -571,33 +571,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
-  AppAdvisorRoute: typeof AppAdvisorRoute
-  AppAnalyticsRoute: typeof AppAnalyticsRoute
-  AppChannelsRoute: typeof AppChannelsRoute
-  AppCommunityRoute: typeof AppCommunityRoute
-  AppCooperativeRoute: typeof AppCooperativeRoute
-  AppCropsRoute: typeof AppCropsRoute
-  AppDashboardRoute: typeof AppDashboardRoute
-  AppFinanceRoute: typeof AppFinanceRoute
-  AppHarvestRoute: typeof AppHarvestRoute
-  AppInventoryRoute: typeof AppInventoryRoute
-  AppLabourRoute: typeof AppLabourRoute
-  AppLogsRoute: typeof AppLogsRoute
-  AppMachineryRoute: typeof AppMachineryRoute
-  AppMapRoute: typeof AppMapRoute
-  AppMarketRoute: typeof AppMarketRoute
-  AppNurseryRoute: typeof AppNurseryRoute
-  AppOnboardingRoute: typeof AppOnboardingRoute
-  AppOrdersRoute: typeof AppOrdersRoute
-  AppPlannerRoute: typeof AppPlannerRoute
-  AppRecordsRoute: typeof AppRecordsRoute
-  AppSeasonsRoute: typeof AppSeasonsRoute
-  AppSettingsRoute: typeof AppSettingsRoute
-  AppSoilRoute: typeof AppSoilRoute
-  AppTeamRoute: typeof AppTeamRoute
-  AppWalletRoute: typeof AppWalletRoute
-  AppWeatherRoute: typeof AppWeatherRoute
-  AppWeatherProRoute: typeof AppWeatherProRoute
   AuthAccountStatusRoute: typeof AuthAccountStatusRoute
   AuthHubRoute: typeof AuthHubRoute
   AuthIdentityRoute: typeof AuthIdentityRoute
@@ -607,10 +580,37 @@ export interface RootRouteChildren {
   AuthRecoveryRoute: typeof AuthRecoveryRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthSecurityRoute: typeof AuthSecurityRoute
+  DashboardAdvisorRoute: typeof DashboardAdvisorRoute
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardChannelsRoute: typeof DashboardChannelsRoute
+  DashboardCommunityRoute: typeof DashboardCommunityRoute
+  DashboardCooperativeRoute: typeof DashboardCooperativeRoute
+  DashboardCropsRoute: typeof DashboardCropsRoute
+  DashboardDashboardRoute: typeof DashboardDashboardRoute
+  DashboardFinanceRoute: typeof DashboardFinanceRoute
+  DashboardHarvestRoute: typeof DashboardHarvestRoute
+  DashboardInventoryRoute: typeof DashboardInventoryRoute
+  DashboardLabourRoute: typeof DashboardLabourRoute
+  DashboardLogsRoute: typeof DashboardLogsRoute
+  DashboardMachineryRoute: typeof DashboardMachineryRoute
+  DashboardMapRoute: typeof DashboardMapRoute
+  DashboardMarketRoute: typeof DashboardMarketRoute
+  DashboardNurseryRoute: typeof DashboardNurseryRoute
+  DashboardOnboardingRoute: typeof DashboardOnboardingRoute
+  DashboardOrdersRoute: typeof DashboardOrdersRoute
+  DashboardPlannerRoute: typeof DashboardPlannerRoute
+  DashboardRecordsRoute: typeof DashboardRecordsRoute
+  DashboardSeasonsRoute: typeof DashboardSeasonsRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardSoilRoute: typeof DashboardSoilRoute
+  DashboardTeamRoute: typeof DashboardTeamRoute
+  DashboardWalletRoute: typeof DashboardWalletRoute
+  DashboardWeatherRoute: typeof DashboardWeatherRoute
+  DashboardWeatherProRoute: typeof DashboardWeatherProRoute
   ServicesSlugRoute: typeof ServicesSlugRoute
   ShopSlugRoute: typeof ShopSlugRoute
-  AppIndexRoute: typeof AppIndexRoute
   AuthIndexRoute: typeof AuthIndexRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
 }
@@ -636,202 +636,6 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/': {
-      id: '/app/'
-      path: '/app'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/advisor': {
-      id: '/app/advisor'
-      path: '/app/advisor'
-      fullPath: '/app/advisor'
-      preLoaderRoute: typeof AppAdvisorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/analytics': {
-      id: '/app/analytics'
-      path: '/app/analytics'
-      fullPath: '/app/analytics'
-      preLoaderRoute: typeof AppAnalyticsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/channels': {
-      id: '/app/channels'
-      path: '/app/channels'
-      fullPath: '/app/channels'
-      preLoaderRoute: typeof AppChannelsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/community': {
-      id: '/app/community'
-      path: '/app/community'
-      fullPath: '/app/community'
-      preLoaderRoute: typeof AppCommunityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/cooperative': {
-      id: '/app/cooperative'
-      path: '/app/cooperative'
-      fullPath: '/app/cooperative'
-      preLoaderRoute: typeof AppCooperativeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/crops': {
-      id: '/app/crops'
-      path: '/app/crops'
-      fullPath: '/app/crops'
-      preLoaderRoute: typeof AppCropsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/dashboard': {
-      id: '/app/dashboard'
-      path: '/app/dashboard'
-      fullPath: '/app/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/finance': {
-      id: '/app/finance'
-      path: '/app/finance'
-      fullPath: '/app/finance'
-      preLoaderRoute: typeof AppFinanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/harvest': {
-      id: '/app/harvest'
-      path: '/app/harvest'
-      fullPath: '/app/harvest'
-      preLoaderRoute: typeof AppHarvestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/inventory': {
-      id: '/app/inventory'
-      path: '/app/inventory'
-      fullPath: '/app/inventory'
-      preLoaderRoute: typeof AppInventoryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/labour': {
-      id: '/app/labour'
-      path: '/app/labour'
-      fullPath: '/app/labour'
-      preLoaderRoute: typeof AppLabourRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/logs': {
-      id: '/app/logs'
-      path: '/app/logs'
-      fullPath: '/app/logs'
-      preLoaderRoute: typeof AppLogsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/machinery': {
-      id: '/app/machinery'
-      path: '/app/machinery'
-      fullPath: '/app/machinery'
-      preLoaderRoute: typeof AppMachineryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/map': {
-      id: '/app/map'
-      path: '/app/map'
-      fullPath: '/app/map'
-      preLoaderRoute: typeof AppMapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/market': {
-      id: '/app/market'
-      path: '/app/market'
-      fullPath: '/app/market'
-      preLoaderRoute: typeof AppMarketRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/nursery': {
-      id: '/app/nursery'
-      path: '/app/nursery'
-      fullPath: '/app/nursery'
-      preLoaderRoute: typeof AppNurseryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/onboarding': {
-      id: '/app/onboarding'
-      path: '/app/onboarding'
-      fullPath: '/app/onboarding'
-      preLoaderRoute: typeof AppOnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/orders': {
-      id: '/app/orders'
-      path: '/app/orders'
-      fullPath: '/app/orders'
-      preLoaderRoute: typeof AppOrdersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/planner': {
-      id: '/app/planner'
-      path: '/app/planner'
-      fullPath: '/app/planner'
-      preLoaderRoute: typeof AppPlannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/records': {
-      id: '/app/records'
-      path: '/app/records'
-      fullPath: '/app/records'
-      preLoaderRoute: typeof AppRecordsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/seasons': {
-      id: '/app/seasons'
-      path: '/app/seasons'
-      fullPath: '/app/seasons'
-      preLoaderRoute: typeof AppSeasonsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/settings': {
-      id: '/app/settings'
-      path: '/app/settings'
-      fullPath: '/app/settings'
-      preLoaderRoute: typeof AppSettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/soil': {
-      id: '/app/soil'
-      path: '/app/soil'
-      fullPath: '/app/soil'
-      preLoaderRoute: typeof AppSoilRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/team': {
-      id: '/app/team'
-      path: '/app/team'
-      fullPath: '/app/team'
-      preLoaderRoute: typeof AppTeamRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/wallet': {
-      id: '/app/wallet'
-      path: '/app/wallet'
-      fullPath: '/app/wallet'
-      preLoaderRoute: typeof AppWalletRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/weather': {
-      id: '/app/weather'
-      path: '/app/weather'
-      fullPath: '/app/weather'
-      preLoaderRoute: typeof AppWeatherRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/app/weather-pro': {
-      id: '/app/weather-pro'
-      path: '/app/weather-pro'
-      fullPath: '/app/weather-pro'
-      preLoaderRoute: typeof AppWeatherProRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/': {
@@ -904,6 +708,202 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSecurityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/advisor': {
+      id: '/dashboard/advisor'
+      path: '/dashboard/advisor'
+      fullPath: '/dashboard/advisor'
+      preLoaderRoute: typeof DashboardAdvisorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/analytics': {
+      id: '/dashboard/analytics'
+      path: '/dashboard/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/channels': {
+      id: '/dashboard/channels'
+      path: '/dashboard/channels'
+      fullPath: '/dashboard/channels'
+      preLoaderRoute: typeof DashboardChannelsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/community': {
+      id: '/dashboard/community'
+      path: '/dashboard/community'
+      fullPath: '/dashboard/community'
+      preLoaderRoute: typeof DashboardCommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/cooperative': {
+      id: '/dashboard/cooperative'
+      path: '/dashboard/cooperative'
+      fullPath: '/dashboard/cooperative'
+      preLoaderRoute: typeof DashboardCooperativeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/crops': {
+      id: '/dashboard/crops'
+      path: '/dashboard/crops'
+      fullPath: '/dashboard/crops'
+      preLoaderRoute: typeof DashboardCropsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/dashboard': {
+      id: '/dashboard/dashboard'
+      path: '/dashboard/dashboard'
+      fullPath: '/dashboard/dashboard'
+      preLoaderRoute: typeof DashboardDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/finance': {
+      id: '/dashboard/finance'
+      path: '/dashboard/finance'
+      fullPath: '/dashboard/finance'
+      preLoaderRoute: typeof DashboardFinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/harvest': {
+      id: '/dashboard/harvest'
+      path: '/dashboard/harvest'
+      fullPath: '/dashboard/harvest'
+      preLoaderRoute: typeof DashboardHarvestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/inventory': {
+      id: '/dashboard/inventory'
+      path: '/dashboard/inventory'
+      fullPath: '/dashboard/inventory'
+      preLoaderRoute: typeof DashboardInventoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/labour': {
+      id: '/dashboard/labour'
+      path: '/dashboard/labour'
+      fullPath: '/dashboard/labour'
+      preLoaderRoute: typeof DashboardLabourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/logs': {
+      id: '/dashboard/logs'
+      path: '/dashboard/logs'
+      fullPath: '/dashboard/logs'
+      preLoaderRoute: typeof DashboardLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/machinery': {
+      id: '/dashboard/machinery'
+      path: '/dashboard/machinery'
+      fullPath: '/dashboard/machinery'
+      preLoaderRoute: typeof DashboardMachineryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/map': {
+      id: '/dashboard/map'
+      path: '/dashboard/map'
+      fullPath: '/dashboard/map'
+      preLoaderRoute: typeof DashboardMapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/market': {
+      id: '/dashboard/market'
+      path: '/dashboard/market'
+      fullPath: '/dashboard/market'
+      preLoaderRoute: typeof DashboardMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/nursery': {
+      id: '/dashboard/nursery'
+      path: '/dashboard/nursery'
+      fullPath: '/dashboard/nursery'
+      preLoaderRoute: typeof DashboardNurseryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/onboarding': {
+      id: '/dashboard/onboarding'
+      path: '/dashboard/onboarding'
+      fullPath: '/dashboard/onboarding'
+      preLoaderRoute: typeof DashboardOnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/orders': {
+      id: '/dashboard/orders'
+      path: '/dashboard/orders'
+      fullPath: '/dashboard/orders'
+      preLoaderRoute: typeof DashboardOrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/planner': {
+      id: '/dashboard/planner'
+      path: '/dashboard/planner'
+      fullPath: '/dashboard/planner'
+      preLoaderRoute: typeof DashboardPlannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/records': {
+      id: '/dashboard/records'
+      path: '/dashboard/records'
+      fullPath: '/dashboard/records'
+      preLoaderRoute: typeof DashboardRecordsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/seasons': {
+      id: '/dashboard/seasons'
+      path: '/dashboard/seasons'
+      fullPath: '/dashboard/seasons'
+      preLoaderRoute: typeof DashboardSeasonsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/dashboard/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/soil': {
+      id: '/dashboard/soil'
+      path: '/dashboard/soil'
+      fullPath: '/dashboard/soil'
+      preLoaderRoute: typeof DashboardSoilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/team': {
+      id: '/dashboard/team'
+      path: '/dashboard/team'
+      fullPath: '/dashboard/team'
+      preLoaderRoute: typeof DashboardTeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/wallet': {
+      id: '/dashboard/wallet'
+      path: '/dashboard/wallet'
+      fullPath: '/dashboard/wallet'
+      preLoaderRoute: typeof DashboardWalletRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/weather': {
+      id: '/dashboard/weather'
+      path: '/dashboard/weather'
+      fullPath: '/dashboard/weather'
+      preLoaderRoute: typeof DashboardWeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/weather-pro': {
+      id: '/dashboard/weather-pro'
+      path: '/dashboard/weather-pro'
+      fullPath: '/dashboard/weather-pro'
+      preLoaderRoute: typeof DashboardWeatherProRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/': {
       id: '/services/'
       path: '/services'
@@ -939,33 +939,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
-  AppAdvisorRoute: AppAdvisorRoute,
-  AppAnalyticsRoute: AppAnalyticsRoute,
-  AppChannelsRoute: AppChannelsRoute,
-  AppCommunityRoute: AppCommunityRoute,
-  AppCooperativeRoute: AppCooperativeRoute,
-  AppCropsRoute: AppCropsRoute,
-  AppDashboardRoute: AppDashboardRoute,
-  AppFinanceRoute: AppFinanceRoute,
-  AppHarvestRoute: AppHarvestRoute,
-  AppInventoryRoute: AppInventoryRoute,
-  AppLabourRoute: AppLabourRoute,
-  AppLogsRoute: AppLogsRoute,
-  AppMachineryRoute: AppMachineryRoute,
-  AppMapRoute: AppMapRoute,
-  AppMarketRoute: AppMarketRoute,
-  AppNurseryRoute: AppNurseryRoute,
-  AppOnboardingRoute: AppOnboardingRoute,
-  AppOrdersRoute: AppOrdersRoute,
-  AppPlannerRoute: AppPlannerRoute,
-  AppRecordsRoute: AppRecordsRoute,
-  AppSeasonsRoute: AppSeasonsRoute,
-  AppSettingsRoute: AppSettingsRoute,
-  AppSoilRoute: AppSoilRoute,
-  AppTeamRoute: AppTeamRoute,
-  AppWalletRoute: AppWalletRoute,
-  AppWeatherRoute: AppWeatherRoute,
-  AppWeatherProRoute: AppWeatherProRoute,
   AuthAccountStatusRoute: AuthAccountStatusRoute,
   AuthHubRoute: AuthHubRoute,
   AuthIdentityRoute: AuthIdentityRoute,
@@ -975,13 +948,49 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRecoveryRoute: AuthRecoveryRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthSecurityRoute: AuthSecurityRoute,
+  DashboardAdvisorRoute: DashboardAdvisorRoute,
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardChannelsRoute: DashboardChannelsRoute,
+  DashboardCommunityRoute: DashboardCommunityRoute,
+  DashboardCooperativeRoute: DashboardCooperativeRoute,
+  DashboardCropsRoute: DashboardCropsRoute,
+  DashboardDashboardRoute: DashboardDashboardRoute,
+  DashboardFinanceRoute: DashboardFinanceRoute,
+  DashboardHarvestRoute: DashboardHarvestRoute,
+  DashboardInventoryRoute: DashboardInventoryRoute,
+  DashboardLabourRoute: DashboardLabourRoute,
+  DashboardLogsRoute: DashboardLogsRoute,
+  DashboardMachineryRoute: DashboardMachineryRoute,
+  DashboardMapRoute: DashboardMapRoute,
+  DashboardMarketRoute: DashboardMarketRoute,
+  DashboardNurseryRoute: DashboardNurseryRoute,
+  DashboardOnboardingRoute: DashboardOnboardingRoute,
+  DashboardOrdersRoute: DashboardOrdersRoute,
+  DashboardPlannerRoute: DashboardPlannerRoute,
+  DashboardRecordsRoute: DashboardRecordsRoute,
+  DashboardSeasonsRoute: DashboardSeasonsRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardSoilRoute: DashboardSoilRoute,
+  DashboardTeamRoute: DashboardTeamRoute,
+  DashboardWalletRoute: DashboardWalletRoute,
+  DashboardWeatherRoute: DashboardWeatherRoute,
+  DashboardWeatherProRoute: DashboardWeatherProRoute,
   ServicesSlugRoute: ServicesSlugRoute,
   ShopSlugRoute: ShopSlugRoute,
-  AppIndexRoute: AppIndexRoute,
   AuthIndexRoute: AuthIndexRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
   ServicesIndexRoute: ServicesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -441,6 +441,11 @@ img, svg {
   width: 19px;
   height: 19px;
 }
+.gm-icon-btn.is-on {
+  background: var(--gm-forest-950);
+  border-color: var(--gm-forest-950);
+  color: var(--gm-lime-300);
+}
 .gm-icon-btn:hover {
   border-color: var(--gm-leaf-500);
   color: var(--gm-leaf-700);
@@ -3726,6 +3731,14 @@ img, svg {
 .gm-toggle-row.is-on .gm-toggle-thumb {
   left: 23px;
 }
+/* direct pattern (switch button carries is-on itself, e.g. check-in methods) */
+.gm-toggle-track.is-on {
+  background: var(--gm-grad-primary);
+  box-shadow: var(--gm-shadow-glow);
+}
+.gm-toggle-track.is-on .gm-toggle-thumb {
+  left: 23px;
+}
 .gm-toggle-text strong {
   display: block;
   font-size: 0.9rem;
@@ -3861,6 +3874,10 @@ img, svg {
   border: 1px solid var(--gm-line-soft);
   border-radius: var(--gm-r-md);
   background: #fff;
+}
+/* let a row's popup menu escape the scroll clip while it is open */
+.gm-table-wrap:has(.gm-menu) {
+  overflow: visible;
 }
 .gm-table {
   width: 100%;
