@@ -251,7 +251,7 @@ function HarvestPage() {
   };
 
   return (
-    <div>
+    <main className="gm-app-page gm-page-std gm-harvest-page">
       <HarvestHero
         metrics={[
           {
@@ -484,7 +484,7 @@ function HarvestPage() {
         onClose={() => setModal(null)}
         onSaved={savedWorkflow}
       />
-    </div>
+    </main>
   );
 }
 

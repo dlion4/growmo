@@ -38,6 +38,9 @@ import logsCss from '../components/dashboard/styles/logs.css?url'
 // Page 15.3 team management & HR
 import teamCss from '../components/dashboard/styles/team.css?url'
 import mapCss from '../components/dashboard/styles/map.css?url'
+// Shared opt-in page body for app screens (.gm-page-std) — loads before the
+// per-page layers so a page can always override it
+import pageKitCss from '../components/dashboard/styles/page-kit.css?url'
 // Page 25 seeds & seedling nursery — token-only and .gm-nursery-page scoped
 import nurseryCss from '../components/dashboard/styles/nursery.css?url'
 // Page 23 multi-season planning & rotation — token-only and .gm-seasons-page scoped
@@ -59,7 +62,7 @@ export const Route = createRootRoute({
     links: [
       // ?v= busts preview/proxy CSS caches — bump it whenever a stylesheet changes
       { rel: 'stylesheet', href: `${appCss}?v=8` },
-      { rel: 'stylesheet', href: `${dashboardCss}?v=4` },
+      { rel: 'stylesheet', href: `${dashboardCss}?v=5` },
       { rel: 'stylesheet', href: `${plannerCss}?v=5` },
       { rel: 'stylesheet', href: `${weatherProCss}?v=1` },
       { rel: 'stylesheet', href: `${advisorCss}?v=1` },
@@ -74,8 +77,9 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${logsCss}?v=1` },
       { rel: 'stylesheet', href: `${teamCss}?v=4` },
       { rel: 'stylesheet', href: `${mapCss}?v=1` },
-      { rel: 'stylesheet', href: `${nurseryCss}?v=1` },
-      { rel: 'stylesheet', href: `${seasonsCss}?v=1` },
+      { rel: 'stylesheet', href: `${pageKitCss}?v=1` },
+      { rel: 'stylesheet', href: `${nurseryCss}?v=2` },
+      { rel: 'stylesheet', href: `${seasonsCss}?v=2` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

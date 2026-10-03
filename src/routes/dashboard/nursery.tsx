@@ -352,7 +352,7 @@ function NurseryPage() {
   );
 
   return (
-    <main className="gm-app-page gm-nursery-page">
+    <main className="gm-app-page gm-page-std gm-nursery-page">
       <Reveal>
         <NurseryHero
           metrics={[

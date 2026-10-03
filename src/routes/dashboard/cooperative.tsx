@@ -270,14 +270,14 @@ function CooperativeManagementPage() {
     members.filter((member) => member.status === "Active").length + 35;
 
   return (
-    <div>
-      <header className="gm-card gm-plan-head">
-        <div className="d-flex flex-wrap align-items-start gap-4">
-          <div style={{ flex: "1 1 440px" }}>
+    <main className="gm-app-page gm-page-std gm-coop-page">
+      <header className="gm-card gm-page-head gm-coop-hero">
+        <div className="gm-page-head-top">
+          <div className="gm-page-head-copy">
             <span className="gm-eyebrow on-dark">
               <span className="dot" /> Page 22 · Githunguri, Kiambu
             </span>
-            <h1 className="font-display mt-2">
+            <h1 className="font-display">
               One cooperative record, stronger buying and fairer sales
             </h1>
             <p className="gm-lead on-dark mb-0">
@@ -286,7 +286,7 @@ function CooperativeManagementPage() {
               Pamoja tunauza zaidi.
             </p>
           </div>
-          <div className="gm-plan-hero-actions">
+          <div className="gm-page-head-actions">
             <button
               type="button"
               className="gm-btn gm-btn-lime"
@@ -303,7 +303,8 @@ function CooperativeManagementPage() {
             </button>
           </div>
         </div>
-        <div className="gm-plan-kpi-row mt-4">
+
+        <div className="gm-page-kpis">
           {[
             {
               icon: UsersRound,
@@ -330,18 +331,16 @@ function CooperativeManagementPage() {
               note: "After quality checks",
             },
           ].map((metric) => (
-            <div
-              className="gm-plan-facts"
-              key={metric.label}
-              style={{ minWidth: 158 }}
-            >
-              <span>
+            <div className="gm-page-kpi" key={metric.label}>
+              <span className="gm-page-kpi-icon" aria-hidden="true">
                 <metric.icon />
-                <small>{metric.label}</small>
-                <strong className="font-display" style={{ fontSize: "1.1rem" }}>
+              </span>
+              <span className="gm-page-kpi-body">
+                <small className="gm-page-kpi-label">{metric.label}</small>
+                <strong className="gm-page-kpi-value font-display">
                   {metric.value}
                 </strong>
-                <small>{metric.note}</small>
+                <small className="gm-page-kpi-note">{metric.note}</small>
               </span>
             </div>
           ))}
@@ -497,7 +496,7 @@ function CooperativeManagementPage() {
         onClose={() => setModal(null)}
         onSaved={savedWorkflow}
       />
-    </div>
+    </main>
   );
 }
 

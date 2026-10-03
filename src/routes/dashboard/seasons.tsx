@@ -254,7 +254,7 @@ function SeasonsPage() {
   };
 
   return (
-    <main className="gm-app-page gm-seasons-page">
+    <main className="gm-app-page gm-page-std gm-seasons-page">
       <SeasonsHero
         metrics={[
           {

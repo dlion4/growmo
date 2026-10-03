@@ -387,7 +387,7 @@ function OrdersPortfolioPage() {
   ];
 
   return (
-    <main className="gm-app-inner">
+    <main className="gm-app-page gm-page-std gm-orders-page">
       <Reveal>
         <OrdersHero
           metrics={[

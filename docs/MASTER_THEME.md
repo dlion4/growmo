@@ -969,10 +969,47 @@ Two defensive resets also live here and fix **every** app screen:
 `.gm-dash-section-title` gained `flex-wrap: wrap` so its action buttons drop
 to a second line instead of being squeezed.
 
-### 28.3 Page layers — `nursery.css` / `seasons.css`
+### 28.3 The shared page kit — `page-kit.css` (`.gm-page-std`)
 
-Loaded in `__root.tsx` after `mapCss`; token-only; **every** selector is
-scoped to `.gm-app .gm-nursery-page` / `.gm-app .gm-seasons-page`.
+The same five faults turned up again on pages 20–22 and 24, so the generic
+half of the nursery/seasons work was extracted into an **opt-in** body layer.
+A route opts in by adding one class:
+
+```tsx
+<main className="gm-app-page gm-page-std gm-orders-page">
+```
+
+`page-kit.css` supplies: vertical page flow + `.gm-page-view` stacking,
+`.gm-card` padding / calm hover / heading sizes, the section-header
+first-child margin reset, the sticky horizontally-scrollable tab rail,
+inline `.gm-search` + `.gm-select` appearance, `.gm-check-row` list rows,
+`.gm-table-wrap` / `.gm-table`, the 992px single-column collapse and a print
+block. It is opt-in so the pages that already ship a complete layer of their
+own (team, soil, wallet, map, records, …) are untouched, and a page layer
+always wins because it loads afterwards.
+
+**Pages on the kit:** nursery (25), seasons (23), orders (21),
+cooperative (22), harvest (24), machinery (20).
+
+Two more roots were repaired at the same time: `orders` and `machinery` used
+`<main className="gm-app-inner">`, nesting the shell's content wrapper inside
+itself and therefore applying its 1240px cap and horizontal padding **twice**;
+`harvest` and `cooperative` had a bare `<div>` with no page scope at all.
+
+### 28.3b Tab counts and the analytics rail — `dashboard.css` §6E
+
+`.gm-tab .gm-n` (rendered by `PlannerSubtabs` whenever a tab has a `count`),
+plus `.gm-subtabs`, `.gm-subtab` and `.gm-subtab-count` used by the analytics
+page, had **no rule anywhere in the project**. Counts rendered as bare digits
+welded to the label ("Pre-built reports10") and the analytics rail was a row
+of unstyled browser buttons. All four are now styled in `dashboard.css`, so
+every page that uses them is fixed at once.
+
+### 28.4 Page layers — `nursery.css` / `seasons.css`
+
+Loaded in `__root.tsx` after `pageKitCss`; token-only; **every** selector is
+scoped to `.gm-app .gm-nursery-page` / `.gm-app .gm-seasons-page`. Only the
+page-specific pieces live here — everything generic comes from the kit.
 
 Layout contract for both pages:
 
@@ -995,7 +1032,7 @@ Both layers end with a `@media print` block: tab rail, hero actions,
 dropdowns and toolbars are hidden, cards get `break-inside: avoid`, tables
 drop their `min-width` and the sticky calendar column goes static.
 
-### 28.4 Features added
+### 28.5 Features added
 
 `EmptyState` (new shared widget) is wired into all nine filterable
 collections — nursery seed store, nurseries, germination log, health monitor,
@@ -1003,3 +1040,23 @@ purchases and variety performance; seasons plan register, 3-year projection,
 fallow tasks and intercrop plans — so a search that matches nothing explains
 itself instead of showing an empty table. Nursery record cards gained a
 ready / target progress bar, and both tab rails are sticky.
+
+### 28.6 Heroes rewritten onto `.gm-page-head`
+
+Four heroes rendered each KPI as `<div class="gm-plan-facts">` wrapping a
+single `<span>`. `.gm-plan-facts` is a planner **2-column grid** whose tiles
+paint `background: var(--gm-surface)` — white — so on the dark hero the
+inherited white value text was invisible, and the icon/label/value/note
+auto-placed into the wrong grid cells. All four now use the shared
+`.gm-page-head` + `.gm-page-kpi` components:
+
+| Page | Component |
+| --- | --- |
+| 21 orders | `OrdersHero` → `.gm-orders-hero` |
+| 24 harvest | `HarvestHero` → `.gm-harvest-hero` |
+| 20 machinery | `MachineryHero` → `.gm-machinery-hero` |
+| 22 cooperative | inline header in `cooperative.tsx` → `.gm-coop-hero` |
+
+The remaining `.gm-plan-facts` uses (planner, weather, inventory, labour and
+the detail cards on orders/machinery) are the **legitimate** pattern — a fact
+grid inside a white card — and were left alone.
