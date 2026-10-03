@@ -39,6 +39,12 @@ import {
 } from "../../components/dashboard/pages/DashboardWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
+  createReport,
+  ReportActionBar,
+  type ReportDefinition,
+  ReportPreviewDrawer,
+} from "../../components/dashboard/pages/ReportActions";
+import {
   SeasonsModalHub,
   type SeasonsModalId,
 } from "../../components/dashboard/pages/SeasonsModals";
@@ -114,6 +120,9 @@ function SeasonsPage() {
   const [selectedProjection, setSelectedProjection] =
     useState<ProjectionRow | null>(FINANCIAL_PROJECTIONS[2]);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [planSearch, setPlanSearch] = useState("");
   const [planStatus, setPlanStatus] = useState<
     "All" | (typeof plans)[number]["status"]
@@ -252,8 +261,88 @@ function SeasonsPage() {
     toast.notify(message, "success");
   };
 
+  const seasonReports: Record<View, ReportDefinition> = {
+    calendar: createReport({
+      id: "seasons-calendar-plans",
+      title: `${calendarYear} farm calendar plans`,
+      filename: `growmo-${calendarYear}-farm-calendar-plans`,
+      description:
+        "Current season plans using the active calendar search and status filter.",
+      rows: filteredPlans,
+      columns: ["plan", "plot", "starts", "crop", "acreage", "status"],
+    }),
+    rotation: createReport({
+      id: "seasons-rotation-plan",
+      title: "Three-year rotation plan",
+      filename: "growmo-three-year-rotation-plan",
+      description:
+        "Current soil-first crop rotation across the three planning years.",
+      rows: ROTATION_PLAN,
+      columns: ["season", "yearOne", "yearTwo", "yearThree", "purpose", "note"],
+    }),
+    projection: createReport({
+      id: "seasons-financial-projection",
+      title: "Three-year financial projection",
+      filename: "growmo-three-year-financial-projection",
+      description:
+        "Current financial projection using the active crop and season search.",
+      rows: filteredProjections,
+      columns: [
+        "season",
+        "crop",
+        "cost",
+        "revenue",
+        "profit",
+        "cumulative",
+        "status",
+      ],
+    }),
+    compare: createReport({
+      id: "seasons-comparison",
+      title: "Season comparison",
+      filename: "growmo-season-comparison",
+      description:
+        "Current short-rains, long-rains and irrigated season comparison.",
+      rows: SEASON_COMPARISON,
+      columns: ["factor", "shortRains", "longRains", "irrigated"],
+    }),
+    recovery: createReport({
+      id: "seasons-fallow-recovery",
+      title: "Cover and fallow recovery tasks",
+      filename: "growmo-cover-and-fallow-recovery",
+      description:
+        "Current recovery tasks using the active task-status filter.",
+      rows: filteredFallow,
+      columns: ["week", "action", "owner", "timing", "status"],
+    }),
+    intercrop: createReport({
+      id: "seasons-intercropping",
+      title: "Intercropping plans",
+      filename: "growmo-intercropping-plans",
+      description: "Current intercropping plans using the active search.",
+      rows: filteredIntercrops,
+      columns: [
+        "main",
+        "intercrop",
+        "spacing",
+        "benefit",
+        "compatibility",
+        "plot",
+      ],
+    }),
+    climate: createReport({
+      id: "seasons-climate-plan",
+      title: "Climate adaptation plan",
+      filename: "growmo-climate-adaptation-plan",
+      description: "Current long-range climate scenarios and farm responses.",
+      rows: CLIMATE_SCENARIOS,
+      columns: ["event", "seasons", "impact", "avoid", "favor", "advisory"],
+    }),
+  };
+  const activeReport = seasonReports[view];
+
   return (
-    <div>
+    <main className="gm-seasons-page">
       <SeasonsHero
         metrics={[
           {
@@ -384,6 +473,54 @@ function SeasonsPage() {
           },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
+
+      <section
+        className="gm-seasons-pulse"
+        aria-label="Planning horizon summary"
+      >
+        <div className="gm-seasons-pulse-main">
+          <span>
+            <CalendarDays />
+          </span>
+          <div>
+            <span className="gm-eyebrow">Planning horizon</span>
+            <strong>
+              2027 rotation is aligned across production and recovery
+            </strong>
+            <p>
+              Keep the next crop cycle, cover-crop recovery and buyer window in
+              one decision trail before planting commitments are made.
+            </p>
+          </div>
+        </div>
+        <div className="gm-seasons-pulse-stats">
+          <span>
+            <strong>3 yrs</strong>
+            <small>mapped horizon</small>
+          </span>
+          <span>
+            <strong>{plans.length}</strong>
+            <small>active plans</small>
+          </span>
+        </div>
+        <div className="gm-seasons-pulse-actions">
+          <button
+            type="button"
+            className="gm-btn gm-btn-soft gm-btn-sm"
+            onClick={() => setView("calendar")}
+          >
+            <CalendarRange /> View calendar
+          </button>
+          <button
+            type="button"
+            className="gm-btn gm-btn-lime gm-btn-sm"
+            onClick={() => setModal("generate-rotation")}
+          >
+            <Sparkles /> Refresh rotation
+          </button>
+        </div>
+      </section>
 
       {view === "calendar" ? (
         <CalendarContent
@@ -488,7 +625,11 @@ function SeasonsPage() {
         onClose={() => setModal(null)}
         onSaved={savedWorkflow}
       />
-    </div>
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
+      />
+    </main>
   );
 }
 

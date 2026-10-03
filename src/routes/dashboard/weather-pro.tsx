@@ -63,6 +63,13 @@ import {
 } from "../../components/dashboard/pages/DashboardWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
+import {
   CONDITION_ICONS,
   severityTone,
   WxAlertCard,
@@ -311,6 +318,7 @@ function WeatherPage() {
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [menu, setMenu] = useState<string | null>(null);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [updatedLabel, setUpdatedLabel] = useState(WEATHER_PROFILE.updated);
   const [wallet, setWallet] = useState(35000);
@@ -766,6 +774,16 @@ function WeatherPage() {
     setModal(id);
   };
 
+  const weatherReports: Record<WeatherView, ReportDefinition> = {
+    now: createReport({ id: "weather-pro-now", title: "Weather Pro current conditions", filename: "growmo-weather-pro-current-conditions", description: "Live weather-station conditions and current monitoring parameters.", rows: CURRENT_CONDITIONS }),
+    outlook: createReport({ id: "weather-pro-outlook", title: "Weather Pro seasonal outlook", filename: "growmo-weather-pro-seasonal-outlook", description: "Current seasonal outlook for farm planning.", rows: SEASONAL_OUTLOOK }),
+    engine: createReport({ id: "weather-pro-crop-engine", title: "Weather Pro crop engine", filename: "growmo-weather-pro-crop-engine", description: "Live crop weather plans in the decision engine.", rows: plans }),
+    planting: createReport({ id: "weather-pro-planting-windows", title: "Weather Pro planting windows", filename: "growmo-weather-pro-planting-windows", description: "Planting-window results using the current weather filters.", rows: filteredWindows }),
+    alerts: createReport({ id: "weather-pro-alerts", title: "Weather Pro alert register", filename: "growmo-weather-pro-alert-register", description: "Current weather alerts using the active alert filters.", rows: filteredAlerts }),
+    history: createReport({ id: "weather-pro-history", title: "Weather Pro climate history", filename: "growmo-weather-pro-climate-history", description: "Historical monthly climate record for farm planning.", rows: HISTORICAL_MONTHLY }),
+  };
+  const activeReport = weatherReports[view];
+
   /* ============================ render ============================ */
 
   return (
@@ -1027,6 +1045,7 @@ function WeatherPage() {
           onChange={(next) => setView(next)}
         />
       </div>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "now" ? (
         <NowView
@@ -2130,6 +2149,7 @@ function WeatherPage() {
         <ShareWizard station={station} onSent={sendMessages} />
       </Dialog>
 
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <Dialog
         open={modal === "et0"}
         onClose={() => setModal(null)}

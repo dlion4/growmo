@@ -71,6 +71,13 @@ import {
   Stepper,
   Toggle,
 } from "../../components/auth/controls";
+
+import {
+  createReport,
+  ReportActionBar,
+  type ReportDefinition,
+  ReportPreviewDrawer,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   ACTIVE_CROPS,
@@ -313,6 +320,9 @@ function CropManagementPage() {
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [selectedStageId, setSelectedStageId] = useState("stage-vegetative");
   const [selectedTaskId, setSelectedTaskId] = useState("task-008");
   const [selectedWidgetId, setSelectedWidgetId] = useState("fertilizer");
@@ -510,6 +520,76 @@ function CropManagementPage() {
 
   if (!crop) return null;
 
+  const cropReports: Record<CropView, ReportDefinition> = {
+    overview: createReport({
+      id: "crop-active-overview",
+      title: `${crop.crop} crop overview`,
+      filename: "growmo-active-crop-overview",
+      description:
+        "Live summary for the currently selected crop and field establishment record.",
+      rows: [crop],
+      columns: [
+        "crop",
+        "variety",
+        "plot",
+        "acres",
+        "plantingDate",
+        "harvestDate",
+        "currentStage",
+        "healthScore",
+        "predictedYield",
+        "predictedRevenue",
+      ],
+    }),
+    tasks: createReport({
+      id: "crop-task-checklist",
+      title: `${crop.crop} task checklist`,
+      filename: "growmo-crop-task-checklist",
+      description: "Live task checklist for the currently selected crop.",
+      rows: cropTasks,
+      columns: [
+        "date",
+        "task",
+        "stage",
+        "input",
+        "labour",
+        "cost",
+        "priority",
+        "status",
+        "doneBy",
+      ],
+    }),
+    widgets: createReport({
+      id: "crop-enabled-widgets",
+      title: `${crop.crop} enabled widgets`,
+      filename: "growmo-crop-enabled-widgets",
+      description:
+        "Current active management widgets for the selected crop enterprise.",
+      rows: widgetDefinitions.filter((widget) =>
+        enabledWidgetIds.includes(widget.id),
+      ),
+      columns: ["label", "category", "description", "summary", "availability"],
+    }),
+    evidence: createReport({
+      id: "crop-evidence-record",
+      title: `${crop.crop} evidence record`,
+      filename: "growmo-crop-evidence-record",
+      description:
+        "Photo and field evidence currently linked to crop monitoring.",
+      rows: GROWTH_PHOTOS,
+      columns: [
+        "date",
+        "stage",
+        "note",
+        "status",
+        "plantsVisible",
+        "capturedBy",
+        "reference",
+      ],
+    }),
+  };
+  const activeReport = cropReports[view];
+
   return (
     <div>
       <Reveal>
@@ -638,6 +718,7 @@ function CropManagementPage() {
           },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "overview" ? (
         <OverviewView
@@ -1362,6 +1443,10 @@ function CropManagementPage() {
           />
         ) : null}
       </Dialog>
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
+      />
     </div>
   );
 }

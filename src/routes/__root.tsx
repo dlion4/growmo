@@ -38,6 +38,8 @@ import logsCss from '../components/dashboard/styles/logs.css?url'
 // Page 15.3 team management & HR
 import teamCss from '../components/dashboard/styles/team.css?url'
 import mapCss from '../components/dashboard/styles/map.css?url'
+// Page 23/25 composition and responsive layout layer
+import nurserySeasonsCss from '../components/dashboard/styles/nursery-seasons.css?url'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -70,6 +72,7 @@ export const Route = createRootRoute({
       { rel: 'stylesheet', href: `${logsCss}?v=1` },
       { rel: 'stylesheet', href: `${teamCss}?v=4` },
       { rel: 'stylesheet', href: `${mapCss}?v=1` },
+      { rel: 'stylesheet', href: `${nurserySeasonsCss}?v=1` },
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
     ],

@@ -60,6 +60,11 @@ import {
   StatusChip,
 } from "../../components/dashboard/pages/DashboardWidgets";
 import {
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+import {
   AdvanceWizard,
   AttendanceWizard,
   BenchmarkDialog,
@@ -247,6 +252,7 @@ function LabourManagementPage() {
   const [payments, setPayments] = useState<PayrollPayment[]>(PAYROLL_PAYMENTS);
   const [settings, setSettings] = useState<LabourSettings>(LABOUR_SETTINGS);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [rowMenu, setRowMenu] = useState<string | null>(null);
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
@@ -282,9 +288,9 @@ function LabourManagementPage() {
   const [forecastCrop, setForecastCrop] = useState("Cabbage");
 
   useEffect(() => {
-    if (modal || drawer)
+    if (modal || drawer || reportPreview)
       window.dispatchEvent(new Event("close-appshell-drawers"));
-  }, [modal, drawer]);
+  }, [modal, drawer, reportPreview]);
 
   useEffect(() => {
     if (!rowMenu) return;
@@ -520,6 +526,172 @@ function LabourManagementPage() {
   const sendWorkerUpdate = (audience: string) =>
     toast.notify(`Simulated SMS queued for ${audience}`, "success");
 
+  const labourReports: Record<LabourView, ReportDefinition> = {
+    workers: {
+      id: "labour-worker-directory",
+      title: "Labour worker directory",
+      filename: "growmo-labour-worker-directory",
+      description: "Current worker records, agreed pay arrangements, skills and season earnings.",
+      columns: [
+        { key: "worker", label: "Worker" },
+        { key: "contact", label: "Contact" },
+        { key: "skills", label: "Skills" },
+        { key: "pay", label: "Pay arrangement" },
+        { key: "rating", label: "Rating / tasks" },
+        { key: "status", label: "Status" },
+      ],
+      rows: workers.map((worker) => ({
+        worker: `${worker.name} · ${worker.id}`,
+        contact: `${worker.phone} · ${worker.village}`,
+        skills: worker.skills.join(", "),
+        pay: `${money(worker.payAmount)}${PAY_SUFFIX[worker.payCadence]} · ${worker.payDestination}`,
+        rating: `${worker.rating ? worker.rating.toFixed(1) : "New"} · ${worker.tasksCompleted} completed`,
+        status: statusLabel(worker.status),
+      })),
+    },
+    scheduler: {
+      id: "labour-task-schedule",
+      title: "Labour task schedule",
+      filename: "growmo-labour-task-schedule",
+      description: "Scheduled, active and completed labour tasks across all crop plots.",
+      columns: [
+        { key: "date", label: "Date" },
+        { key: "task", label: "Task" },
+        { key: "crop", label: "Crop / plot" },
+        { key: "crew", label: "Crew" },
+        { key: "budget", label: "Budget" },
+        { key: "status", label: "Status" },
+      ],
+      rows: tasks.map((task) => ({
+        date: `${task.date} · ${task.startTime}`,
+        task: task.title,
+        crop: `${task.crop} · ${task.plot}`,
+        crew: `${task.workerIds.length} worker${task.workerIds.length === 1 ? "" : "s"}`,
+        budget: money(task.estimatedTotal),
+        status: task.status,
+      })),
+    },
+    calendar: {
+      id: "labour-calendar",
+      title: "Labour calendar schedule",
+      filename: "growmo-labour-calendar-schedule",
+      description: `All labour activities in the ${monthLabel(calendarCursor)} planning calendar.`,
+      columns: [
+        { key: "date", label: "Date" },
+        { key: "task", label: "Task" },
+        { key: "plot", label: "Plot" },
+        { key: "time", label: "Time / duration" },
+        { key: "crew", label: "Crew" },
+        { key: "status", label: "Status" },
+      ],
+      rows: tasks.map((task) => ({
+        date: task.date,
+        task: task.title,
+        plot: task.plot,
+        time: `${task.startTime} · ${task.duration}`,
+        crew: `${task.workerIds.length} assigned`,
+        status: task.status,
+      })),
+    },
+    attendance: {
+      id: "labour-attendance-register",
+      title: "Labour attendance register",
+      filename: "growmo-labour-attendance-register",
+      description: "Confirmed and pending attendance records that feed task completion and payroll.",
+      columns: [
+        { key: "date", label: "Date" },
+        { key: "worker", label: "Worker" },
+        { key: "task", label: "Task" },
+        { key: "crop", label: "Crop" },
+        { key: "hours", label: "Hours" },
+        { key: "status", label: "Status" },
+        { key: "note", label: "Note" },
+      ],
+      rows: attendance.map((record) => ({
+        date: record.date,
+        worker: `${record.workerName} · ${record.workerId}`,
+        task: record.taskTitle,
+        crop: record.crop,
+        hours: record.actualHours,
+        status: `${record.status}${record.confirmed ? " · confirmed" : " · awaiting confirmation"}`,
+        note: record.note,
+      })),
+    },
+    payroll: {
+      id: "labour-payroll-register",
+      title: "Labour payroll register",
+      filename: "growmo-labour-payroll-register",
+      description: "Current payroll obligations, payment method, status and M-Pesa receipts where paid.",
+      columns: [
+        { key: "worker", label: "Worker" },
+        { key: "task", label: "Task / crop" },
+        { key: "amount", label: "Amount" },
+        { key: "due", label: "Due date" },
+        { key: "method", label: "Method" },
+        { key: "status", label: "Status" },
+        { key: "receipt", label: "Receipt" },
+      ],
+      rows: payments.map((payment) => ({
+        worker: `${payment.workerName} · ${payment.workerId}`,
+        task: `${payment.task} · ${payment.crop}`,
+        amount: money(payment.amount),
+        due: payment.dueDate,
+        method: payment.method,
+        status: payment.status,
+        receipt: payment.receipt ?? "Pending receipt",
+      })),
+    },
+    forecast: {
+      id: "labour-cost-forecast",
+      title: "Labour cost forecast",
+      filename: "growmo-labour-cost-forecast",
+      description: `Full-season labour cost forecast for ${forecastCrop}.`,
+      columns: [
+        { key: "task", label: "Task" },
+        { key: "plot", label: "Plot" },
+        { key: "crew", label: "Workers / days" },
+        { key: "rate", label: "Rate" },
+        { key: "total", label: "Total" },
+        { key: "when", label: "When" },
+        { key: "status", label: "Status" },
+      ],
+      rows: LABOUR_FORECAST.filter((row) => row.crop === forecastCrop).map((row) => ({
+        task: row.task,
+        plot: row.plot,
+        crew: `${row.workers} · ${row.days} day${row.days === 1 ? "" : "s"}`,
+        rate: money(row.ratePerDay),
+        total: money(row.total),
+        when: row.when,
+        status: row.status,
+      })),
+    },
+    benchmarks: {
+      id: "labour-county-benchmarks",
+      title: "County labour rate benchmarks",
+      filename: "growmo-labour-county-benchmarks",
+      description: "County rate comparisons for key farm operations, including the current GrowMO insight.",
+      columns: [
+        { key: "county", label: "County" },
+        { key: "weeding", label: "Weeding" },
+        { key: "planting", label: "Planting" },
+        { key: "harvesting", label: "Harvesting" },
+        { key: "spraying", label: "Spraying" },
+        { key: "ploughing", label: "Ploughing" },
+        { key: "insight", label: "Insight" },
+      ],
+      rows: LABOUR_BENCHMARKS.map((row) => ({
+        county: row.county,
+        weeding: `KES ${row.weeding}`,
+        planting: `KES ${row.planting}`,
+        harvesting: `KES ${row.harvesting}`,
+        spraying: `KES ${row.spraying}`,
+        ploughing: `KES ${row.ploughing}`,
+        insight: row.insight,
+      })),
+    },
+  };
+  const activeReport = labourReports[view];
+
   const tabItems = [
     {
       id: "workers" as const,
@@ -623,17 +795,23 @@ function LabourManagementPage() {
                     <button type="button" onClick={() => openModal("settings")}>
                       <Settings2 /> Labour settings
                     </button>
-                    <button type="button" onClick={() => openModal("export")}>
-                      <Download /> Export labour records
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenu(false);
+                        setReportPreview(activeReport);
+                      }}
+                    >
+                      <Download /> Preview labour report
                     </button>
                     <button
                       type="button"
                       onClick={() => {
                         setMenu(false);
-                        window.print();
+                        setReportPreview(activeReport);
                       }}
                     >
-                      <Printer /> Print current view
+                      <Printer /> Print / download current report
                     </button>
                   </div>
                 ) : null}
@@ -660,6 +838,8 @@ function LabourManagementPage() {
           label="Labour management sections"
         />
       </div>
+
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "workers" ? (
         <WorkersView
@@ -822,6 +1002,8 @@ function LabourManagementPage() {
           }}
         />
       ) : null}
+
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
 
       <PageDrawers
         drawer={drawer}

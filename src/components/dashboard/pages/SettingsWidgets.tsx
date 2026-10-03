@@ -31,6 +31,7 @@ import {
 } from "../../../data/app/settings";
 import { kes } from "../../../data/site";
 import { ProgressLine, StatusChip } from "./DashboardWidgets";
+import { type ReportDefinition, ReportTools } from "./ReportActions";
 
 /* ---------------- hero ---------------- */
 export function SettingsHero({ ctx, onInvite, onUpgrade }: { ctx: typeof SETTINGS_CONTEXT; onInvite: () => void; onUpgrade: () => void }) {
@@ -312,15 +313,98 @@ export function HrPanel({
   onPayroll,
   onJob,
   onOnboard,
+  onPreview,
 }: {
   onWorker: (worker: Worker) => void;
   onPayWorker: (worker: Worker) => void;
   onPayroll: () => void;
   onJob: () => void;
   onOnboard: () => void;
+  onPreview: (report: ReportDefinition) => void;
 }) {
   const [tab, setTab] = useState<"directory" | "recruit" | "attendance" | "performance" | "payroll" | "advances" | "compliance" | "analytics">("directory");
   const payrollTotal = PAYSLIPS.reduce((sum, slip) => sum + slip.net, 0);
+  const hrReports: Record<typeof tab, ReportDefinition> = {
+    directory: {
+      id: "worker-directory",
+      title: "Worker directory",
+      filename: "growmo-worker-directory",
+      description: "Current worker profiles, pay rates, attendance and employment status.",
+      columns: [
+        { key: "worker", label: "Worker" }, { key: "phone", label: "Phone" }, { key: "role", label: "Role" },
+        { key: "rate", label: "Daily rate" }, { key: "attendance", label: "Attendance" }, { key: "rating", label: "Rating" }, { key: "status", label: "Status" },
+      ],
+      rows: WORKERS.map((worker) => ({ worker: worker.name, phone: worker.phone, role: worker.role, rate: kes(worker.dailyRate), attendance: `${worker.attendance}%`, rating: `${worker.rating}★`, status: worker.status })),
+    },
+    recruit: {
+      id: "recruitment-record",
+      title: "Recruitment & onboarding record",
+      filename: "growmo-recruitment-onboarding",
+      description: "The open job post, its distribution channels and the onboarding sequence for a new hire.",
+      columns: [{ key: "area", label: "Area" }, { key: "record", label: "Record" }, { key: "detail", label: "Detail" }],
+      rows: [
+        ...Object.entries(JOB_POST).map(([record, detail]) => ({ area: "Job post", record, detail })),
+        ...JOB_CHANNELS.map((channel) => ({ area: "Distribution", record: channel.channel, detail: `${channel.reach} · ${channel.status}` })),
+        ...ONBOARDING_CHECKLIST.map((item) => ({ area: "Onboarding", record: item.step, detail: `Owner: ${item.owner}` })),
+      ],
+    },
+    attendance: {
+      id: "attendance-register",
+      title: "Attendance register",
+      filename: "growmo-attendance-register",
+      description: "Today's crew register and the current monthly attendance summary.",
+      columns: [{ key: "period", label: "Period" }, { key: "worker", label: "Worker" }, { key: "detail", label: "Attendance detail" }, { key: "status", label: "Status" }],
+      rows: [
+        ...ATTENDANCE_TODAY.map((row) => ({ period: "Today", worker: row.worker, detail: `${row.checkIn}–${row.checkOut} · ${row.hours} hours · ${row.task}`, status: `${row.status}${row.note !== "—" ? ` · ${row.note}` : ""}` })),
+        ...ATTENDANCE_MONTH.map((row) => ({ period: "This month", worker: row.worker, detail: `${row.present} present · ${row.absent} absent · ${row.late} late · ${row.overtime} overtime hours`, status: `${row.pct}% attendance` })),
+      ],
+    },
+    performance: {
+      id: "worker-performance",
+      title: "Worker performance record",
+      filename: "growmo-worker-performance",
+      description: "Performance scorecard and monthly rating history for the current review period.",
+      columns: [{ key: "metric", label: "Metric" }, { key: "value", label: "Current value" }, { key: "detail", label: "Detail" }],
+      rows: [
+        { metric: "Worker", value: PERFORMANCE_CARD.worker, detail: `${PERFORMANCE_CARD.average}★ average across ${PERFORMANCE_CARD.totalTasks} tasks` },
+        { metric: "Strength", value: PERFORMANCE_CARD.strength, detail: PERFORMANCE_CARD.speed },
+        { metric: "Improvement focus", value: PERFORMANCE_CARD.improve, detail: PERFORMANCE_CARD.quality },
+        ...PERFORMANCE_CARD.history.map((point) => ({ metric: `${point.month} rating`, value: `${point.rating}★`, detail: `${point.tasks} tasks` })),
+      ],
+    },
+    payroll: {
+      id: "weekly-payroll",
+      title: "Weekly payroll",
+      filename: "growmo-weekly-payroll",
+      description: `${PAYROLL_CYCLE}. Net payroll total: ${kes(payrollTotal)}.`,
+      columns: [{ key: "worker", label: "Worker" }, { key: "days", label: "Days" }, { key: "basic", label: "Basic" }, { key: "overtime", label: "Overtime" }, { key: "deductions", label: "Deductions" }, { key: "net", label: "Net pay" }],
+      rows: PAYSLIPS.map((slip) => ({ worker: `${slip.worker} · ${slip.phone}`, days: slip.days, basic: kes(slip.basic), overtime: `${slip.otHours} h · ${kes(slip.otPay)}`, deductions: slip.absence + slip.advance === 0 ? "—" : kes(slip.absence + slip.advance), net: kes(slip.net) })),
+    },
+    advances: {
+      id: "advances-deductions",
+      title: "Advances & deductions register",
+      filename: "growmo-advances-deductions",
+      description: "Current worker advances, deductions and repayment plans.",
+      columns: [{ key: "record", label: "Record" }, { key: "worker", label: "Worker" }, { key: "type", label: "Type" }, { key: "amount", label: "Amount" }, { key: "date", label: "Date" }, { key: "repayment", label: "Repayment" }, { key: "status", label: "Status" }],
+      rows: ADVANCES.map((row) => ({ record: row.id, worker: row.worker, type: row.type, amount: `${row.amount < 0 ? "−" : ""}${kes(Math.abs(row.amount))}`, date: row.date, repayment: row.plan, status: row.status })),
+    },
+    compliance: {
+      id: "labour-compliance",
+      title: "Labour compliance register",
+      filename: "growmo-labour-compliance",
+      description: "Kenyan labour requirements tracked for this farm and how each requirement is monitored.",
+      columns: [{ key: "requirement", label: "Requirement" }, { key: "detail", label: "Requirement detail" }, { key: "tracking", label: "Tracking" }, { key: "status", label: "Status" }],
+      rows: COMPLIANCE_ITEMS.map((item) => ({ requirement: item.requirement, detail: item.detail, tracking: item.tracking, status: item.tone === "good" ? "Compliant" : "Track" })),
+    },
+    analytics: {
+      id: "labour-analytics",
+      title: "Labour analytics",
+      filename: "growmo-labour-analytics",
+      description: "This month's labour outcomes compared with last month and the local benchmark where available.",
+      columns: [{ key: "metric", label: "Metric" }, { key: "now", label: "This month" }, { key: "before", label: "Last month" }, { key: "change", label: "Change" }, { key: "county", label: "County average" }],
+      rows: LABOUR_ANALYTICS.map((row) => ({ metric: row.metric, now: row.now, before: row.before, change: row.change, county: row.county })),
+    },
+  };
 
   return (
     <div className="gm-st-hr">
@@ -339,6 +423,9 @@ export function HrPanel({
             {label}
           </button>
         ))}
+      </div>
+      <div className="d-flex flex-wrap justify-content-end mt-3 mb-3">
+        <ReportTools report={hrReports[tab]} onPreview={onPreview} />
       </div>
 
       {tab === "directory" ? (

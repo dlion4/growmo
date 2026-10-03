@@ -61,6 +61,12 @@ import {
 } from "../../components/dashboard/pages/MapWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+import {
   COMPARE,
   FARM_AVG_COMPARE,
   MAP_ALERTS,
@@ -87,6 +93,7 @@ const METHOD_KINDS = ["walk", "tap", "dims", "coords", "upload", "registry"] as 
 
 function MapPage() {
   const [tab, setTab] = useState<MapTab>("overview");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [view, setView] = useState<MapView>("satellite");
   const [layers, setLayers] = useState<MapLayer[]>(MAP_LAYERS);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -114,6 +121,16 @@ function MapPage() {
     tasks: PLOTS.reduce((s, p) => s + p.tasksToday, 0),
   };
   const openPins = PINS.filter((p) => p.status !== "Resolved").length;
+
+  const mapReports: Record<MapTab, ReportDefinition> = {
+    overview: createReport({ id: "map-plot-overview", title: "Farm plot overview", filename: "growmo-farm-plot-overview", description: "Current farm plot overview and registered field metrics.", rows: PLOTS }),
+    map: createReport({ id: "map-active-layers", title: "Farm map layer settings", filename: "growmo-farm-map-layers", description: "Current map layers and their enabled state.", rows: layers }),
+    plots: createReport({ id: "map-plot-register", title: "Farm plot register", filename: "growmo-farm-plot-register", description: "Current farm plots, crop use and management record.", rows: PLOTS }),
+    pins: createReport({ id: "map-problem-pins", title: "Farm problem-pin register", filename: "growmo-farm-problem-pins", description: "Current farm map problem pins and their resolution status.", rows: PINS }),
+    compare: createReport({ id: "map-plot-comparison", title: "Farm plot comparison", filename: "growmo-farm-plot-comparison", description: "Current plot comparison metrics for farm decisions.", rows: COMPARE }),
+    measure: createReport({ id: "map-measurement-tools", title: "Farm map measurement tools", filename: "growmo-farm-map-measurements", description: "Available field measurement tools and data-capture methods.", rows: MEASURE_TOOLS }),
+  };
+  const activeReport = mapReports[tab];
 
   return (
     <main className="gm-app-page gm-map-page">
@@ -145,6 +162,7 @@ function MapPage() {
             { id: "measure", label: "Measure", icon: <Ruler size={14} /> },
           ]}
         />
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         {/* ============ OVERVIEW (19.4) ============ */}
         {tab === "overview" && (
@@ -509,6 +527,7 @@ function MapPage() {
       {modal?.kind === "slope" && <SlopeModal state={modal} onClose={close} />}
       {modal?.kind === "sun" && <SunModal state={modal} onClose={close} />}
       {modal?.kind === "export" && <ExportModal state={modal} onClose={close} />}
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
     </main>
   );
 }

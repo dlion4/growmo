@@ -47,6 +47,13 @@ import {
   StorageFacilityCard,
 } from "../../components/dashboard/pages/HarvestWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   CABBAGE_HARVEST_DETAIL,
@@ -83,6 +90,7 @@ type DrawerId = "harvest" | "facility" | "packing" | "storage" | "value" | null;
 function HarvestPage() {
   const toast = useToast();
   const [view, setView] = useState<View>("harvest");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [gradeTab, setGradeTab] = useState<GradeTab>("cabbage");
   const [harvests, setHarvests] = useState(HARVEST_RECORDS);
   const [storageLogs, setStorageLogs] = useState(STORAGE_LOGS);
@@ -250,6 +258,16 @@ function HarvestPage() {
     toast.notify(message, "success");
   };
 
+  const harvestReports: Record<View, ReportDefinition> = {
+    harvest: createReport({ id: "harvest-log", title: "Harvest log", filename: "growmo-harvest-log", description: "Current harvest records using the active crop and status filters.", rows: filteredHarvests }),
+    grading: createReport({ id: "harvest-grading", title: "Grading standards", filename: "growmo-grading-standards", description: "Current crop grading and packing standards.", rows: [GRADING_STANDARDS] }),
+    storage: createReport({ id: "harvest-storage", title: "Storage log", filename: "growmo-storage-log", description: "Current storage records using the active crop and storage-state filters.", rows: filteredStorage }),
+    losses: createReport({ id: "harvest-losses", title: "Post-harvest loss record", filename: "growmo-post-harvest-loss-record", description: "Current post-harvest loss tracking and interventions.", rows: LOSS_TRACKING }),
+    value: createReport({ id: "harvest-value-addition", title: "Value-addition register", filename: "growmo-value-addition-register", description: "Current value-addition opportunities using the active search.", rows: filteredValue }),
+    units: createReport({ id: "harvest-units", title: "Crop units reference", filename: "growmo-crop-units-reference", description: "Current crop pack, unit and conversion reference.", rows: CROP_UNITS }),
+  };
+  const activeReport = harvestReports[view];
+
   return (
     <div>
       <HarvestHero
@@ -385,6 +403,7 @@ function HarvestPage() {
           },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
       {view === "harvest" ? (
         <HarvestContent
           records={shownHarvests}
@@ -474,6 +493,7 @@ function HarvestPage() {
         onClose={() => setDrawer(null)}
         onModal={setModal}
       />
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <HarvestModalHub
         active={modal}
         harvest={selectedHarvest}
