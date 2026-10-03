@@ -1060,3 +1060,26 @@ auto-placed into the wrong grid cells. All four now use the shared
 The remaining `.gm-plan-facts` uses (planner, weather, inventory, labour and
 the detail cards on orders/machinery) are the **legitimate** pattern — a fact
 grid inside a white card — and were left alone.
+
+### 28.7 `nursery-seasons.css` — the pulse brief layer
+
+`main` landed a parallel fix for the same two pages while this work was in
+flight (the report controls + the `gm-*-pulse` briefs). On merge the two
+layers overlapped: that file also carried page flow, `.gm-card` padding,
+section-title margins and table / check-row rules that the page kit now owns.
+
+Resolution — **one definition per rule**:
+
+* `page-kit.css` keeps everything generic (`.gm-page-std`).
+* `nursery-seasons.css` was trimmed to the one thing that is genuinely new,
+  the operational brief component: `.gm-nursery-pulse` / `.gm-seasons-pulse`
+  plus `-main`, `-stats` and `-actions`. A 3-column gradient card
+  (copy · stats · actions) that drops the stats divider at 980px and stacks
+  to a single column with full-width buttons at 640px.
+* Load order in `__root.tsx` is `page-kit.css` → `nursery-seasons.css` →
+  `nursery.css` / `seasons.css`, so the page layers still have the last word.
+
+The report controls themselves (`ReportActionBar`, `ReportPreviewDrawer` in
+`src/components/dashboard/pages/ReportActions.tsx`) need no new CSS — the bar
+is a `.gm-card p-3 mt-3` and inherits the kit's card treatment on every
+`.gm-page-std` page.
