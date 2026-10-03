@@ -922,3 +922,84 @@ Bootstrap utilities plus existing theme classes — notably the planner page's
 `gm-plan-*` components, `gm-check-row`, `gm-dropdown`, `gm-search-field`,
 `gm-btn-mpesa` and `gm-btn-soft`. It adds **no** page CSS file and **no**
 new tokens; nothing here needs documenting beyond this note.
+
+## 28. Page shell + nursery / seasons layers (pages 23 & 25)
+
+### 28.1 What was broken
+
+An appearance audit of `/dashboard/nursery` (page 25) and `/dashboard/seasons`
+(page 23) found five faults, four of which came from **re-using a theme class
+that already means something else**:
+
+| # | Fault | Cause |
+| --- | --- | --- |
+| 1 | The whole nursery page laid itself out **left-to-right** | the route root was `<main className="gm-app">`. `.gm-app` is the *shell* class (`display:flex; min-height:100vh`), so nesting it inside `.gm-app-inner` turned hero + tab rail + every section into flex **row** items. |
+| 2 | Every search box invisible and unclickable | `.gm-search` is the marketing site's **full-screen search overlay** (`position:fixed; inset:0; opacity:0; pointer-events:none`). Both pages use it for the small inline search box above a table. |
+| 3 | Text flush against the card border | `.gm-card` in the master theme is an **unpadded** surface — padding is a per-page responsibility, and neither page supplied it. |
+| 4 | Hero KPI values invisible (white on white) | the heroes wrapped each KPI in `.gm-plan-facts`, a planner 2-column grid whose tiles paint `background: var(--gm-surface)` (white) — on the dark hero the inherited white text disappeared. |
+| 5 | Section headers pushed down inside their card | the global `.gm-dash-section-title` carries `margin: 1.8rem 0 .7rem`, which also applied when the header is a card's first child. |
+
+Seasons additionally had no page class at all (its root was a bare `<div>`),
+so it had no scope to hang any styling on, and nursery passed `delay={40}` /
+`delay={80}` to `<Reveal>` — that prop is **seconds**, not milliseconds.
+
+### 28.2 Shared layer — `dashboard.css` §§6B–6D
+
+New, previously unstyled class names, so nothing existing changes:
+
+| Class | Role |
+| --- | --- |
+| `.gm-app-page` | the root of every authenticated screen. Explicitly `display:block` + `width:100%` + `min-width:0` so a page can never inherit the shell's row layout again. |
+| `.gm-page-head` (`-top`, `-copy`, `-actions`) | the dark gradient page hero: wrapping flex header, ≤62ch lead, action cluster that goes full-width under 576px. |
+| `.gm-page-kpis` / `.gm-page-kpi` (`-icon`, `-body`, `-label`, `-value`, `-note`) | translucent KPI tiles **on** the dark hero (`--gm-white-06` fill, `--gm-lime-300` icon, white value). `repeat(auto-fit, minmax(190px, 1fr))` → 4 / 2 / 1 up with no per-page breakpoint. |
+| `.gm-toolbar` | search + filter + action row above a table. |
+| `.gm-progress-wrap` | spacing wrapper around a `<ProgressLine />`. |
+| `.gm-page-empty` | dashed "nothing matched your filters" state, rendered by the new `EmptyState` widget in `DashboardWidgets.tsx`. |
+
+Two defensive resets also live here and fix **every** app screen:
+
+* `.gm-app .gm-search` — switches off the overlay behaviour (`position`,
+  `inset`, `z-index`, `opacity`, `pointer-events`, `backdrop-filter`,
+  `background`, `overflow`). The shell's own search is `.gm-app-search`, so
+  inside `.gm-app` the class only ever means "inline search box". This also
+  repairs `/dashboard/cooperative` and `/dashboard/harvest`.
+* `.gm-app .gm-progress` — `display:block`, so a `<ProgressLine />` rendered
+  as a `<span>` still paints.
+
+`.gm-dash-section-title` gained `flex-wrap: wrap` so its action buttons drop
+to a second line instead of being squeezed.
+
+### 28.3 Page layers — `nursery.css` / `seasons.css`
+
+Loaded in `__root.tsx` after `mapCss`; token-only; **every** selector is
+scoped to `.gm-app .gm-nursery-page` / `.gm-app .gm-seasons-page`.
+
+Layout contract for both pages:
+
+1. The page root is a vertical stack — hero → tab rail → view, with
+   `> * + *` rhythm of `clamp(.9rem, 2vw, 1.4rem)`.
+2. A view (`.gm-nur-view` / `.gm-sea-view`) is itself a vertical stack of
+   section cards at `clamp(.8rem, 1.8vw, 1.15rem)`.
+3. Only the Bootstrap `.row`/`.col-*` grids **inside** a section go
+   multi-column, and they are forced to one column below 992px.
+
+| Area | Classes |
+| --- | --- |
+| Shared per page | `.gm-card` padding `clamp(1rem, 2.1vw, 1.4rem)` + calm hover (no `translateY`), `.gm-card > .gm-dash-section-title:first-child` margin reset, `.gm-check-row` (no `translateX` nudge), `.gm-search`/`.gm-select` sizing, `.gm-tab .gm-n` count pill, `.gm-table-wrap`/`.gm-table` |
+| Tab rail | sticky at `top: var(--gm-d-top)` (under the app topbar), `z-index: 4`, horizontally scrollable, bled to the `.gm-app-inner` padding edge with `margin/padding-inline: clamp(.9rem, 2.6vw, 2rem)` |
+| Nursery | `.gm-nur-hero`, `.gm-nur-view`, `.gm-nur-seed-row`/`-copy`, `.gm-nur-record`/`-top`/`-title`/`-count`/`-bar`/`-foot` (now shows a ready-vs-target progress bar) |
+| Seasons | `.gm-sea-hero`, `.gm-sea-view`, `.gm-sea-plot-row`/`-copy`, `.gm-sea-benefit`/`-value`/`-title`/`-note`, `.gm-sea-legend`/`-hint`, `.gm-table-link` |
+| Calendar matrix | the 13-column month grid pins its first column with `position: sticky; left: 0` (header at `z-index: 3`, body cells at `2`) so plot names stay readable while the 12 months scroll |
+
+Both layers end with a `@media print` block: tab rail, hero actions,
+dropdowns and toolbars are hidden, cards get `break-inside: avoid`, tables
+drop their `min-width` and the sticky calendar column goes static.
+
+### 28.4 Features added
+
+`EmptyState` (new shared widget) is wired into all nine filterable
+collections — nursery seed store, nurseries, germination log, health monitor,
+purchases and variety performance; seasons plan register, 3-year projection,
+fallow tasks and intercrop plans — so a search that matches nothing explains
+itself instead of showing an empty table. Nursery record cards gained a
+ready / target progress bar, and both tab rails are sticky.

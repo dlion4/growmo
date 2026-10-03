@@ -35,6 +35,7 @@ import {
   DashboardDrawer,
   DashboardMetric,
   DashboardSectionHeader,
+  EmptyState,
   StatusChip,
 } from "../../components/dashboard/pages/DashboardWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
@@ -253,7 +254,7 @@ function SeasonsPage() {
   };
 
   return (
-    <div>
+    <main className="gm-app-page gm-seasons-page">
       <SeasonsHero
         metrics={[
           {
@@ -488,7 +489,7 @@ function SeasonsPage() {
         onClose={() => setModal(null)}
         onSaved={savedWorkflow}
       />
-    </div>
+    </main>
   );
 }
 
@@ -526,7 +527,7 @@ function CalendarContent({
   onModal: (id: SeasonsModalId) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className="gm-sea-view">
       <section className="gm-card">
         <DashboardSectionHeader
           eyebrow="Annual farm view"
@@ -714,6 +715,13 @@ function CalendarContent({
                   </tbody>
                 </table>
               </div>
+              {plans.length === 0 ? (
+                <EmptyState
+                  icon={CalendarRange}
+                  title="No season plans match that filter"
+                  hint="Try another crop, plot or plan name, or reset the status filter."
+                />
+              ) : null}
               <Pagination
                 page={planPage}
                 total={planPages}
@@ -735,7 +743,7 @@ function RotationContent({
   onModal: (id: SeasonsModalId) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className="gm-sea-view">
       <section className="gm-card">
         <DashboardSectionHeader
           eyebrow="AI-suggested · Plot 1"
@@ -904,7 +912,7 @@ function ProjectionContent({
   onModal: (id: SeasonsModalId) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className="gm-sea-view">
       <section className="gm-card">
         <DashboardSectionHeader
           eyebrow="Plot 1 · three-year money view"
@@ -1023,6 +1031,13 @@ function ProjectionContent({
             </tfoot>
           </table>
         </div>
+        {rows.length === 0 ? (
+          <EmptyState
+            icon={TrendingUp}
+            title="No projections match that search"
+            hint="Search by season or crop to view its three-year cash position."
+          />
+        ) : null}
         <Pagination
           page={page}
           total={pages}
@@ -1061,7 +1076,7 @@ function ComparisonContent({
   onModal: (id: SeasonsModalId) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className="gm-sea-view">
       <section className="gm-card">
         <DashboardSectionHeader
           eyebrow="Cabbage Gloria F1 · Kiambu"
@@ -1173,7 +1188,7 @@ function RecoveryContent({
   onModal: (id: SeasonsModalId) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className="gm-sea-view">
       <section className="gm-card">
         <DashboardSectionHeader
           eyebrow="Dry break · Jul–Sep"
@@ -1310,6 +1325,13 @@ function RecoveryContent({
             </tbody>
           </table>
         </div>
+        {tasks.length === 0 ? (
+          <EmptyState
+            icon={Leaf}
+            title="No fallow tasks match that status"
+            hint="Switch the filter back to All to see the full soil-recovery programme."
+          />
+        ) : null}
         <Pagination
           page={page}
           total={pages}
@@ -1424,6 +1446,13 @@ function IntercropContent({
           </tbody>
         </table>
       </div>
+      {plans.length === 0 ? (
+        <EmptyState
+          icon={Wheat}
+          title="No intercrop plans match that search"
+          hint="Search by main crop, companion crop or plot to find a pairing."
+        />
+      ) : null}
       <Pagination
         page={page}
         total={pages}
@@ -1441,7 +1470,7 @@ function ClimateContent({
   onModal: (id: SeasonsModalId) => void;
 }) {
   return (
-    <div className="mt-4">
+    <div className="gm-sea-view">
       <section className="gm-card">
         <DashboardSectionHeader
           eyebrow="Long-range weather planning"

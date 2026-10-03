@@ -26,9 +26,11 @@ import {
   Wheat,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { ScoreRing } from "../../components/auth/controls";
 import {
   DashboardDrawer,
   DashboardSectionHeader,
+  EmptyState,
   ProgressLine,
   StatusChip,
 } from "../../components/dashboard/pages/DashboardWidgets";
@@ -42,7 +44,6 @@ import {
   SeedStockSummary,
 } from "../../components/dashboard/pages/NurseryWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
-import { ScoreRing } from "../../components/auth/controls";
 import { Pagination, Reveal, Stars } from "../../components/ui/primitives";
 import {
   CABBAGE_NURSERY_SETUP,
@@ -351,7 +352,7 @@ function NurseryPage() {
   );
 
   return (
-    <main className="gm-app">
+    <main className="gm-app-page gm-nursery-page">
       <Reveal>
         <NurseryHero
           metrics={[
@@ -444,9 +445,9 @@ function NurseryPage() {
         />
       </Reveal>
 
-      <Reveal delay={40}>
+      <Reveal delay={0.04}>
         <div
-          className="gm-tabs mt-4"
+          className="gm-tabs"
           role="tablist"
           aria-label="Seed and nursery workspaces"
         >
@@ -467,8 +468,8 @@ function NurseryPage() {
       </Reveal>
 
       {view === "seeds" ? (
-        <Reveal delay={80}>
-          <section className="mt-4">
+        <Reveal delay={0.08}>
+          <section className="gm-nur-view">
             <DashboardSectionHeader
               eyebrow="Seed sourcing & storage"
               title="Know every seed lot before it reaches the soil"
@@ -656,6 +657,13 @@ function NurseryPage() {
                       </tbody>
                     </table>
                   </div>
+                  {filteredSeeds.length === 0 ? (
+                    <EmptyState
+                      icon={PackageCheck}
+                      title="No seed lots match that search"
+                      hint="Try a different seed, company or lot number, or clear the status filter."
+                    />
+                  ) : null}
                   <Pagination
                     page={seedPage}
                     total={seedPages}
@@ -759,8 +767,8 @@ function NurseryPage() {
       ) : null}
 
       {view === "nursery" ? (
-        <Reveal delay={80}>
-          <section className="mt-4">
+        <Reveal delay={0.08}>
+          <section className="gm-nur-view">
             <DashboardSectionHeader
               eyebrow="Nursery establishment"
               title="Raise steady, healthy seedlings"
@@ -800,16 +808,26 @@ function NurseryPage() {
                 <option>Transplanted</option>
               </select>
             </div>
-            <div className="row g-3 mt-1">
-              {filteredNurseries.map((nursery) => (
-                <div className="col-sm-6 col-xl-3" key={nursery.id}>
-                  <NurseryRecordCard
-                    nursery={nursery}
-                    onOpen={() => openNursery(nursery)}
-                  />
-                </div>
-              ))}
-            </div>
+            {filteredNurseries.length === 0 ? (
+              <div className="mt-3">
+                <EmptyState
+                  icon={Sprout}
+                  title="No nurseries match that filter"
+                  hint="Clear the search or status filter, or establish a new nursery to start raising seedlings."
+                />
+              </div>
+            ) : (
+              <div className="row g-3 mt-1">
+                {filteredNurseries.map((nursery) => (
+                  <div className="col-sm-6 col-xl-3" key={nursery.id}>
+                    <NurseryRecordCard
+                      nursery={nursery}
+                      onOpen={() => openNursery(nursery)}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="row g-3 mt-3">
               <div className="col-xl-7">
                 <div className="gm-card h-100">
@@ -891,8 +909,8 @@ function NurseryPage() {
       ) : null}
 
       {view === "germination" ? (
-        <Reveal delay={80}>
-          <section className="mt-4">
+        <Reveal delay={0.08}>
+          <section className="gm-nur-view">
             <DashboardSectionHeader
               eyebrow="Germination monitoring"
               title="Count early, act early"
@@ -971,6 +989,13 @@ function NurseryPage() {
                       </tbody>
                     </table>
                   </div>
+                  {filteredGermination.length === 0 ? (
+                    <EmptyState
+                      icon={TrendingUp}
+                      title="No log entries match that search"
+                      hint="Search by day, activity or observation to find a nursery note."
+                    />
+                  ) : null}
                   <Pagination
                     page={germPage}
                     total={germPages}
@@ -1061,8 +1086,8 @@ function NurseryPage() {
       ) : null}
 
       {view === "health" ? (
-        <Reveal delay={80}>
-          <section className="mt-4">
+        <Reveal delay={0.08}>
+          <section className="gm-nur-view">
             <DashboardSectionHeader
               eyebrow="Seedling health & field readiness"
               title="Inspect every seedling before it becomes a crop"
@@ -1178,6 +1203,13 @@ function NurseryPage() {
                     </tbody>
                   </table>
                 </div>
+                {filteredHealth.length === 0 ? (
+                  <EmptyState
+                    icon={ShieldCheck}
+                    title="No health issues match that filter"
+                    hint="Every monitored seedling issue is outside the current search or status."
+                  />
+                ) : null}
                 <Pagination
                   page={healthPage}
                   total={healthPages}
@@ -1294,8 +1326,8 @@ function NurseryPage() {
       ) : null}
 
       {view === "sources" ? (
-        <Reveal delay={80}>
-          <section className="mt-4">
+        <Reveal delay={0.08}>
+          <section className="gm-nur-view">
             <DashboardSectionHeader
               eyebrow="External seedlings & direct sowing"
               title="Trace bought planting material and field emergence"
@@ -1419,6 +1451,13 @@ function NurseryPage() {
                     </tbody>
                   </table>
                 </div>
+                {filteredPurchases.length === 0 ? (
+                  <EmptyState
+                    icon={Wheat}
+                    title="No seedling purchases match that filter"
+                    hint="Adjust the search or status filter, or record a new purchase."
+                  />
+                ) : null}
                 <Pagination
                   page={purchasePage}
                   total={purchasePages}
@@ -1544,8 +1583,8 @@ function NurseryPage() {
       ) : null}
 
       {view === "performance" ? (
-        <Reveal delay={80}>
-          <section className="mt-4">
+        <Reveal delay={0.08}>
+          <section className="gm-nur-view">
             <DashboardSectionHeader
               eyebrow="Learn from your own farm"
               title="Make the next seed choice with evidence"
@@ -1625,6 +1664,13 @@ function NurseryPage() {
                       </tbody>
                     </table>
                   </div>
+                  {filteredPerformance.length === 0 ? (
+                    <EmptyState
+                      icon={Star}
+                      title="No varieties match that search"
+                      hint="Search by crop, variety or company to compare season performance."
+                    />
+                  ) : null}
                   <Pagination
                     page={performancePage}
                     total={performancePages}

@@ -25,6 +25,29 @@ export function DashboardSectionHeader({
   );
 }
 
+/* Shown instead of a blank table body / empty grid when a search or filter
+   matches nothing. Styling lives in dashboard.css §6D (.gm-page-empty). */
+export function EmptyState({
+  icon: Icon,
+  title,
+  hint,
+  action,
+}: {
+  icon?: LucideIcon;
+  title: string;
+  hint?: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="gm-page-empty" role="status">
+      {Icon ? <Icon aria-hidden="true" /> : null}
+      <strong>{title}</strong>
+      {hint ? <small>{hint}</small> : null}
+      {action ? <div className="mt-2">{action}</div> : null}
+    </div>
+  );
+}
+
 export function StatusChip({
   label,
   tone = "neutral",
