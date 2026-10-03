@@ -849,10 +849,16 @@
 
 .gm-app .gm-dash-section-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.6rem 1rem;
   margin: 1.8rem 0 0.7rem;
+}
+
+/* the title block carries its own leading — never indent its first line */
+.gm-app .gm-dash-section-title > div {
+  min-width: 0;
 }
 
 .gm-app .gm-dash-section-title h2 {
@@ -869,6 +875,363 @@
   border-radius: var(--gm-r-md, 18px);
   padding: clamp(0.9rem, 2vw, 1.3rem);
   box-shadow: var(--gm-shadow-xs, 0 1px 3px rgba(12, 35, 23, 0.1));
+}
+
+/* ==========================================================================
+   6B. PAGE ROOT  —  .gm-app-page
+   Every authenticated screen uses <main class="gm-app-page gm-x-page">.
+   It is a VERTICAL flow container: hero -> tabs -> sections always stack
+   top-to-bottom at every viewport width. Only the grids *inside* a section
+   are ever allowed to become multi-column.
+
+   (Historically .gm-app-page carried no rules at all, so a page that
+   accidentally re-used the shell class `.gm-app` inherited `display:flex`
+   and laid its whole body out left-to-right. The explicit block below makes
+   the intended direction impossible to get wrong.)
+   ========================================================================== */
+.gm-app .gm-app-page {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding-bottom: 0.5rem;
+}
+
+/* no direct child of a page may force the page wider than the content area */
+.gm-app .gm-app-page > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   6C. PAGE HEAD  —  shared dark hero used at the top of a page
+   .gm-page-head > .gm-page-head-top (copy + actions) + .gm-page-kpis
+   ========================================================================== */
+.gm-app .gm-page-head {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.25rem, 3vw, 2.3rem);
+  border: 0;
+  border-radius: var(--gm-r-lg, 26px);
+  background: var(--gm-grad-deep);
+  color: #fff;
+}
+
+/* a dashboard hero must not lift away on hover like a marketing card */
+.gm-app .gm-page-head:hover {
+  transform: none;
+  box-shadow: var(--gm-shadow-md);
+}
+
+.gm-app .gm-page-head::after {
+  content: "";
+  position: absolute;
+  right: -7rem;
+  bottom: -9rem;
+  width: 22rem;
+  aspect-ratio: 1;
+  border: 1px solid var(--gm-white-10, rgba(255, 255, 255, 0.1));
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3rem var(--gm-white-06, rgba(255, 255, 255, 0.06)),
+    0 0 0 7rem var(--gm-white-04, rgba(255, 255, 255, 0.04));
+  pointer-events: none;
+}
+
+.gm-app .gm-page-head > * {
+  position: relative;
+  z-index: 1;
+}
+
+.gm-app .gm-page-head-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.1rem 1.5rem;
+}
+
+.gm-app .gm-page-head-copy {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+
+.gm-app .gm-page-head-copy h1 {
+  margin: 0.55rem 0 0.5rem;
+  font-size: clamp(1.45rem, 2.9vw, 2.15rem);
+  line-height: 1.12;
+  color: #fff;
+}
+
+.gm-app .gm-page-head-copy .gm-lead {
+  max-width: 62ch;
+  font-size: clamp(0.88rem, 1.4vw, 0.98rem);
+  line-height: 1.55;
+  color: var(--gm-mint-100, #dcf5e5);
+}
+
+.gm-app .gm-page-head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 0 1 auto;
+}
+
+/* --- KPI strip ------------------------------------------------------------
+   Auto-fit so 4 tiles sit in a row on desktop, 2 on tablet and 1 on phones
+   without needing a breakpoint per page. */
+.gm-app .gm-page-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 0.7rem;
+  margin-top: clamp(1.1rem, 2.4vw, 1.6rem);
+}
+
+.gm-app .gm-page-kpi {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-width: 0;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--gm-white-10, rgba(255, 255, 255, 0.1));
+  border-radius: var(--gm-r-md, 18px);
+  background: var(--gm-white-06, rgba(255, 255, 255, 0.06));
+  backdrop-filter: blur(4px);
+  transition:
+    background var(--gm-t-fast, 0.18s) ease,
+    border-color var(--gm-t-fast, 0.18s) ease;
+}
+
+.gm-app .gm-page-kpi:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: rgba(216, 246, 95, 0.4);
+}
+
+.gm-app .gm-page-kpi-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--gm-r-sm, 12px);
+  background: rgba(216, 246, 95, 0.16);
+  color: var(--gm-lime-300, #d8f65f);
+}
+
+.gm-app .gm-page-kpi-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.gm-app .gm-page-kpi-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.gm-app .gm-page-kpi-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--gm-mint-200, #b9efcf);
+}
+
+.gm-app .gm-page-kpi-value {
+  margin: 0.2rem 0 0.1rem;
+  font-size: clamp(1.02rem, 1.7vw, 1.22rem);
+  line-height: 1.15;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.gm-app .gm-page-kpi-note {
+  font-size: 0.73rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ==========================================================================
+   6D. SHARED PAGE UTILITIES
+   .gm-toolbar      search + filters + actions row above a table
+   .gm-progress-wrap  spacing wrapper around a <ProgressLine />
+   .gm-page-empty   "nothing matched your filters" state
+   ========================================================================== */
+/* In the master theme `.gm-search` is the marketing site's FULL-SCREEN search
+   overlay (position:fixed; inset:0; opacity:0; pointer-events:none). The app
+   screens re-use the same class name for the little inline search box that
+   sits above a table, which made those inputs invisible and unclickable.
+   The app shell's own search is `.gm-app-search`, so inside `.gm-app` the
+   overlay behaviour can safely be switched off. */
+.gm-app .gm-search {
+  position: static;
+  inset: auto;
+  z-index: auto;
+  padding: 0;
+  overflow: visible;
+  opacity: 1;
+  pointer-events: auto;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.gm-app .gm-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.gm-app .gm-toolbar > .gm-search {
+  flex: 1 1 240px;
+  min-width: 0;
+  max-width: 420px;
+}
+
+.gm-app .gm-toolbar > .gm-select {
+  flex: 0 1 auto;
+}
+
+.gm-app .gm-progress-wrap {
+  margin-bottom: 0.4rem;
+}
+
+.gm-app .gm-progress-wrap .gm-progress {
+  margin-bottom: 0.35rem;
+}
+
+/* <ProgressLine /> renders a span on card surfaces — keep it a block box */
+.gm-app .gm-progress {
+  display: block;
+}
+
+.gm-app .gm-page-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: clamp(1.6rem, 4vw, 2.6rem) 1.25rem;
+  border: 1.5px dashed var(--gm-line, #dfe9e1);
+  border-radius: var(--gm-r-md, 18px);
+  background: var(--gm-mint-50, #f0faf3);
+  text-align: center;
+}
+
+.gm-app .gm-page-empty svg {
+  width: 26px;
+  height: 26px;
+  color: var(--gm-leaf-600, #1d8345);
+}
+
+.gm-app .gm-page-empty strong {
+  font-family: var(--gm-font-display, Georgia, serif);
+  font-size: 1rem;
+  color: var(--gm-forest-900, #0c2317);
+}
+
+.gm-app .gm-page-empty small {
+  max-width: 46ch;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gm-ink-400, #6b7d72);
+}
+
+@media (max-width: 575.98px) {
+  .gm-app .gm-page-head-actions {
+    width: 100%;
+  }
+
+  .gm-app .gm-page-head-actions > .gm-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .gm-app .gm-toolbar > .gm-search,
+  .gm-app .gm-toolbar > .gm-select {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
+/* ==========================================================================
+   6E. TAB COUNT PILLS + SUB-TAB RAIL
+   `PlannerSubtabs` renders `<span class="gm-n">{count}</span>` inside a tab,
+   and the analytics page renders a `.gm-subtabs` rail of `.gm-subtab`
+   buttons with a `.gm-subtab-count`. None of those three class names had a
+   single rule anywhere, so the counts rendered as bare digits glued to the
+   label ("Pre-built reports10") and the analytics rail was unstyled buttons.
+   ========================================================================== */
+.gm-app .gm-tab .gm-n,
+.gm-app .gm-subtab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 0.1rem;
+  padding: 0 0.35rem;
+  border-radius: var(--gm-r-pill, 999px);
+  background: var(--gm-mint-100, #dcf5e5);
+  color: var(--gm-leaf-700, #166534);
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.gm-app .gm-tab.on .gm-n,
+.gm-app .gm-subtab.on .gm-subtab-count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.gm-app .gm-subtabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0.4rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.gm-app .gm-subtabs::-webkit-scrollbar {
+  height: 5px;
+}
+
+.gm-app .gm-subtab {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  border: 1.5px solid var(--gm-line, #dfe9e1);
+  border-radius: var(--gm-r-pill, 999px);
+  background: #fff;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--gm-ink-700, #2b3a31);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--gm-t-fast, 0.18s) ease;
+}
+
+.gm-app .gm-subtab svg {
+  width: 15px;
+  height: 15px;
+}
+
+.gm-app .gm-subtab:hover {
+  border-color: var(--gm-leaf-400, #3aa96f);
+}
+
+.gm-app .gm-subtab.on {
+  border-color: transparent;
+  background: var(--gm-grad-primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(27, 94, 32, 0.3);
 }
 
 /* ==========================================================================
@@ -1239,7 +1602,11 @@
   width: 36px;
   height: 36px;
   border-radius: var(--gm-r-md, 12px);
-  background: linear-gradient(135deg, var(--gm-leaf-100, #e8f5e9) 0%, var(--gm-leaf-50, #f1f8f4) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gm-leaf-100, #e8f5e9) 0%,
+    var(--gm-leaf-50, #f1f8f4) 100%
+  );
   color: var(--gm-leaf-600, #1d8345);
   flex-shrink: 0;
 }
@@ -1348,7 +1715,11 @@
 }
 
 .gm-app .gm-settings-menu-item:hover {
-  background: linear-gradient(135deg, var(--gm-leaf-50, #f1f8f4) 0%, var(--gm-leaf-100, #e8f5e9) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gm-leaf-50, #f1f8f4) 0%,
+    var(--gm-leaf-100, #e8f5e9) 100%
+  );
   transform: translateX(4px);
 }
 
@@ -1399,13 +1770,18 @@
 }
 
 .gm-app .gm-time-btn::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -1450,20 +1826,33 @@
 }
 
 .gm-app .gm-payment-header {
-  background: linear-gradient(135deg, var(--gm-leaf-600, #1d8345) 0%, var(--gm-leaf-700, #155832) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gm-leaf-600, #1d8345) 0%,
+    var(--gm-leaf-700, #155832) 100%
+  );
   color: white;
   padding: 1.5rem;
   position: relative;
 }
 
 .gm-app .gm-payment-header::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39, #ffeb3b, #ffc107, #ff9800, #ff5722);
+  background: linear-gradient(
+    90deg,
+    #4caf50,
+    #8bc34a,
+    #cddc39,
+    #ffeb3b,
+    #ffc107,
+    #ff9800,
+    #ff5722
+  );
 }
 
 .gm-app .gm-payment-profile {
@@ -1563,7 +1952,7 @@
 }
 
 .gm-app .gm-payment-receipt::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1656,9 +2045,15 @@
 }
 
 @keyframes gm-pin-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .gm-app .gm-pinpad {
@@ -1684,7 +2079,11 @@
 }
 
 .gm-app .gm-pin-key:hover {
-  background: linear-gradient(135deg, var(--gm-leaf-50, #f1f8f4) 0%, var(--gm-leaf-100, #e8f5e9) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gm-leaf-50, #f1f8f4) 0%,
+    var(--gm-leaf-100, #e8f5e9) 100%
+  );
   border-color: var(--gm-leaf-400, #4caf50);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -1762,7 +2161,7 @@
 }
 
 .gm-app .gm-channel-status-indicator::before {
-  content: '';
+  content: "";
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -1771,12 +2170,23 @@
 }
 
 @keyframes gm-status-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.2); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.2);
+  }
 }
 
 .gm-app .gm-channel-hero-card {
-  background: linear-gradient(135deg, var(--gm-leaf-600, #1d8345) 0%, var(--gm-leaf-700, #155832) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gm-leaf-600, #1d8345) 0%,
+    var(--gm-leaf-700, #155832) 100%
+  );
   border-radius: var(--gm-r-xl, 32px);
   padding: 2rem;
   color: white;
@@ -1785,23 +2195,36 @@
 }
 
 .gm-app .gm-channel-hero-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   right: -50%;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
 }
 
 .gm-app .gm-channel-hero-card::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39, #ffeb3b, #ffc107, #ff9800, #ff5722);
+  background: linear-gradient(
+    90deg,
+    #4caf50,
+    #8bc34a,
+    #cddc39,
+    #ffeb3b,
+    #ffc107,
+    #ff9800,
+    #ff5722
+  );
 }
 
 .gm-app .gm-channel-icon-grid {
@@ -1861,7 +2284,7 @@
   border-radius: var(--gm-r-md, 12px);
   padding: 1.5rem;
   min-height: 200px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #0f0;
   font-size: 0.9rem;
   line-height: 1.6;
@@ -1870,7 +2293,7 @@
 }
 
 .gm-app .gm-ussd-screen::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -1936,13 +2359,17 @@
 }
 
 .gm-app .gm-whatsapp-panel::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   right: -20%;
   width: 80%;
   height: 80%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
 }
 
 .gm-app .gm-whatsapp-chat-bubble {
@@ -1976,13 +2403,17 @@
 }
 
 .gm-app .gm-agent-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--gm-leaf-500, #43a047), var(--gm-leaf-600, #1d8345));
+  background: linear-gradient(
+    90deg,
+    var(--gm-leaf-500, #43a047),
+    var(--gm-leaf-600, #1d8345)
+  );
 }
 
 .gm-app .gm-agent-card:hover {
@@ -2130,7 +2561,11 @@
   gap: 0.75rem;
   padding: 0.65rem 1rem;
   border-radius: var(--gm-r-pill);
-  background: linear-gradient(90deg, var(--gm-mint-50) 0%, rgba(240, 250, 243, 0.35) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--gm-mint-50) 0%,
+    rgba(240, 250, 243, 0.35) 100%
+  );
   border: 1px solid var(--gm-line-soft);
 }
 .gm-app .gm-gtl-meta-label {
@@ -2187,14 +2622,30 @@
 .gm-app .gm-gtl-row {
   animation: gm-dash-fade-in 0.45s var(--gm-d-ease) both;
 }
-.gm-app .gm-gtl-row:nth-child(1) { animation-delay: 0.02s; }
-.gm-app .gm-gtl-row:nth-child(2) { animation-delay: 0.07s; }
-.gm-app .gm-gtl-row:nth-child(3) { animation-delay: 0.12s; }
-.gm-app .gm-gtl-row:nth-child(4) { animation-delay: 0.17s; }
-.gm-app .gm-gtl-row:nth-child(5) { animation-delay: 0.22s; }
-.gm-app .gm-gtl-row:nth-child(6) { animation-delay: 0.27s; }
-.gm-app .gm-gtl-row:nth-child(7) { animation-delay: 0.32s; }
-.gm-app .gm-gtl-row:nth-child(8) { animation-delay: 0.37s; }
+.gm-app .gm-gtl-row:nth-child(1) {
+  animation-delay: 0.02s;
+}
+.gm-app .gm-gtl-row:nth-child(2) {
+  animation-delay: 0.07s;
+}
+.gm-app .gm-gtl-row:nth-child(3) {
+  animation-delay: 0.12s;
+}
+.gm-app .gm-gtl-row:nth-child(4) {
+  animation-delay: 0.17s;
+}
+.gm-app .gm-gtl-row:nth-child(5) {
+  animation-delay: 0.22s;
+}
+.gm-app .gm-gtl-row:nth-child(6) {
+  animation-delay: 0.27s;
+}
+.gm-app .gm-gtl-row:nth-child(7) {
+  animation-delay: 0.32s;
+}
+.gm-app .gm-gtl-row:nth-child(8) {
+  animation-delay: 0.37s;
+}
 
 .gm-app .gm-gtl-node {
   display: grid;
@@ -2457,7 +2908,8 @@
 
 /* --- timeline-only keyframes --- */
 @keyframes gm-gtl-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(34, 163, 85, 0.28);
   }
   50% {

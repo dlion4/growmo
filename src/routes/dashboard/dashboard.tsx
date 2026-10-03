@@ -25,6 +25,7 @@ import {
   PackageCheck,
   Pencil,
   Plus,
+  Printer,
   Receipt,
   RefreshCw,
   Search,

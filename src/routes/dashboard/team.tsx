@@ -445,10 +445,10 @@ function TeamPage() {
       ],
       rows: ANALYTICS.map((row) => ({
         metric: row.metric,
-        current: row.current,
-        previous: row.previous,
+        current: row.thisMonth,
+        previous: row.lastMonth,
         change: row.change,
-        county: row.county,
+        county: row.countyAvg,
       })),
     },
   };

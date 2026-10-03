@@ -383,7 +383,7 @@ function MachineryPage() {
   const activeReport = machineryReports[view];
 
   return (
-    <main className="gm-app-inner">
+    <main className="gm-app-page gm-page-std gm-machinery-page">
       <Reveal>
         <MachineryHero
           kpis={[

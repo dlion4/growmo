@@ -1,0 +1,152 @@
+/* ============================================================================
+   PAGE 25 — SEEDS & SEEDLING NURSERY  (/dashboard/nursery)
+   ----------------------------------------------------------------------------
+   Page-specific layer. The generic page body (card padding, section headers,
+   sticky tab rail, search, list rows, tables, responsive, print) comes from
+   the shared kit — this route opts in with:
+
+       <main className="gm-app-page gm-page-std gm-nursery-page">
+
+   so only the seed/nursery-specific pieces live here. Token-only: no colour,
+   font, radius or shadow is invented.
+   ========================================================================== */
+
+/* ==========================================================================
+   1. VERTICAL RHYTHM
+   Hero -> tab rail -> view, always stacked, never side by side.
+   ========================================================================== */
+.gm-app .gm-nursery-page > * + * {
+  margin-top: clamp(0.9rem, 2vw, 1.4rem);
+}
+
+/* ==========================================================================
+   2. HERO
+   ========================================================================== */
+.gm-app .gm-nur-hero .gm-eyebrow.on-dark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--gm-lime-300);
+}
+
+.gm-app .gm-nur-hero .gm-eyebrow.on-dark .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gm-lime-400);
+  box-shadow: 0 0 0 4px rgba(216, 246, 95, 0.18);
+}
+
+/* ==========================================================================
+   3. SEED-STORE CHECK-IN ROWS
+   ========================================================================== */
+.gm-app .gm-nur-seed-row {
+  width: 100%;
+  cursor: pointer;
+}
+
+.gm-app .gm-nur-seed-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   4. NURSERY RECORD CARD
+   Shows how far a nursery has come against its seedling target.
+   ========================================================================== */
+.gm-app .gm-nur-record {
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.gm-app .gm-nur-record-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.gm-app .gm-nur-record-title {
+  font-size: 0.95rem;
+  line-height: 1.3;
+  color: var(--gm-forest-900);
+  overflow-wrap: anywhere;
+}
+
+.gm-app .gm-nur-record-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0.35rem 0 0.5rem;
+}
+
+.gm-app .gm-nur-record-count strong {
+  font-size: 1.22rem;
+  line-height: 1;
+  color: var(--gm-leaf-700);
+}
+
+.gm-app .gm-nur-record-count small {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--gm-ink-400);
+}
+
+.gm-app .gm-nur-record-bar {
+  display: block;
+  height: 6px;
+  margin: 0 0 0.7rem;
+}
+
+.gm-app .gm-nur-record-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.3rem 0.6rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--gm-line-soft);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--gm-ink-500);
+}
+
+/* ==========================================================================
+   5. TABLES
+   The seed store and purchase ledgers carry 8–9 columns, so they need more
+   room than the kit's default before they start scrolling.
+   ========================================================================== */
+.gm-app .gm-nursery-page .gm-table td {
+  vertical-align: top;
+}
+
+.gm-app .gm-nursery-page .gm-table td strong {
+  display: block;
+}
+
+/* keep the row-open chevron tight against the right edge */
+.gm-app .gm-nursery-page .gm-table td:last-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE
+   ========================================================================== */
+@media (max-width: 575.98px) {
+  .gm-app .gm-nursery-page > * + * {
+    margin-top: 0.85rem;
+  }
+
+  .gm-app .gm-nur-record-count strong {
+    font-size: 1.1rem;
+  }
+
+  /* three cramped pills read worse than three stacked buttons */
+  .gm-app .gm-nursery-page .d-flex.flex-wrap.gap-2 > .gm-btn {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}

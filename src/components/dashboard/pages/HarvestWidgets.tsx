@@ -14,13 +14,13 @@ export function HarvestHero({
   actions: ReactNode;
 }) {
   return (
-    <header className="gm-card gm-plan-head">
-      <div className="d-flex flex-wrap align-items-start gap-4">
-        <div style={{ flex: "1 1 440px" }}>
+    <header className="gm-card gm-page-head gm-harvest-hero">
+      <div className="gm-page-head-top">
+        <div className="gm-page-head-copy">
           <span className="gm-eyebrow on-dark">
             <span className="dot" /> Page 24 · harvest with care
           </span>
-          <h1 className="font-display mt-2">
+          <h1 className="font-display">
             Every harvested crop deserves a clean path to the buyer
           </h1>
           <p className="gm-lead on-dark mb-0">
@@ -29,22 +29,21 @@ export function HarvestHero({
             vizuri.
           </p>
         </div>
-        <div className="gm-plan-hero-actions">{actions}</div>
+        <div className="gm-page-head-actions">{actions}</div>
       </div>
-      <div className="gm-plan-kpi-row mt-4">
+
+      <div className="gm-page-kpis">
         {metrics.map((metric) => (
-          <div
-            className="gm-plan-facts"
-            key={metric.label}
-            style={{ minWidth: 158 }}
-          >
-            <span>
+          <div className="gm-page-kpi" key={metric.label}>
+            <span className="gm-page-kpi-icon" aria-hidden="true">
               <metric.icon />
-              <small>{metric.label}</small>
-              <strong className="font-display" style={{ fontSize: "1.12rem" }}>
+            </span>
+            <span className="gm-page-kpi-body">
+              <small className="gm-page-kpi-label">{metric.label}</small>
+              <strong className="gm-page-kpi-value font-display">
                 {metric.value}
               </strong>
-              <small>{metric.note}</small>
+              <small className="gm-page-kpi-note">{metric.note}</small>
             </span>
           </div>
         ))}

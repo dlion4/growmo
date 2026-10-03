@@ -12,7 +12,10 @@ import {
   Wrench,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import type { EquipmentAsset, MaintenanceTask } from "../../../data/app/machinery";
+import type {
+  EquipmentAsset,
+  MaintenanceTask,
+} from "../../../data/app/machinery";
 import { kes } from "../../../data/site";
 import { StatusChip } from "./DashboardWidgets";
 
@@ -24,13 +27,13 @@ export function MachineryHero({
   actions: ReactNode;
 }) {
   return (
-    <header className="gm-card gm-plan-head">
-      <div className="d-flex flex-wrap align-items-start gap-4">
-        <div style={{ flex: "1 1 420px" }}>
+    <header className="gm-card gm-page-head gm-machinery-hero">
+      <div className="gm-page-head-top">
+        <div className="gm-page-head-copy">
           <span className="gm-eyebrow on-dark">
             <span className="dot" /> Page 20 · farm infrastructure
           </span>
-          <h1 className="font-display mt-2">
+          <h1 className="font-display">
             Every machine earns its place on the shamba
           </h1>
           <p className="gm-lead on-dark mb-0">
@@ -39,22 +42,21 @@ export function MachineryHero({
             Githunguri.
           </p>
         </div>
-        <div className="gm-plan-hero-actions">{actions}</div>
+        <div className="gm-page-head-actions">{actions}</div>
       </div>
-      <div className="gm-plan-kpi-row mt-4">
+
+      <div className="gm-page-kpis">
         {kpis.map((kpi) => (
-          <div
-            key={kpi.label}
-            className="gm-plan-facts"
-            style={{ minWidth: 170 }}
-          >
-            <span>
+          <div className="gm-page-kpi" key={kpi.label}>
+            <span className="gm-page-kpi-icon" aria-hidden="true">
               <kpi.icon />
-              <small>{kpi.label}</small>
-              <strong className="font-display" style={{ fontSize: "1.15rem" }}>
+            </span>
+            <span className="gm-page-kpi-body">
+              <small className="gm-page-kpi-label">{kpi.label}</small>
+              <strong className="gm-page-kpi-value font-display">
                 {kpi.value}
               </strong>
-              <small>{kpi.note}</small>
+              <small className="gm-page-kpi-note">{kpi.note}</small>
             </span>
           </div>
         ))}
