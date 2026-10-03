@@ -1,0 +1,269 @@
+/* ============================================================================
+   PAGE 23 + 25 — SEASONS & NURSERY
+   A focused composition layer for the long-range planning and seedling pages.
+   These screens live inside AppShell's `.gm-app-inner`; the rules below keep
+   their content in a vertical reading flow, give unpadded data cards a calm
+   rhythm, and collapse deliberately on narrow farm phones.
+   ========================================================================== */
+
+.gm-app .gm-nursery-page,
+.gm-app .gm-seasons-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  gap: 1.25rem;
+}
+
+.gm-app .gm-nursery-page > *,
+.gm-app .gm-seasons-page > * {
+  min-width: 0;
+}
+
+.gm-app .gm-nursery-page .gm-reveal,
+.gm-app .gm-seasons-page .gm-reveal {
+  width: 100%;
+}
+
+/* These two legacy pages use the shared card primitive directly. The primitive
+   intentionally has no padding for marketing components, so establish the
+   dashboard treatment locally instead of changing cards across the product. */
+.gm-app .gm-nursery-page .gm-card:not(.gm-plan-head),
+.gm-app .gm-seasons-page .gm-card:not(.gm-plan-head) {
+  padding: clamp(1rem, 2.1vw, 1.45rem);
+}
+
+.gm-app .gm-nursery-page .gm-card > .gm-dash-section-title:first-child,
+.gm-app .gm-seasons-page .gm-card > .gm-dash-section-title:first-child {
+  margin-top: 0;
+}
+
+.gm-app .gm-nursery-page .gm-dash-section-title,
+.gm-app .gm-seasons-page .gm-dash-section-title {
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.gm-app .gm-nursery-page .gm-dash-section-title > div,
+.gm-app .gm-seasons-page .gm-dash-section-title > div {
+  min-width: 0;
+}
+
+.gm-app .gm-nursery-page .gm-dash-section-title .gm-lead,
+.gm-app .gm-seasons-page .gm-dash-section-title .gm-lead {
+  max-width: 70ch;
+}
+
+/* The action bar belongs to the page flow, not beside its data panel. */
+.gm-app .gm-nursery-page > .gm-card,
+.gm-app .gm-seasons-page > .gm-card {
+  width: 100%;
+}
+
+/* Compact operational briefs make each page useful at a glance, while the
+   existing tabs retain the detailed records and planning workspaces. */
+.gm-app .gm-nursery-pulse,
+.gm-app .gm-seasons-pulse {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) auto auto;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-radius-lg, 18px);
+  background:
+    radial-gradient(circle at 100% 0, rgba(196, 239, 60, 0.2), transparent 34%),
+    linear-gradient(135deg, #f7fcf5, #ffffff 60%);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-nursery-pulse-main,
+.gm-app .gm-seasons-pulse-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.gm-app .gm-nursery-pulse-main > span,
+.gm-app .gm-seasons-pulse-main > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  color: var(--gm-leaf-700);
+  background: var(--gm-lime-100);
+}
+
+.gm-app .gm-nursery-pulse-main svg,
+.gm-app .gm-seasons-pulse-main svg {
+  width: 21px;
+  height: 21px;
+}
+
+.gm-app .gm-nursery-pulse-main strong,
+.gm-app .gm-seasons-pulse-main strong {
+  display: block;
+  margin-top: 0.08rem;
+  font-size: 0.94rem;
+  color: var(--gm-ink-900);
+}
+
+.gm-app .gm-nursery-pulse-main p,
+.gm-app .gm-seasons-pulse-main p {
+  margin: 0.2rem 0 0;
+  color: var(--gm-ink-500);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.gm-app .gm-nursery-pulse-stats,
+.gm-app .gm-seasons-pulse-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-left: 1.1rem;
+  border-left: 1px solid var(--gm-line);
+}
+
+.gm-app .gm-nursery-pulse-stats span,
+.gm-app .gm-seasons-pulse-stats span {
+  display: grid;
+  gap: 0.1rem;
+  white-space: nowrap;
+}
+
+.gm-app .gm-nursery-pulse-stats strong,
+.gm-app .gm-seasons-pulse-stats strong {
+  color: var(--gm-leaf-800);
+  font-family: var(--gm-font-display);
+  font-size: 1.05rem;
+  line-height: 1.05;
+}
+
+.gm-app .gm-nursery-pulse-stats small,
+.gm-app .gm-seasons-pulse-stats small {
+  color: var(--gm-ink-500);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.gm-app .gm-nursery-pulse-actions,
+.gm-app .gm-seasons-pulse-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+/* Data-heavy planning boards stay contained instead of widening the whole
+   shell. Tables retain horizontal access on phones, without pulling headers
+   and cards into a left-to-right page layout. */
+.gm-app .gm-nursery-page .gm-table-wrap,
+.gm-app .gm-seasons-page .gm-table-wrap {
+  width: 100%;
+  overscroll-behavior-inline: contain;
+  border-radius: 12px;
+}
+
+.gm-app .gm-nursery-page .gm-table,
+.gm-app .gm-seasons-page .gm-table {
+  min-width: 680px;
+}
+
+.gm-app .gm-seasons-page .gm-table th,
+.gm-app .gm-seasons-page .gm-table td {
+  white-space: nowrap;
+}
+
+.gm-app .gm-nursery-page .gm-check-row,
+.gm-app .gm-seasons-page .gm-check-row {
+  min-width: 0;
+}
+
+@media (max-width: 980px) {
+  .gm-app .gm-nursery-pulse,
+  .gm-app .gm-seasons-pulse {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .gm-app .gm-nursery-pulse-stats,
+  .gm-app .gm-seasons-pulse-stats {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .gm-app .gm-nursery-pulse-actions,
+  .gm-app .gm-seasons-pulse-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-nursery-page,
+  .gm-app .gm-seasons-page {
+    gap: 0.9rem;
+  }
+
+  .gm-app .gm-nursery-page .gm-card:not(.gm-plan-head),
+  .gm-app .gm-seasons-page .gm-card:not(.gm-plan-head) {
+    padding: 0.95rem;
+  }
+
+  .gm-app .gm-nursery-page .gm-dash-section-title,
+  .gm-app .gm-seasons-page .gm-dash-section-title {
+    flex-direction: column;
+  }
+
+  .gm-app .gm-nursery-page .gm-dash-section-title > .gm-btn,
+  .gm-app .gm-nursery-page .gm-dash-section-title > div:last-child,
+  .gm-app .gm-seasons-page .gm-dash-section-title > .gm-btn,
+  .gm-app .gm-seasons-page .gm-dash-section-title > div:last-child {
+    width: 100%;
+  }
+
+  .gm-app .gm-nursery-page .gm-dash-section-title .gm-btn,
+  .gm-app .gm-seasons-page .gm-dash-section-title .gm-btn {
+    justify-content: center;
+  }
+
+  .gm-app .gm-nursery-pulse,
+  .gm-app .gm-seasons-pulse {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    padding: 0.95rem;
+  }
+
+  .gm-app .gm-nursery-pulse-stats,
+  .gm-app .gm-seasons-pulse-stats {
+    justify-content: space-between;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--gm-line);
+  }
+
+  .gm-app .gm-nursery-pulse-actions,
+  .gm-app .gm-seasons-pulse-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-nursery-page .gm-nursery-pulse-actions .gm-btn,
+  .gm-app .gm-seasons-page .gm-seasons-pulse-actions .gm-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .gm-app .gm-nursery-page .gm-tabs {
+    margin-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gm-app .gm-nursery-page .gm-card,
+  .gm-app .gm-seasons-page .gm-card {
+    transition: none;
+  }
+}

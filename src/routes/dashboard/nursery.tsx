@@ -522,7 +522,7 @@ function NurseryPage() {
   );
 
   return (
-    <main className="gm-app">
+    <main className="gm-nursery-page">
       <Reveal>
         <NurseryHero
           metrics={[
@@ -637,6 +637,48 @@ function NurseryPage() {
         </div>
       </Reveal>
       <ReportActionBar report={activeReport} onPreview={setReportPreview} />
+
+      <section className="gm-nursery-pulse" aria-label="Today's nursery pulse">
+        <div className="gm-nursery-pulse-main">
+          <span>
+            <Droplets />
+          </span>
+          <div>
+            <span className="gm-eyebrow">Today&apos;s nursery pulse</span>
+            <strong>Hardening-off check due before the evening round</strong>
+            <p>
+              Reduce water gradually, inspect root moisture and confirm Plot 1
+              is ready for the 20–22 October transplant window.
+            </p>
+          </div>
+        </div>
+        <div className="gm-nursery-pulse-stats">
+          <span>
+            <strong>3,200</strong>
+            <small>seedlings ready</small>
+          </span>
+          <span>
+            <strong>85%</strong>
+            <small>germination rate</small>
+          </span>
+        </div>
+        <div className="gm-nursery-pulse-actions">
+          <button
+            type="button"
+            className="gm-btn gm-btn-soft gm-btn-sm"
+            onClick={() => openModal("record-watering")}
+          >
+            <Droplets /> Record care
+          </button>
+          <button
+            type="button"
+            className="gm-btn gm-btn-lime gm-btn-sm"
+            onClick={() => setView("nursery")}
+          >
+            <Sprout /> Open active batch
+          </button>
+        </div>
+      </section>
 
       {view === "seeds" ? (
         <Reveal delay={80}>

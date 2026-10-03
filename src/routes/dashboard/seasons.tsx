@@ -342,7 +342,7 @@ function SeasonsPage() {
   const activeReport = seasonReports[view];
 
   return (
-    <div>
+    <main className="gm-seasons-page">
       <SeasonsHero
         metrics={[
           {
@@ -475,6 +475,53 @@ function SeasonsPage() {
       />
       <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
+      <section
+        className="gm-seasons-pulse"
+        aria-label="Planning horizon summary"
+      >
+        <div className="gm-seasons-pulse-main">
+          <span>
+            <CalendarDays />
+          </span>
+          <div>
+            <span className="gm-eyebrow">Planning horizon</span>
+            <strong>
+              2027 rotation is aligned across production and recovery
+            </strong>
+            <p>
+              Keep the next crop cycle, cover-crop recovery and buyer window in
+              one decision trail before planting commitments are made.
+            </p>
+          </div>
+        </div>
+        <div className="gm-seasons-pulse-stats">
+          <span>
+            <strong>3 yrs</strong>
+            <small>mapped horizon</small>
+          </span>
+          <span>
+            <strong>{plans.length}</strong>
+            <small>active plans</small>
+          </span>
+        </div>
+        <div className="gm-seasons-pulse-actions">
+          <button
+            type="button"
+            className="gm-btn gm-btn-soft gm-btn-sm"
+            onClick={() => setView("calendar")}
+          >
+            <CalendarRange /> View calendar
+          </button>
+          <button
+            type="button"
+            className="gm-btn gm-btn-lime gm-btn-sm"
+            onClick={() => setModal("generate-rotation")}
+          >
+            <Sparkles /> Refresh rotation
+          </button>
+        </div>
+      </section>
+
       {view === "calendar" ? (
         <CalendarContent
           year={calendarYear}
@@ -582,7 +629,7 @@ function SeasonsPage() {
         report={reportPreview}
         onClose={() => setReportPreview(null)}
       />
-    </div>
+    </main>
   );
 }
 
