@@ -54,6 +54,13 @@ import {
   PortfolioCard,
 } from "../../components/dashboard/pages/OrdersWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   AVAILABILITY,
@@ -118,6 +125,7 @@ function downloadOrders(rows: string[][]) {
 function OrdersPortfolioPage() {
   const toast = useToast();
   const [view, setView] = useState<View>("portfolios");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [portfolioTab, setPortfolioTab] = useState<PortfolioTab>("overview");
   const [portfolios, setPortfolios] = useState(PORTFOLIOS);
   const [inquiries, setInquiries] = useState(INQUIRIES);
@@ -386,6 +394,16 @@ function OrdersPortfolioPage() {
     { id: "links" as const, label: "Link insights", icon: <Share2 /> },
   ];
 
+  const ordersReports: Record<View, ReportDefinition> = {
+    portfolios: createReport({ id: "orders-portfolios", title: "Buyer portfolio register", filename: "growmo-buyer-portfolio-register", description: "Current live buyer portfolios and market presentation records.", rows: portfolios }),
+    inquiries: createReport({ id: "orders-inquiries", title: "Buyer inquiries", filename: "growmo-buyer-inquiries", description: "Current buyer inquiries using the active status filter.", rows: filteredInquiries }),
+    orders: createReport({ id: "orders-register", title: "Farm order register", filename: "growmo-farm-order-register", description: "Current farm orders using the active order-status filter.", rows: filteredOrders }),
+    contracts: createReport({ id: "orders-contracts", title: "Order contract", filename: "growmo-order-contract", description: "Current order contract and its supply terms.", rows: [CONTRACT] }),
+    buyers: createReport({ id: "orders-buyers", title: "Buyer register", filename: "growmo-buyer-register", description: "Current buyer records using the active search.", rows: filteredBuyers }),
+    links: createReport({ id: "orders-link-analytics", title: "Buyer-link analytics", filename: "growmo-buyer-link-analytics", description: "Current buyer-link performance analytics.", rows: LINK_ANALYTICS }),
+  };
+  const activeReport = ordersReports[view];
+
   return (
     <main className="gm-app-page gm-page-std gm-orders-page">
       <Reveal>
@@ -494,6 +512,7 @@ function OrdersPortfolioPage() {
           label="Orders and portfolio workspace"
         />
       </div>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
       {view === "portfolios" ? (
         <PortfolioSection
           portfolios={portfolios}
@@ -767,6 +786,7 @@ function OrdersPortfolioPage() {
           />
         ) : null}
       </DashboardDrawer>
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <OrdersModalHub
         active={modal}
         portfolio={selectedPortfolio}

@@ -1,0 +1,158 @@
+/* ============================================================================
+   PAGES 23 + 25 — OPERATIONAL "PULSE" BRIEFS
+   ----------------------------------------------------------------------------
+   The compact at-a-glance brief that opens the nursery and seasons pages
+   (`.gm-nursery-pulse` / `.gm-seasons-pulse`), introduced in PR #10.
+
+   Everything else this file used to carry — page flow, `.gm-card` padding,
+   section-title margins, table and check-row rules — is now owned by the
+   shared `page-kit.css` layer (`.gm-page-std`), which both pages opt into.
+   Keeping one definition of each rule avoids the two layers fighting over
+   the same selectors.
+   ========================================================================== */
+
+/* Compact operational briefs make each page useful at a glance, while the
+   existing tabs retain the detailed records and planning workspaces. */
+.gm-app .gm-nursery-pulse,
+.gm-app .gm-seasons-pulse {
+  margin-top: clamp(0.9rem, 2vw, 1.4rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) auto auto;
+  align-items: center;
+  gap: 1.1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--gm-line);
+  border-radius: var(--gm-radius-lg, 18px);
+  background:
+    radial-gradient(circle at 100% 0, rgba(196, 239, 60, 0.2), transparent 34%),
+    linear-gradient(135deg, #f7fcf5, #ffffff 60%);
+  box-shadow: var(--gm-shadow-xs);
+}
+
+.gm-app .gm-nursery-pulse-main,
+.gm-app .gm-seasons-pulse-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+  min-width: 0;
+}
+
+.gm-app .gm-nursery-pulse-main > span,
+.gm-app .gm-seasons-pulse-main > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  color: var(--gm-leaf-700);
+  background: var(--gm-lime-100);
+}
+
+.gm-app .gm-nursery-pulse-main svg,
+.gm-app .gm-seasons-pulse-main svg {
+  width: 21px;
+  height: 21px;
+}
+
+.gm-app .gm-nursery-pulse-main strong,
+.gm-app .gm-seasons-pulse-main strong {
+  display: block;
+  margin-top: 0.08rem;
+  font-size: 0.94rem;
+  color: var(--gm-ink-900);
+}
+
+.gm-app .gm-nursery-pulse-main p,
+.gm-app .gm-seasons-pulse-main p {
+  margin: 0.2rem 0 0;
+  color: var(--gm-ink-500);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.gm-app .gm-nursery-pulse-stats,
+.gm-app .gm-seasons-pulse-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding-left: 1.1rem;
+  border-left: 1px solid var(--gm-line);
+}
+
+.gm-app .gm-nursery-pulse-stats span,
+.gm-app .gm-seasons-pulse-stats span {
+  display: grid;
+  gap: 0.1rem;
+  white-space: nowrap;
+}
+
+.gm-app .gm-nursery-pulse-stats strong,
+.gm-app .gm-seasons-pulse-stats strong {
+  color: var(--gm-leaf-800);
+  font-family: var(--gm-font-display);
+  font-size: 1.05rem;
+  line-height: 1.05;
+}
+
+.gm-app .gm-nursery-pulse-stats small,
+.gm-app .gm-seasons-pulse-stats small {
+  color: var(--gm-ink-500);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.gm-app .gm-nursery-pulse-actions,
+.gm-app .gm-seasons-pulse-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.55rem;
+}
+
+@media (max-width: 980px) {
+  .gm-app .gm-nursery-pulse,
+  .gm-app .gm-seasons-pulse {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .gm-app .gm-nursery-pulse-stats,
+  .gm-app .gm-seasons-pulse-stats {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .gm-app .gm-nursery-pulse-actions,
+  .gm-app .gm-seasons-pulse-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .gm-app .gm-nursery-pulse,
+  .gm-app .gm-seasons-pulse {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    padding: 0.95rem;
+  }
+
+  .gm-app .gm-nursery-pulse-stats,
+  .gm-app .gm-seasons-pulse-stats {
+    justify-content: space-between;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--gm-line);
+  }
+
+  .gm-app .gm-nursery-pulse-actions,
+  .gm-app .gm-seasons-pulse-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .gm-app .gm-nursery-page .gm-nursery-pulse-actions .gm-btn,
+  .gm-app .gm-seasons-page .gm-seasons-pulse-actions .gm-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

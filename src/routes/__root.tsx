@@ -1,98 +1,109 @@
-import { HeadContent, Scripts, createRootRoute, useLocation } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { AuthMiniFooter, AuthTopbar } from '../components/auth/shell'
-import Footer from '../components/home/layout/Footer'
-import Header from '../components/home/layout/Header'
-import { AppShell } from '../components/dashboard/layout/AppShell'
-import { CartProvider } from '../store/cart'
-import { ToastHost, ToastProvider } from '../store/toast'
+import {
+  HeadContent,
+  Scripts,
+  createRootRoute,
+  useLocation,
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { AuthMiniFooter, AuthTopbar } from "../components/auth/shell";
+import Footer from "../components/home/layout/Footer";
+import Header from "../components/home/layout/Header";
+import { AppShell } from "../components/dashboard/layout/AppShell";
+import { CartProvider } from "../store/cart";
+import { ToastHost, ToastProvider } from "../store/toast";
 
-import appCss from '../styles.css?url'
+import appCss from "../styles.css?url";
 // Additive dashboard layer — loaded after the master theme, scoped to .gm-app
-import dashboardCss from '../components/dashboard/styles/dashboard.css?url'
+import dashboardCss from "../components/dashboard/styles/dashboard.css?url";
 // Page 3 crop-planner additions — token-only and .gm-app scoped
-import plannerCss from '../components/dashboard/styles/planner.css?url'
+import plannerCss from "../components/dashboard/styles/planner.css?url";
 // Page 8 weather & climate additions — token-only and .gm-app scoped
-import weatherProCss from '../components/dashboard/styles/weather-pro.css?url'
+import weatherProCss from "../components/dashboard/styles/weather-pro.css?url";
 // Page 9 AI advisor additions — token-only and .gm-app scoped
-import advisorCss from '../components/dashboard/styles/advisor.css?url'
+import advisorCss from "../components/dashboard/styles/advisor.css?url";
 // Page 12 records & compliance additions — token-only and .gm-app scoped
-import recordsCss from '../components/dashboard/styles/records.css?url'
+import recordsCss from "../components/dashboard/styles/records.css?url";
 // Page 13 community & learning additions — token-only and .gm-app scoped
-import communityCss from '../components/dashboard/styles/community.css?url'
+import communityCss from "../components/dashboard/styles/community.css?url";
 // Page 17 soil health & testing layer — token-only and .gm-app scoped
-import soilCss from '../components/dashboard/styles/soil.css?url'
+import soilCss from "../components/dashboard/styles/soil.css?url";
 // Page 10 market & sales layer — token-only and .gm-app scoped
-import marketCss from '../components/dashboard/styles/market.css?url'
+import marketCss from "../components/dashboard/styles/market.css?url";
 // Page 11 analytics & reporting layer — token-only and .gm-app scoped
-import analyticsCss from '../components/dashboard/styles/analytics.css?url'
+import analyticsCss from "../components/dashboard/styles/analytics.css?url";
 // Page 14 wallet / mobile-money layer
-import walletCss from '../components/dashboard/styles/wallet.css?url'
+import walletCss from "../components/dashboard/styles/wallet.css?url";
 // Page 15 settings / team / permissions
-import settingsCss from '../components/dashboard/styles/settings.css?url'
+import settingsCss from "../components/dashboard/styles/settings.css?url";
 // Page 16 channels (PWA offline, USSD, SMS, WhatsApp, agents)
-import channelsCss from '../components/dashboard/styles/channels.css?url'
+import channelsCss from "../components/dashboard/styles/channels.css?url";
 // Page 18 security, logs, backups & account protection
-import logsCss from '../components/dashboard/styles/logs.css?url'
+import logsCss from "../components/dashboard/styles/logs.css?url";
 // Page 15.3 team management & HR
-import teamCss from '../components/dashboard/styles/team.css?url'
-import mapCss from '../components/dashboard/styles/map.css?url'
+import teamCss from "../components/dashboard/styles/team.css?url";
+import mapCss from "../components/dashboard/styles/map.css?url";
 // Shared opt-in page body for app screens (.gm-page-std) — loads before the
 // per-page layers so a page can always override it
-import pageKitCss from '../components/dashboard/styles/page-kit.css?url'
+import pageKitCss from "../components/dashboard/styles/page-kit.css?url";
+// Page 23/25 operational "pulse" briefs
+import nurserySeasonsCss from "../components/dashboard/styles/nursery-seasons.css?url";
 // Page 25 seeds & seedling nursery — token-only and .gm-nursery-page scoped
-import nurseryCss from '../components/dashboard/styles/nursery.css?url'
+import nurseryCss from "../components/dashboard/styles/nursery.css?url";
 // Page 23 multi-season planning & rotation — token-only and .gm-seasons-page scoped
-import seasonsCss from '../components/dashboard/styles/seasons.css?url'
+import seasonsCss from "../components/dashboard/styles/seasons.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
     meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'GrowMO — Smart Farming for Kenya | Plan, Predict, Profit' },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "GrowMO — Smart Farming for Kenya | Plan, Predict, Profit" },
       {
-        name: 'description',
+        name: "description",
         content:
-          'GrowMO plans your season, predicts pests, tracks every shilling on M-Pesa and connects you straight to buyers. 128K+ Kenyan farmers grow with us.',
+          "GrowMO plans your season, predicts pests, tracks every shilling on M-Pesa and connects you straight to buyers. 128K+ Kenyan farmers grow with us.",
       },
-      { name: 'theme-color', content: '#0c2317' },
+      { name: "theme-color", content: "#0c2317" },
     ],
     links: [
       // ?v= busts preview/proxy CSS caches — bump it whenever a stylesheet changes
-      { rel: 'stylesheet', href: `${appCss}?v=8` },
-      { rel: 'stylesheet', href: `${dashboardCss}?v=5` },
-      { rel: 'stylesheet', href: `${plannerCss}?v=5` },
-      { rel: 'stylesheet', href: `${weatherProCss}?v=1` },
-      { rel: 'stylesheet', href: `${advisorCss}?v=1` },
-      { rel: 'stylesheet', href: `${recordsCss}?v=3` },
-      { rel: 'stylesheet', href: `${communityCss}?v=3` },
-      { rel: 'stylesheet', href: `${soilCss}?v=2` },
-      { rel: 'stylesheet', href: `${marketCss}?v=2` },
-      { rel: 'stylesheet', href: `${analyticsCss}?v=2` },
-      { rel: 'stylesheet', href: `${walletCss}?v=2` },
-      { rel: 'stylesheet', href: `${settingsCss}?v=2` },
-      { rel: 'stylesheet', href: `${channelsCss}?v=3` },
-      { rel: 'stylesheet', href: `${logsCss}?v=1` },
-      { rel: 'stylesheet', href: `${teamCss}?v=4` },
-      { rel: 'stylesheet', href: `${mapCss}?v=1` },
-      { rel: 'stylesheet', href: `${pageKitCss}?v=1` },
-      { rel: 'stylesheet', href: `${nurseryCss}?v=2` },
-      { rel: 'stylesheet', href: `${seasonsCss}?v=2` },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+      { rel: "stylesheet", href: `${appCss}?v=8` },
+      { rel: "stylesheet", href: `${dashboardCss}?v=5` },
+      { rel: "stylesheet", href: `${plannerCss}?v=5` },
+      { rel: "stylesheet", href: `${weatherProCss}?v=1` },
+      { rel: "stylesheet", href: `${advisorCss}?v=1` },
+      { rel: "stylesheet", href: `${recordsCss}?v=3` },
+      { rel: "stylesheet", href: `${communityCss}?v=3` },
+      { rel: "stylesheet", href: `${soilCss}?v=2` },
+      { rel: "stylesheet", href: `${marketCss}?v=2` },
+      { rel: "stylesheet", href: `${analyticsCss}?v=2` },
+      { rel: "stylesheet", href: `${walletCss}?v=2` },
+      { rel: "stylesheet", href: `${settingsCss}?v=2` },
+      { rel: "stylesheet", href: `${channelsCss}?v=3` },
+      { rel: "stylesheet", href: `${logsCss}?v=1` },
+      { rel: "stylesheet", href: `${teamCss}?v=4` },
+      { rel: "stylesheet", href: `${mapCss}?v=1` },
+      { rel: "stylesheet", href: `${pageKitCss}?v=1` },
+      { rel: "stylesheet", href: `${nurserySeasonsCss}?v=2` },
+      { rel: "stylesheet", href: `${nurseryCss}?v=2` },
+      { rel: "stylesheet", href: `${seasonsCss}?v=2` },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      {
+        rel: "preconnect",
+        href: "https://fonts.gstatic.com",
+        crossOrigin: "anonymous",
+      },
     ],
   }),
   shellComponent: RootDocument,
-})
+});
 
 /* Marketing chrome on site pages, minimal secure chrome on /auth/* — same master theme */
 function Chrome({ children }: { children: React.ReactNode }) {
-  const { pathname } = useLocation()
-  const isAuth = pathname.startsWith('/auth')
-  const isApp =
-    pathname === '/dashboard' || pathname.startsWith('/dashboard/')
+  const { pathname } = useLocation();
+  const isAuth = pathname.startsWith("/auth");
+  const isApp = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 
   if (isApp) {
     return (
@@ -100,7 +111,7 @@ function Chrome({ children }: { children: React.ReactNode }) {
         <AppShell>{children}</AppShell>
         <ToastHost />
       </>
-    )
+    );
   }
 
   if (isAuth) {
@@ -111,7 +122,7 @@ function Chrome({ children }: { children: React.ReactNode }) {
         <AuthMiniFooter />
         <ToastHost />
       </>
-    )
+    );
   }
   return (
     <>
@@ -120,7 +131,7 @@ function Chrome({ children }: { children: React.ReactNode }) {
       <Footer />
       <ToastHost />
     </>
-  )
+  );
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -137,11 +148,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         </ToastProvider>
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: "bottom-right",
           }}
           plugins={[
             {
-              name: 'Tanstack Router',
+              name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
           ]}
@@ -149,5 +160,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

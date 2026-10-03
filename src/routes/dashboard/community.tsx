@@ -101,6 +101,12 @@ import {
   StoryDetailDialog,
   ThreadDetailDialog,
 } from "../../components/dashboard/pages/CommunityModals";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   AGRONOMIST_SERVICES,
@@ -2061,6 +2067,7 @@ function BenchmarksSection({
 function CommunityPage() {
   const toast = useToast();
   const [view, setView] = useState<CommunityView>("forums");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [menu, setMenu] = useState(false);
@@ -2476,6 +2483,16 @@ function CommunityPage() {
 
   /* --------------------------------------------------------------- render */
 
+  const communityReports: Record<CommunityView, ReportDefinition> = {
+    forums: createReport({ id: "community-forum-threads", title: "Community forum threads", filename: "growmo-community-forum-threads", description: "Current live community discussions and replies.", rows: threads }),
+    library: createReport({ id: "community-library", title: "Extension library", filename: "growmo-extension-library", description: "Current extension resources and saved learning material.", rows: resources }),
+    experts: createReport({ id: "community-experts", title: "Agronomist directory", filename: "growmo-agronomist-directory", description: "Current available agronomists and advisory services.", rows: experts }),
+    groups: createReport({ id: "community-groups", title: "Farmer group register", filename: "growmo-farmer-group-register", description: "Current farmer group memberships and activity.", rows: groups }),
+    stories: createReport({ id: "community-stories", title: "Community success stories", filename: "growmo-community-success-stories", description: "Current farmer success stories and learning outcomes.", rows: stories }),
+    benchmarks: createReport({ id: "community-benchmarks", title: "Community benchmarks", filename: "growmo-community-benchmarks", description: "Current community benchmarking metrics.", rows: BENCHMARK_METRICS }),
+  };
+  const activeCommunityReport = communityReports[view];
+
   return (
     <main className="gm-app-page gm-community-page">
       <div className="gm-container py-4">
@@ -2690,6 +2707,7 @@ function CommunityPage() {
             ]}
           />
         </div>
+        <ReportActionBar report={activeCommunityReport} onPreview={setReportPreview} />
 
         <div className="mt-3">
           {view === "forums" ? (
@@ -3362,6 +3380,7 @@ function CommunityPage() {
         onInvited={inviteFarmer}
       />
 
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <CommunitySettingsDialog
         open={modal === "settings"}
         settings={settings}

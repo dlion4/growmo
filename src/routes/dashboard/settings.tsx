@@ -32,6 +32,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DashboardMetric, DashboardSectionHeader } from "../../components/dashboard/pages/DashboardWidgets";
+import {
+  ReportPreviewDrawer,
+  ReportTools,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
   ConfirmSettingsDialog,
@@ -69,8 +74,11 @@ import {
   DATA_SETTINGS,
   FARM_PLOTS,
   NOTIF_PREFS,
+  PERM_MATRIX,
+  PERM_MATRIX_KEYS,
   PLAN_COMPARISON_ROWS,
   PLANS,
+  PROFILE_FIELDS,
   ROLES,
   SETTINGS_CONTEXT,
   SETTINGS_FAQ,
@@ -89,20 +97,6 @@ export const Route = createFileRoute("/dashboard/settings")({
 
 type SettingsView = "profile" | "farm" | "team" | "hr" | "notifications" | "data" | "plan" | "faq";
 
-function downloadText(filename: string, body: string, type = "text/csv") {
-  const blob = new Blob([body], { type });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
-
-function csvCell(value: string | number | null | undefined) {
-  return `"${String(value ?? "").replaceAll('"', '""')}"`;
-}
-
 function SettingsPage() {
   const toast = useToast();
   const navigate = useNavigate();
@@ -113,6 +107,7 @@ function SettingsPage() {
   const [notifs, setNotifs] = useState(NOTIF_PREFS);
   const [plan, setPlan] = useState(SETTINGS_CONTEXT.plan);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
 
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -130,13 +125,84 @@ function SettingsPage() {
   const activePlan = PLANS.find((p) => p.id === plan) ?? PLANS[1];
   const payrollTotal = 9312.5;
 
+  const profileReport: ReportDefinition = {
+    id: "farm-profile",
+    title: "Farm profile & access record",
+    filename: "growmo-farm-profile",
+    description: "Farm owner profile, location, operating preferences and account security settings.",
+    columns: [{ key: "group", label: "Group" }, { key: "field", label: "Field" }, { key: "value", label: "Value" }],
+    rows: PROFILE_FIELDS.map((field) => ({ group: field.group, field: field.k, value: field.v })),
+  };
+  const plotsReport: ReportDefinition = {
+    id: "farm-plots",
+    title: "Farm plots & settings",
+    filename: "growmo-farm-plots",
+    description: "Active plot records with crop, soil, planting and expected harvest information.",
+    columns: [{ key: "plot", label: "Plot" }, { key: "crop", label: "Crop" }, { key: "size", label: "Size" }, { key: "soil", label: "Soil / pH" }, { key: "planted", label: "Planted" }, { key: "harvest", label: "Harvest" }, { key: "status", label: "Status" }],
+    rows: plots.map((plot) => ({ plot: plot.name, crop: plot.crop, size: plot.size, soil: `${plot.soil} · pH ${plot.ph}`, planted: plot.planted, harvest: plot.harvest, status: plot.status })),
+  };
+  const teamReport: ReportDefinition = {
+    id: "team-roster",
+    title: "Team roster & authority",
+    filename: "growmo-team-roster",
+    description: "Current team access, role assignments, plot scope and payment authority.",
+    columns: [{ key: "name", label: "Name" }, { key: "role", label: "Role" }, { key: "phone", label: "Phone" }, { key: "status", label: "Status" }, { key: "plots", label: "Plots" }, { key: "financial", label: "Financial access" }, { key: "authority", label: "Payment authority" }, { key: "validity", label: "Valid until" }],
+    rows: members.map((member) => ({ name: member.name, role: ROLES.find((role) => role.key === member.role)?.label ?? member.role, phone: member.phone, status: member.status, plots: member.plots, financial: member.financial, authority: member.paymentAuthority, validity: member.validUntil })),
+  };
+  const permissionsReport: ReportDefinition = {
+    id: "permission-matrix",
+    title: "Role permission matrix",
+    filename: "growmo-role-permissions",
+    description: "Full, limited and unavailable permission levels for every farm role.",
+    columns: [{ key: "feature", label: "Feature" }, ...PERM_MATRIX_KEYS.map((role) => ({ key: role, label: ROLES.find((entry) => entry.key === role)?.label ?? role }))],
+    rows: PERM_MATRIX.map((row) => ({
+      feature: row.feature,
+      ...Object.fromEntries(PERM_MATRIX_KEYS.map((role) => [role, row.cells[role] === "y" ? "Full" : row.cells[role] === "l" ? "Limited" : "No access"])),
+    })),
+  };
+  const notificationsReport: ReportDefinition = {
+    id: "notification-preferences",
+    title: "Notification preferences",
+    filename: "growmo-notification-preferences",
+    description: "Message channels currently enabled for every farm alert and report type.",
+    columns: [{ key: "type", label: "Notification" }, { key: "description", label: "Description" }, { key: "push", label: "Push" }, { key: "sms", label: "SMS" }, { key: "whatsapp", label: "WhatsApp" }, { key: "email", label: "Email" }],
+    rows: notifs.map((row) => ({ type: row.label, description: row.desc, push: row.channels.push, sms: row.channels.sms, whatsapp: row.channels.wa, email: row.channels.email })),
+  };
+  const privacyReport: ReportDefinition = {
+    id: "data-privacy-settings",
+    title: "Data & privacy settings",
+    filename: "growmo-data-privacy-settings",
+    description: "Data sharing, retention and export controls configured for this farm account.",
+    columns: [{ key: "setting", label: "Setting" }, { key: "detail", label: "Detail" }, { key: "action", label: "Available action" }],
+    rows: DATA_SETTINGS.map((row) => ({ setting: row.label, detail: row.desc, action: row.action })),
+  };
+  const plansReport: ReportDefinition = {
+    id: "plan-comparison",
+    title: "Plan feature comparison",
+    filename: "growmo-plan-feature-comparison",
+    description: "GrowMO plan limits and feature availability across Free, Premium and Enterprise.",
+    columns: [{ key: "feature", label: "Feature" }, { key: "free", label: "Free" }, { key: "premium", label: "Premium" }, { key: "enterprise", label: "Enterprise" }],
+    rows: PLAN_COMPARISON_ROWS.map((row) => ({ feature: row.feature, free: row.free, premium: row.premium, enterprise: row.enterprise })),
+  };
+  const settingsReport: ReportDefinition = {
+    id: "settings-summary",
+    title: "Settings summary",
+    filename: "growmo-settings-summary",
+    description: "A shareable summary of the farm account, plan, team and plot configuration.",
+    columns: [{ key: "area", label: "Area" }, { key: "record", label: "Record" }, { key: "value", label: "Current value" }],
+    rows: [
+      { area: "Farm", record: "Farm name", value: ctx.farmName },
+      { area: "Farm", record: "Location", value: `${ctx.ward}, ${ctx.subCounty}, ${ctx.county}` },
+      { area: "Account", record: "Plan", value: activePlan.name },
+      { area: "Account", record: "Team members", value: members.length },
+      { area: "Farm", record: "Plots", value: plots.length },
+      { area: "Security", record: "Two-factor login", value: ctx.twoFactor },
+    ],
+  };
+
   function exportTeam() {
-    const rows = [
-      ["Name", "Role", "Phone", "Email", "Status", "Plots", "Financial access", "Payment authority", "Valid until"],
-      ...members.map((member) => [member.name, member.role, member.phone, member.email, member.status, member.plots, member.financial, member.paymentAuthority, member.validUntil]),
-    ];
-    downloadText("growmo-team-roster.csv", rows.map((row) => row.map(csvCell).join(",")).join("\n"));
-    toast.notify(`Exported ${members.length} team members to CSV.`, "success");
+    setMenu(false);
+    setReportPreview(teamReport);
   }
 
   return (
@@ -164,7 +230,7 @@ function SettingsPage() {
                     <UserPlus /> Invite a team member
                   </button>
                   <button type="button" className="gm-settings-menu-item" onClick={() => { exportTeam(); setMenu(false); }}>
-                    <FileSpreadsheet /> Export team roster (CSV)
+                    <FileSpreadsheet /> Preview team roster report
                   </button>
                   <button type="button" className="gm-settings-menu-item" onClick={() => { setJobOpen(true); setMenu(false); }}>
                     <CalendarClock /> Post a farm job
@@ -184,8 +250,8 @@ function SettingsPage() {
                   <button type="button" className="gm-settings-menu-item" onClick={() => { setView("data"); setMenu(false); toast.notify("Opened data & privacy.", "info"); }}>
                     <ShieldCheck /> Data & privacy
                   </button>
-                  <button type="button" className="gm-settings-menu-item" onClick={() => { window.print(); setMenu(false); toast.notify("Printing the settings page as it appears on screen.", "info"); }}>
-                    <Printer /> Print settings
+                  <button type="button" className="gm-settings-menu-item" onClick={() => { setReportPreview(settingsReport); setMenu(false); }}>
+                    <Printer /> Preview settings report
                   </button>
                 </div>
               </div>
@@ -233,7 +299,12 @@ function SettingsPage() {
         {view === "profile" ? (
           <div className="mt-3">
             <ProfileCard ctx={ctx} onEdit={() => setProfileOpen(true)} />
-            <DashboardSectionHeader eyebrow="15.1" title="Everything from onboarding, now editable" subtitle="Change a value and it flows straight through plans, records and analytics." />
+            <DashboardSectionHeader
+              eyebrow="15.1"
+              title="Everything from onboarding, now editable"
+              subtitle="Change a value and it flows straight through plans, records and analytics."
+              action={<ReportTools report={profileReport} onPreview={setReportPreview} />}
+            />
             <ProfileFieldGroups />
             <div className="row g-3 mt-3">
               <div className="col-lg-6">
@@ -270,9 +341,12 @@ function SettingsPage() {
               title="Farm settings"
               subtitle="Plots, soil readings, irrigation, units and record retention."
               action={
-                <button type="button" className="gm-btn gm-btn-sm gm-btn-outline" onClick={() => toast.notify("New plot form opens with the same fields as an existing plot.", "info")}>
-                  + Add plot
-                </button>
+                <div className="d-flex flex-wrap gap-2">
+                  <ReportTools report={plotsReport} onPreview={setReportPreview} />
+                  <button type="button" className="gm-btn gm-btn-sm gm-btn-outline" onClick={() => toast.notify("New plot form opens with the same fields as an existing plot.", "info")}>
+                    + Add plot
+                  </button>
+                </div>
               }
             />
             <div className="gm-st-plot-grid">
@@ -312,9 +386,12 @@ function SettingsPage() {
               title="Team & permissions"
               subtitle="Six roles, 13 permission rows and a date range on every invitation."
               action={
-                <button type="button" className="gm-btn gm-btn-sm gm-btn-lime" onClick={() => setInviteOpen(true)}>
-                  <UserPlus /> Invite member
-                </button>
+                <div className="d-flex flex-wrap gap-2">
+                  <ReportTools report={teamReport} onPreview={setReportPreview} />
+                  <button type="button" className="gm-btn gm-btn-sm gm-btn-lime" onClick={() => setInviteOpen(true)}>
+                    <UserPlus /> Invite member
+                  </button>
+                </div>
               }
             />
             <div className="gm-st-member-grid">
@@ -325,7 +402,10 @@ function SettingsPage() {
 
             <div className="row g-4 mt-3">
               <div className="col-xl-7">
-                <h3 className="gm-h-section">Role permission matrix</h3>
+                <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                  <h3 className="gm-h-section mb-0">Role permission matrix</h3>
+                  <ReportTools report={permissionsReport} onPreview={setReportPreview} />
+                </div>
                 <PermissionMatrix />
               </div>
               <div className="col-xl-5">
@@ -362,6 +442,7 @@ function SettingsPage() {
               onPayroll={() => setPayrollOpen(true)}
               onJob={() => setJobOpen(true)}
               onOnboard={() => setOnboardOpen(true)}
+              onPreview={setReportPreview}
             />
           </div>
         ) : null}
@@ -369,7 +450,12 @@ function SettingsPage() {
         {/* ---------------- 15.4 notifications ---------------- */}
         {view === "notifications" ? (
           <div className="mt-3">
-            <DashboardSectionHeader eyebrow="15.4" title="Notification preferences" subtitle="Ten message types across push, SMS, WhatsApp and email — choose per row." />
+            <DashboardSectionHeader
+              eyebrow="15.4"
+              title="Notification preferences"
+              subtitle="Ten message types across push, SMS, WhatsApp and email — choose per row."
+              action={<ReportTools report={notificationsReport} onPreview={setReportPreview} />}
+            />
             <div className="gm-card p-3">
               {notifs.map((row) => (
                 <NotifRow
@@ -412,7 +498,12 @@ function SettingsPage() {
         {/* ---------------- 15.5 data & privacy ---------------- */}
         {view === "data" ? (
           <div className="mt-3">
-            <DashboardSectionHeader eyebrow="15.5" title="Data & privacy" subtitle="You decide what leaves the farm, who sees it, and for how long it is kept." />
+            <DashboardSectionHeader
+              eyebrow="15.5"
+              title="Data & privacy"
+              subtitle="You decide what leaves the farm, who sees it, and for how long it is kept."
+              action={<ReportTools report={privacyReport} onPreview={setReportPreview} />}
+            />
             <div className="gm-st-data-list">
               {DATA_SETTINGS.map((row) => (
                 <DataRow key={row.id} d={row} onAction={setDataAction} />
@@ -447,6 +538,7 @@ function SettingsPage() {
               eyebrow="15.6"
               title="Subscription plans"
               subtitle="Free to start, Premium at KES 299 a month, Enterprise at KES 999 — paid from the GrowMO wallet by M-Pesa."
+              action={<ReportTools report={plansReport} onPreview={setReportPreview} />}
             />
             <div className="gm-st-plan-grid">
               {PLANS.map((entry) => (
@@ -475,7 +567,10 @@ function SettingsPage() {
                 />
               ))}
             </div>
-            <h3 className="gm-h-section mt-4">Feature comparison</h3>
+            <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-4 mb-2">
+              <h3 className="gm-h-section mb-0">Feature comparison</h3>
+              <ReportTools report={plansReport} onPreview={setReportPreview} />
+            </div>
             <PlanComparison rows={PLAN_COMPARISON_ROWS} />
             <div className="row g-3 mt-3">
               <div className="col-lg-6">
@@ -520,6 +615,8 @@ function SettingsPage() {
           </button>
         </div>
       </div>
+
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
 
       {/* ---------------- modals ---------------- */}
       <InviteMemberDialog

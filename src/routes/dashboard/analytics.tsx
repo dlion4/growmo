@@ -53,6 +53,12 @@ import {
   RunReportWizard,
   WorkerDetailDialog,
 } from "../../components/dashboard/pages/AnalyticsModals";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   AN_CONTEXT,
@@ -103,6 +109,7 @@ function AnalyticsPage() {
   const toast = useToast();
   const totals = useMemo(() => analyticsTotals(), []);
   const [section, setSection] = useState<AnSection>("overview");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [drawer, setDrawer] = useState<"saved" | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -153,6 +160,18 @@ function AnalyticsPage() {
     setResult({ title: name, sub: "Auto-generated summary", rows }); setModal("report-result");
   }
 
+  const analyticsReports: Record<AnSection, ReportDefinition> = {
+    overview: createReport({ id: "analytics-farm-kpis", title: "Farm analytics overview", filename: "growmo-farm-analytics-overview", description: "Current farm KPI analytics for the active season.", rows: FARM_KPIS }),
+    crops: createReport({ id: "analytics-crop-performance", title: "Crop performance analytics", filename: "growmo-crop-performance-analytics", description: "Current crop performance, cost, revenue and ROI comparison.", rows: CROP_PERF }),
+    cost: createReport({ id: "analytics-cost-breakdown", title: "Cost breakdown analytics", filename: "growmo-cost-breakdown-analytics", description: "Current farm costs by category.", rows: COST_CATEGORIES }),
+    revenue: createReport({ id: "analytics-revenue", title: "Revenue analytics", filename: "growmo-revenue-analytics", description: "Current revenue and target tracking by period.", rows: REVENUE_MONTHS }),
+    labour: createReport({ id: "analytics-labour", title: "Labour analytics", filename: "growmo-labour-analytics", description: "Current worker and labour-efficiency results using active search.", rows: filteredWorkers }),
+    weather: createReport({ id: "analytics-weather-impact", title: "Weather impact analytics", filename: "growmo-weather-impact-analytics", description: "Current weather impact analytics for the farm season.", rows: WEATHER_IMPACT }),
+    builder: createReport({ id: "analytics-custom-builder", title: "Analytics report builder", filename: "growmo-analytics-report-builder", description: "Available custom analytics report definitions.", rows: PREMADE_REPORTS }),
+    reports: createReport({ id: "analytics-premade-reports", title: "Pre-built analytics reports", filename: "growmo-premade-analytics-reports", description: "Available pre-built reports using the active search.", rows: filteredReports }),
+  };
+  const activeReport = analyticsReports[section];
+
   return (
     <div className="gm-app-page">
       <AnalyticsHero score={AN_CONTEXT.healthScore} profit={totals.profit} reports={AN_CONTEXT.reportsGenerated}>
@@ -194,6 +213,7 @@ function AnalyticsPage() {
           ))}
         </div>
       </Reveal>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {/* ==================================== 11.1 OVERVIEW KPIs ==================================== */}
       {section === "overview" ? (
@@ -437,6 +457,7 @@ function AnalyticsPage() {
         .gm-app .gm-an-step { display: flex; align-items: center; gap: 0.5rem; background: var(--gm-card); border: 1px solid var(--gm-line); border-radius: 999px; padding: 0.4rem 0.9rem; font-size: 0.82rem; font-weight: 600; }
         .gm-app .gm-an-step strong { width: 22px; height: 22px; border-radius: 50%; background: var(--gm-leaf-500); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; }
       `}</style>
+    <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
     </div>
   );
 }

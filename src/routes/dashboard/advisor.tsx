@@ -96,6 +96,12 @@ import {
   Stepper,
   Toggle,
 } from "../../components/auth/controls";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   ADVISOR_FAQS,
@@ -338,6 +344,7 @@ function AdvisorPage() {
 
   /* ---- view / overlay state ---- */
   const [view, setView] = useState<AdvisorView>("chat");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [menu, setMenu] = useState<"none" | "more" | "ask" | "lang">("none");
@@ -966,6 +973,16 @@ function AdvisorPage() {
 
   /* ============================ render ============================ */
 
+  const advisorReports: Record<AdvisorView, ReportDefinition> = {
+    chat: createReport({ id: "advisor-chat-history", title: "AI Advisor conversation record", filename: "growmo-ai-advisor-conversation", description: "Current AI advisor conversation and its farm guidance.", rows: messages }),
+    plan: createReport({ id: "advisor-crop-plans", title: "AI crop plans", filename: "growmo-ai-crop-plans", description: "Current saved AI crop plans and planning outcomes.", rows: plans }),
+    risk: createReport({ id: "advisor-risk-register", title: "AI risk register", filename: "growmo-ai-risk-register", description: "Current crop risks using the active advisor filters.", rows: filteredRisks }),
+    market: createReport({ id: "advisor-market-forecast", title: "AI market forecast", filename: "growmo-ai-market-forecast", description: "Current market forecasts using the selected advisor filters.", rows: filteredMarkets }),
+    bench: createReport({ id: "advisor-benchmarks", title: "AI farm benchmarks", filename: "growmo-ai-farm-benchmarks", description: "Current peer and farm performance benchmarks.", rows: filteredBenchmarks }),
+    inputs: createReport({ id: "advisor-input-guidance", title: "AI input guidance", filename: "growmo-ai-input-guidance", description: "Current AI input and fertilizer recommendations.", rows: filteredProducts }),
+  };
+  const activeReport = advisorReports[view];
+
   return (
     <div>
       <Reveal>
@@ -1197,6 +1214,7 @@ function AdvisorPage() {
           />
         </div>
       </Reveal>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "chat" ? (
         <ChatView
@@ -2378,6 +2396,7 @@ function AdvisorPage() {
           }}
         />
       </Dialog>
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
     </div>
   );
 }

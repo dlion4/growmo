@@ -54,15 +54,24 @@ import {
   WhatsAppPanel,
 } from "../../components/dashboard/pages/ChannelsWidgets";
 import { DashboardMetric, DashboardSectionHeader } from "../../components/dashboard/pages/DashboardWidgets";
+import {
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import type { Agent } from "../../data/app/channels";
 import {
+  AGENTS,
   CHANNELS_CONTEXT,
   CHANNELS_FAQ,
   CHANNELS_GLOSSARY,
+  OFFLINE_FEATURES,
   SMS_COMMANDS,
   SYNC_QUEUE,
+  USSD_SCREENS,
   WA_EXAMPLES,
+  WA_FEATURES,
 } from "../../data/app/channels";
 import { kes } from "../../data/site";
 import { useToast } from "../../store/toast";
@@ -81,6 +90,7 @@ function ChannelsPage() {
   const [online, setOnline] = useState(CHANNELS_CONTEXT.online);
   const [queue, setQueue] = useState(SYNC_QUEUE.length);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [installOpen, setInstallOpen] = useState(false);
   const [offlineAction, setOfflineAction] = useState(false);
   const [activeAgent, setActiveAgent] = useState<Agent | null>(null);
@@ -111,6 +121,121 @@ function ChannelsPage() {
     if (command === "HELP" || command === "MENU") return SMS_COMMANDS.map((entry) => entry.code).join(" · ");
     return "Command not recognised. Reply HELP for the list, or dial *384# for the full menu.";
   }
+
+  const channelReports: Record<ChannelView, ReportDefinition> = {
+    offline: {
+      id: "offline-readiness",
+      title: "Offline readiness & sync queue",
+      filename: "growmo-offline-readiness",
+      description: `${online ? "Online and ready to sync" : "Offline mode active"}. This record captures current offline capabilities and queued farm actions.`,
+      columns: [
+        { key: "area", label: "Area" },
+        { key: "record", label: "Record" },
+        { key: "detail", label: "Detail" },
+      ],
+      rows: [
+        ...OFFLINE_FEATURES.map((item) => ({
+          area: "Offline feature",
+          record: `${item.feature} · ${item.offline}`,
+          detail: `${item.behaviour} · Queue: ${item.queue}`,
+        })),
+        ...SYNC_QUEUE.slice(0, queue).map((item) => ({
+          area: "Sync queue",
+          record: item.action,
+          detail: `${item.detail} · ${item.when} · ${item.gps}`,
+        })),
+      ],
+    },
+    ussd: {
+      id: "ussd-service-map",
+      title: "USSD service map",
+      filename: "growmo-ussd-service-map",
+      description: "Every interactive *384# screen and its next-step options for feature-phone farmers.",
+      columns: [
+        { key: "screen", label: "Screen" },
+        { key: "information", label: "Information" },
+        { key: "options", label: "Available options" },
+      ],
+      rows: Object.values(USSD_SCREENS).map((screen) => ({
+        screen: screen.title,
+        information: screen.lines.join(" · "),
+        options: screen.options.map((option) => `${option.key}. ${option.label}`).join(" · "),
+      })),
+    },
+    sms: {
+      id: "sms-command-register",
+      title: "SMS command register",
+      filename: "growmo-sms-command-register",
+      description: "The supported commands for short code 20550 and the farm information each command returns.",
+      columns: [
+        { key: "command", label: "Command" },
+        { key: "purpose", label: "Purpose" },
+        { key: "example", label: "Example" },
+        { key: "returns", label: "Returns" },
+      ],
+      rows: SMS_COMMANDS.map((command) => ({
+        command: command.code,
+        purpose: command.label,
+        example: command.example,
+        returns: command.returns,
+      })),
+    },
+    whatsapp: {
+      id: "whatsapp-advisor-record",
+      title: "WhatsApp advisory record",
+      filename: "growmo-whatsapp-advisory-record",
+      description: "Photo-diagnosis examples and WhatsApp services available through GrowMO.",
+      columns: [
+        { key: "service", label: "Service" },
+        { key: "record", label: "Record" },
+        { key: "detail", label: "Detail" },
+      ],
+      rows: [
+        ...WA_EXAMPLES.map((item) => ({
+          service: "Photo diagnosis",
+          record: `${item.label} · ${item.confidence}`,
+          detail: `${item.diagnosis} · ${item.remedy} · estimated input ${kes(item.cost)}`,
+        })),
+        ...WA_FEATURES.map((item) => ({
+          service: "WhatsApp feature",
+          record: item.feature,
+          detail: item.how,
+        })),
+      ],
+    },
+    agents: {
+      id: "agent-network-directory",
+      title: "Agent network directory",
+      filename: "growmo-agent-network-directory",
+      description: "Nearby GrowMO agents, their services, working hours and cash float availability.",
+      columns: [
+        { key: "agent", label: "Agent" },
+        { key: "location", label: "Location" },
+        { key: "contact", label: "Contact" },
+        { key: "services", label: "Services" },
+        { key: "availability", label: "Availability" },
+      ],
+      rows: AGENTS.map((agent) => ({
+        agent: `${agent.name} · ${agent.type}`,
+        location: `${agent.town} · ${agent.distance}`,
+        contact: agent.phone,
+        services: agent.services.join(", "),
+        availability: `${agent.hours} · Float ${kes(agent.float)} · ${agent.rating}★`,
+      })),
+    },
+    help: {
+      id: "channel-help-guide",
+      title: "Channel help guide",
+      filename: "growmo-channel-help-guide",
+      description: "Frequently asked questions about offline usage, USSD, SMS, WhatsApp and local agents.",
+      columns: [
+        { key: "question", label: "Question" },
+        { key: "answer", label: "Answer" },
+      ],
+      rows: CHANNELS_FAQ.map((item) => ({ question: item.q, answer: item.a })),
+    },
+  };
+  const activeReport = channelReports[view];
 
   return (
     <main className="gm-app-page gm-channels-page">
@@ -169,8 +294,8 @@ function ChannelsPage() {
                   <button type="button" className="gm-settings-menu-item" onClick={() => { setFaqModal(true); setMenu(false); }}>
                     <HelpCircle /> Channel questions
                   </button>
-                  <button type="button" className="gm-settings-menu-item" onClick={() => { window.print(); setMenu(false); toast.notify("Printing the channel page as it appears on screen.", "info"); }}>
-                    <Printer /> Print this page
+                  <button type="button" className="gm-settings-menu-item" onClick={() => { setReportPreview(activeReport); setMenu(false); }}>
+                    <Printer /> Preview channel report
                   </button>
                 </div>
               </div>
@@ -233,6 +358,8 @@ function ChannelsPage() {
             ]}
           />
         </div>
+
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         {/* ---------------- 16.1 offline ---------------- */}
         {view === "offline" ? (
@@ -425,6 +552,8 @@ function ChannelsPage() {
           </button>
         </div>
       </div>
+
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
 
       {/* ---------------- modals ---------------- */}
       <InstallPwaDialog

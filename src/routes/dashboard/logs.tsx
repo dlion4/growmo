@@ -68,6 +68,12 @@ import {
   TierCard,
 } from "../../components/dashboard/pages/SecurityWidgets";
 import { Toggle } from "../../components/auth/controls";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination } from "../../components/ui/primitives";
 import {
   AUTH_METHODS,
@@ -143,6 +149,7 @@ function LogsPage() {
   const toast = useToast();
   const [menu, setMenu] = useState(false);
   const [view, setView] = useState<SecView>("overview");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [modal, setModal] = useState<SecModalState>({ kind: "none" });
   const [drawer, setDrawer] = useState<LogEvent | null>(null);
 
@@ -313,6 +320,20 @@ function LogsPage() {
   };
 
   /* ================================================================== */
+  const logsReports: Record<SecView, ReportDefinition> = {
+    overview: createReport({ id: "security-overview", title: "Security overview", filename: "growmo-security-overview", description: "Current security alerts and account protection overview.", rows: SEC_ALERTS }),
+    auth: createReport({ id: "security-auth-methods", title: "Authentication methods", filename: "growmo-authentication-methods", description: "Current sign-in and authentication options.", rows: AUTH_METHODS }),
+    pin: createReport({ id: "security-pin-rules", title: "PIN security rules", filename: "growmo-pin-security-rules", description: "Current account and transaction PIN protection rules.", rows: PIN_RULES }),
+    sessions: createReport({ id: "security-sessions", title: "Active sessions", filename: "growmo-active-sessions", description: "Current live account sessions and device access.", rows: sessions }),
+    logs: createReport({ id: "security-event-log", title: "Security event log", filename: "growmo-security-event-log", description: "Current audit events using the active log filters.", rows: events }),
+    backup: createReport({ id: "security-backups", title: "Backup history", filename: "growmo-backup-history", description: "Current live account backup history.", rows: backups }),
+    protection: createReport({ id: "security-protection", title: "Fraud protection", filename: "growmo-fraud-protection", description: "Current fraud protection features and settings.", rows: fraud }),
+    recovery: createReport({ id: "security-recovery", title: "Account recovery", filename: "growmo-account-recovery", description: "Available account-recovery scenarios and safeguards.", rows: RECOVERY_SCENARIOS }),
+    privacy: createReport({ id: "security-privacy", title: "Data sharing preferences", filename: "growmo-data-sharing-preferences", description: "Current live data sharing and privacy preferences.", rows: sharing }),
+    health: createReport({ id: "security-health-check", title: "Security health check", filename: "growmo-security-health-check", description: "Current account-security health checks.", rows: checks }),
+  };
+  const activeReport = logsReports[view];
+
   return (
     <main className="gm-app-page gm-sec-page">
       <div className="gm-container py-4">
@@ -559,6 +580,7 @@ function LogsPage() {
             ]}
           />
         </div>
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         {/* ---------------- overview ---------------- */}
         {view === "overview" ? (
@@ -1743,6 +1765,7 @@ function LogsPage() {
       ) : null}
 
       {/* ---------------- all 28 dialogs / wizards ---------------- */}
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <SecurityModals
         state={modal}
         onClose={close}

@@ -45,6 +45,13 @@ import {
   StatusChip,
 } from "../../components/dashboard/pages/DashboardWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   BULK_INPUT_LINES,
@@ -87,6 +94,7 @@ type FinanceTab = "accounts" | "reports";
 function CooperativeManagementPage() {
   const toast = useToast();
   const [view, setView] = useState<View>("overview");
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [financeTab, setFinanceTab] = useState<FinanceTab>("accounts");
   const [members, setMembers] = useState(COOPERATIVE_MEMBERS);
   const [sales, setSales] = useState(SALE_CONTRIBUTIONS);
@@ -124,7 +132,7 @@ function CooperativeManagementPage() {
           `${member.name} ${member.phone} ${member.farm} ${member.crops} ${member.ward}`
             .toLowerCase()
             .includes(memberSearch.toLowerCase());
-        return (
+  return (
           matches && (memberStatus === "All" || member.status === memberStatus)
         );
       }),
@@ -265,6 +273,17 @@ function CooperativeManagementPage() {
     toast.notify(message, "success");
   };
 
+  const cooperativeReports: Record<View, ReportDefinition> = {
+    overview: createReport({ id: "cooperative-overview", title: "Cooperative crop overview", filename: "growmo-cooperative-crop-overview", description: "Current cooperative crop dashboard and contribution overview.", rows: CROP_DASHBOARD }),
+    members: createReport({ id: "cooperative-members", title: "Cooperative member register", filename: "growmo-cooperative-member-register", description: "Current cooperative members using the active status and search filters.", rows: filteredMembers }),
+    inputs: createReport({ id: "cooperative-inputs", title: "Collective input register", filename: "growmo-collective-input-register", description: "Current collective input-buying lines and workflow.", rows: BULK_INPUT_LINES }),
+    marketing: createReport({ id: "cooperative-sales", title: "Collective sales register", filename: "growmo-collective-sales-register", description: "Current cooperative sale contributions using the active search.", rows: filteredSales }),
+    finance: createReport({ id: "cooperative-finance", title: "Cooperative finance accounts", filename: "growmo-cooperative-finance-accounts", description: "Current cooperative accounts and financial record.", rows: COOP_ACCOUNTS }),
+    contracts: createReport({ id: "cooperative-contracts", title: "Cooperative contracts", filename: "growmo-cooperative-contracts", description: "Current cooperative contracts using the active status filter.", rows: filteredContracts }),
+    comms: createReport({ id: "cooperative-communications", title: "Cooperative communications", filename: "growmo-cooperative-communications", description: "Current cooperative communication log using the active search.", rows: filteredComms }),
+  };
+  const activeReport = cooperativeReports[view];
+
   const memberTotal = Math.max(45, members.length + 35);
   const activeMembers =
     members.filter((member) => member.status === "Active").length + 35;
@@ -381,6 +400,7 @@ function CooperativeManagementPage() {
           },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "overview" ? (
         <OverviewContent
@@ -488,6 +508,7 @@ function CooperativeManagementPage() {
         onClose={() => setDrawer(null)}
         onModal={setModal}
       />
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
       <CooperativeModalHub
         active={modal}
         member={selectedMember}

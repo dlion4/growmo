@@ -25,6 +25,7 @@ import {
   PackageCheck,
   Pencil,
   Plus,
+  Printer,
   Receipt,
   RefreshCw,
   Search,
@@ -50,6 +51,11 @@ import {
   StatusChip,
   WizardActions,
 } from "../../components/dashboard/pages/DashboardWidgets";
+import {
+  ReportPreviewDrawer,
+  ReportTools,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import {
   Dialog,
   PinPad,
@@ -240,6 +246,7 @@ function DashboardPage() {
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [sections, setSections] = useState<DashboardSections>(DEFAULT_SECTIONS);
 
   const [crops, setCrops] = useState<ActiveCrop[]>(ACTIVE_CROPS);
@@ -373,35 +380,41 @@ function DashboardPage() {
     toast.notify("AI recommendation added to tasks", "success");
   };
 
-  const exportDashboard = () => {
-    const rows = [
-      ["GrowMO Dashboard", DASHBOARD_FARM.name],
-      ["Generated", "18 Sep 2026"],
-      ["Active crops", String(crops.length)],
-      [
-        "Open tasks",
-        String(tasks.filter((task) => task.status !== "Done").length),
-      ],
-      ["Wallet balance", String(DASHBOARD_FARM.walletBalance)],
-      ...crops.map((crop) => [
-        `${crop.crop} — ${crop.variety}`,
-        `${crop.plot} | ${crop.stage} | ${crop.progress}% | ${crop.expectedHarvest}`,
-      ]),
-    ];
-    const csv = rows
-      .map((row) =>
-        row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(","),
-      )
-      .join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "growmo-dashboard-18-sep-2026.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-    setMenu(false);
-    toast.notify("Dashboard report downloaded", "success");
+  const dashboardReport: ReportDefinition = {
+    id: "farm-daily-brief",
+    title: "Farm daily brief",
+    filename: "growmo-farm-daily-brief",
+    description: `A live command-centre snapshot for ${DASHBOARD_FARM.name}, including active crops, open work and payment obligations.`,
+    columns: [
+      { key: "area", label: "Area" },
+      { key: "record", label: "Record" },
+      { key: "detail", label: "Current detail" },
+    ],
+    rows: [
+      ...crops.map((crop) => ({
+        area: "Active crop",
+        record: `${crop.crop} · ${crop.variety}`,
+        detail: `${crop.plot} · ${crop.stage} · ${crop.progress}% · harvest ${crop.expectedHarvest}`,
+      })),
+      ...tasks.filter((task) => task.status !== "Done").map((task) => ({
+        area: "Open task",
+        record: task.task,
+        detail: `${task.crop} · ${task.plot} · ${task.time} · ${task.status}`,
+      })),
+      ...payments.filter((payment) => payment.status !== "Paid").map((payment) => ({
+        area: "Payment due",
+        record: payment.payee,
+        detail: `${payment.purpose} · ${kes(payment.amount)} · ${payment.due} · ${payment.status}`,
+      })),
+    ],
   };
+
+  const openReportPreview = (report: ReportDefinition) => {
+    setMenu(false);
+    setReportPreview(report);
+  };
+
+  const exportDashboard = () => openReportPreview(dashboardReport);
 
   const handleQuickAction = (id: (typeof QUICK_ACTIONS)[number]["id"]) => {
     const target: Record<(typeof QUICK_ACTIONS)[number]["id"], ModalId> = {
@@ -491,8 +504,8 @@ function DashboardPage() {
                 {menu ? (
                   <div className="gm-menu">
                     <p className="gm-menuhead">Dashboard actions</p>
-                    <button type="button" onClick={exportDashboard}>
-                      <Download /> Export dashboard CSV
+                    <button type="button" onClick={() => openReportPreview(dashboardReport)}>
+                      <FileText /> Open farm report
                     </button>
                     <button
                       type="button"
@@ -515,11 +528,10 @@ function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setMenu(false);
-                        window.print();
+                        openReportPreview(dashboardReport);
                       }}
                     >
-                      <FileText /> Print farm brief
+                      <Printer /> Print / download farm brief
                     </button>
                   </div>
                 ) : null}
@@ -605,6 +617,7 @@ function DashboardPage() {
           onPage={setTaskPage}
           onOpen={openTask}
           onAdd={() => setModal("task-add")}
+          onPreview={openReportPreview}
         />
       ) : null}
 
@@ -631,8 +644,11 @@ function DashboardPage() {
           onExpense={() => setModal("expense")}
           onPayments={() => setModal("payments")}
           onFinance={() => setModal("finance")}
+          onPreview={openReportPreview}
         />
       ) : null}
+
+      <ReportPreviewDrawer report={reportPreview} onClose={() => setReportPreview(null)} />
 
       <DashboardDrawer
         open={drawer === "briefing"}
@@ -1780,6 +1796,7 @@ function TasksView({
   onPage,
   onOpen,
   onAdd,
+  onPreview,
 }: {
   rows: FarmTask[];
   allRows: FarmTask[];
@@ -1791,6 +1808,7 @@ function TasksView({
   onPage: (page: number) => void;
   onOpen: (id: string) => void;
   onAdd: () => void;
+  onPreview: (report: ReportDefinition) => void;
 }) {
   const perPage = 5;
   const totalPages = Math.max(1, Math.ceil(rows.length / perPage));
@@ -1802,6 +1820,28 @@ function TasksView({
     { id: "upcoming", label: "Upcoming" },
     { id: "done", label: "Done" },
   ];
+  const taskReport: ReportDefinition = {
+    id: "operations-board",
+    title: "Operations board",
+    filename: "growmo-operations-board",
+    description: "Task records using the current search and priority filters.",
+    columns: [
+      { key: "priority", label: "Priority" },
+      { key: "task", label: "Task" },
+      { key: "crop", label: "Crop / plot" },
+      { key: "time", label: "Time" },
+      { key: "assigned", label: "Assigned" },
+      { key: "status", label: "Status" },
+    ],
+    rows: rows.map((task) => ({
+      priority: priorityLabel[task.priority],
+      task: task.task,
+      crop: `${task.crop} · ${task.plot}`,
+      time: task.time,
+      assigned: task.assigned,
+      status: task.status,
+    })),
+  };
 
   return (
     <Reveal>
@@ -1810,9 +1850,12 @@ function TasksView({
         title="Operations board"
         subtitle="Search, filter and open every task for instructions, quantities and completion evidence."
         action={
-          <button type="button" className="gm-btn gm-btn-lime" onClick={onAdd}>
-            <Plus /> Add task
-          </button>
+          <div className="d-flex flex-wrap gap-2">
+            <ReportTools report={taskReport} onPreview={onPreview} />
+            <button type="button" className="gm-btn gm-btn-lime" onClick={onAdd}>
+              <Plus /> Add task
+            </button>
+          </div>
         }
       />
       <section className="gm-card p-3">
@@ -1940,6 +1983,7 @@ function MoneyView({
   onExpense,
   onPayments,
   onFinance,
+  onPreview,
 }: {
   payments: UpcomingPayment[];
   allPayments: UpcomingPayment[];
@@ -1956,6 +2000,7 @@ function MoneyView({
   onExpense: () => void;
   onPayments: () => void;
   onFinance: () => void;
+  onPreview: (report: ReportDefinition) => void;
 }) {
   const paymentPerPage = 5;
   const transactionPerPage = 5;
@@ -1979,6 +2024,52 @@ function MoneyView({
     "Future",
     "Paid",
   ];
+  const paymentsReport: ReportDefinition = {
+    id: "payment-obligations",
+    title: "Payment obligations",
+    filename: "growmo-payment-obligations",
+    description: "Payment records using the current search and payment-status filters.",
+    columns: [
+      { key: "payee", label: "Pay to" },
+      { key: "purpose", label: "Purpose" },
+      { key: "crop", label: "Crop" },
+      { key: "amount", label: "Amount" },
+      { key: "due", label: "Due" },
+      { key: "status", label: "Status" },
+    ],
+    rows: payments.map((payment) => ({
+      payee: `${payment.payee} · ${payment.phone}`,
+      purpose: payment.purpose,
+      crop: payment.crop,
+      amount: kes(payment.amount),
+      due: payment.due,
+      status: payment.status,
+    })),
+  };
+  const transactionsReport: ReportDefinition = {
+    id: "recent-transactions",
+    title: "Recent transactions",
+    filename: "growmo-recent-transactions",
+    description: "The current GrowMO wallet ledger, including recorded income and expenditure.",
+    columns: [
+      { key: "date", label: "Date" },
+      { key: "description", label: "Description" },
+      { key: "category", label: "Category" },
+      { key: "crop", label: "Crop" },
+      { key: "method", label: "Method" },
+      { key: "reference", label: "Reference" },
+      { key: "amount", label: "Amount" },
+    ],
+    rows: transactions.map((transaction) => ({
+      date: transaction.date,
+      description: transaction.description,
+      category: transaction.category,
+      crop: transaction.crop,
+      method: transaction.method,
+      reference: transaction.reference,
+      amount: `${transaction.direction === "in" ? "+" : "−"}${kes(transaction.amount)}`,
+    })),
+  };
 
   return (
     <div>
@@ -2030,13 +2121,16 @@ function MoneyView({
           eyebrow={`${allPayments.length} records`}
           title="Payment obligations"
           action={
-            <button
-              type="button"
-              className="gm-btn gm-btn-soft gm-btn-sm"
-              onClick={onPayments}
-            >
-              Open payment centre
-            </button>
+            <div className="d-flex flex-wrap gap-2">
+              <ReportTools report={paymentsReport} onPreview={onPreview} />
+              <button
+                type="button"
+                className="gm-btn gm-btn-soft gm-btn-sm"
+                onClick={onPayments}
+              >
+                Open payment centre
+              </button>
+            </div>
           }
         />
         <section className="gm-card p-3">
@@ -2084,6 +2178,7 @@ function MoneyView({
         <DashboardSectionHeader
           eyebrow={`${transactions.length} ledger entries`}
           title="Recent transactions"
+          action={<ReportTools report={transactionsReport} onPreview={onPreview} />}
         />
         <section className="gm-card p-3">
           <div className="gm-table-wrap">

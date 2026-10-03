@@ -44,6 +44,13 @@ import {
 import { TrendChart } from "../../components/dashboard/pages/InventoryWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
+
+import {
   AlertDialog,
   type AlertRuleDraft,
   ConfirmWeatherDialog,
@@ -213,6 +220,7 @@ function WeatherClimatePage() {
   const [irrigationPlans, setIrrigationPlans] = useState<IrrigationPlan[]>([]);
   const [sprayPlans, setSprayPlans] = useState<SprayPlan[]>([]);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(null);
   const [locationDrawer, setLocationDrawer] = useState(false);
   const [modal, setModal] = useState<ModalId>(null);
   const [selectedMetric, setSelectedMetric] =
@@ -457,6 +465,38 @@ function WeatherClimatePage() {
     },
   ];
 
+  const weatherReports: Record<WeatherView, ReportDefinition> = {
+    today: createReport({
+      id: "weather-current-conditions", title: "Current farm weather conditions", filename: "growmo-current-weather",
+      description: "Live current-condition metrics for the selected farm weather location.", rows: CURRENT_WEATHER_METRICS,
+    }),
+    forecast: createReport({
+      id: "weather-seven-day-forecast", title: "Seven-day farm forecast", filename: "growmo-seven-day-weather-forecast",
+      description: "Live seven-day weather forecast for the selected farm location.", rows: forecast,
+    }),
+    seasonal: createReport({
+      id: "weather-seasonal-outlook", title: "Seasonal weather outlook", filename: "growmo-seasonal-weather-outlook",
+      description: "Seasonal outlook and planning signals for the current growing period.", rows: SEASONAL_OUTLOOK,
+    }),
+    predictions: createReport({
+      id: "weather-crop-prediction", title: "Crop weather prediction", filename: "growmo-crop-weather-prediction",
+      description: "Current selected crop weather plan and prediction details.", rows: selectedPlan ? [selectedPlan] : [],
+    }),
+    windows: createReport({
+      id: "weather-planting-windows", title: "Planting window advisor", filename: "growmo-planting-window-advisor",
+      description: "Available planting windows for the current farm weather context.", rows: PLANTING_WINDOWS,
+    }),
+    alerts: createReport({
+      id: "weather-extreme-alerts", title: "Extreme weather alerts", filename: "growmo-extreme-weather-alerts",
+      description: "Current live extreme-weather alerts after acknowledgement updates.", rows: alerts,
+    }),
+    history: createReport({
+      id: "weather-history", title: "Historical weather record", filename: "growmo-historical-weather-record",
+      description: "Historical monthly weather records for farm planning.", rows: HISTORICAL_WEATHER,
+    }),
+  };
+  const activeReport = weatherReports[view];
+
   const headerKpis = [
     { label: "Now", value: "24°C", note: "Feels like 22°C · light rain" },
     { label: "Rain next 24h", value: "70%", note: "8–15 mm expected" },
@@ -563,6 +603,7 @@ function WeatherClimatePage() {
             label="Weather intelligence sections"
           />
         </div>
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         <Reveal className="mt-4">
           {view === "today" ? (
@@ -933,6 +974,10 @@ function WeatherClimatePage() {
         title={`${location.ward} weather advisory`}
         onClose={closeModal}
         onShare={handleShare}
+      />
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
       />
       <ConfirmWeatherDialog
         open={modal === "delete-alert"}
