@@ -63,6 +63,13 @@ import {
   Stepper,
   Toggle,
 } from "../../components/auth/controls";
+
+import {
+  createReport,
+  ReportActionBar,
+  type ReportDefinition,
+  ReportPreviewDrawer,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   AI_CABBAGE_RECOMMENDATION,
@@ -190,6 +197,9 @@ function CropPlannerPage() {
   const [drawer, setDrawer] = useState<DrawerId>(null);
   const [modal, setModal] = useState<ModalId>(null);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [detailTab, setDetailTab] = useState<DetailTab>("overview");
   const [selectedCropId, setSelectedCropId] = useState("cabbage");
   const [selectedVarietyId, setSelectedVarietyId] = useState("gloria");
@@ -350,6 +360,60 @@ function CropPlannerPage() {
     toast.notify(`${selectedPlan.crop} plan removed`, "success");
   };
 
+  const plannerReports: Record<PlannerView, ReportDefinition> = {
+    browse: createReport({
+      id: "planner-crop-selector",
+      title: "Crop planner selection",
+      filename: "growmo-crop-planner-selection",
+      description:
+        "Current crop selector results using the active group, search and fit filters.",
+      rows: filteredCrops,
+      columns: [
+        "name",
+        "swahili",
+        "group",
+        "maturity",
+        "zones",
+        "seasons",
+        "costMin",
+        "costMax",
+        "revenueMin",
+        "revenueMax",
+        "difficulty",
+        "water",
+      ],
+    }),
+    plans: createReport({
+      id: "planner-saved-plans",
+      title: "Saved crop plans",
+      filename: "growmo-saved-crop-plans",
+      description:
+        "Current saved crop plans using the active search and status filter.",
+      rows: filteredPlans,
+      columns: [
+        "crop",
+        "variety",
+        "plot",
+        "acreage",
+        "plantingDate",
+        "season",
+        "budget",
+        "projectedRevenue",
+        "status",
+      ],
+    }),
+    tools: createReport({
+      id: "planner-decision-tools",
+      title: "Crop planning decision tools",
+      filename: "growmo-crop-planning-decision-tools",
+      description:
+        "Explainable decision signals currently used in crop planning.",
+      rows: PLANNER_METHODS,
+      columns: ["title", "detail"],
+    }),
+  };
+  const activeReport = plannerReports[view];
+
   return (
     <div>
       <Reveal>
@@ -487,6 +551,7 @@ function CropPlannerPage() {
           { id: "tools", label: "Decision tools", icon: <Gauge />, count: 8 },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "browse" ? (
         <BrowseView
@@ -1089,6 +1154,10 @@ function CropPlannerPage() {
           }}
         />
       </Dialog>
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
+      />
     </div>
   );
 }

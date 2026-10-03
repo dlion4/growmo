@@ -39,6 +39,12 @@ import {
 } from "../../components/dashboard/pages/DashboardWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import {
+  createReport,
+  ReportActionBar,
+  type ReportDefinition,
+  ReportPreviewDrawer,
+} from "../../components/dashboard/pages/ReportActions";
+import {
   SeasonsModalHub,
   type SeasonsModalId,
 } from "../../components/dashboard/pages/SeasonsModals";
@@ -114,6 +120,9 @@ function SeasonsPage() {
   const [selectedProjection, setSelectedProjection] =
     useState<ProjectionRow | null>(FINANCIAL_PROJECTIONS[2]);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [planSearch, setPlanSearch] = useState("");
   const [planStatus, setPlanStatus] = useState<
     "All" | (typeof plans)[number]["status"]
@@ -252,6 +261,86 @@ function SeasonsPage() {
     toast.notify(message, "success");
   };
 
+  const seasonReports: Record<View, ReportDefinition> = {
+    calendar: createReport({
+      id: "seasons-calendar-plans",
+      title: `${calendarYear} farm calendar plans`,
+      filename: `growmo-${calendarYear}-farm-calendar-plans`,
+      description:
+        "Current season plans using the active calendar search and status filter.",
+      rows: filteredPlans,
+      columns: ["plan", "plot", "starts", "crop", "acreage", "status"],
+    }),
+    rotation: createReport({
+      id: "seasons-rotation-plan",
+      title: "Three-year rotation plan",
+      filename: "growmo-three-year-rotation-plan",
+      description:
+        "Current soil-first crop rotation across the three planning years.",
+      rows: ROTATION_PLAN,
+      columns: ["season", "yearOne", "yearTwo", "yearThree", "purpose", "note"],
+    }),
+    projection: createReport({
+      id: "seasons-financial-projection",
+      title: "Three-year financial projection",
+      filename: "growmo-three-year-financial-projection",
+      description:
+        "Current financial projection using the active crop and season search.",
+      rows: filteredProjections,
+      columns: [
+        "season",
+        "crop",
+        "cost",
+        "revenue",
+        "profit",
+        "cumulative",
+        "status",
+      ],
+    }),
+    compare: createReport({
+      id: "seasons-comparison",
+      title: "Season comparison",
+      filename: "growmo-season-comparison",
+      description:
+        "Current short-rains, long-rains and irrigated season comparison.",
+      rows: SEASON_COMPARISON,
+      columns: ["factor", "shortRains", "longRains", "irrigated"],
+    }),
+    recovery: createReport({
+      id: "seasons-fallow-recovery",
+      title: "Cover and fallow recovery tasks",
+      filename: "growmo-cover-and-fallow-recovery",
+      description:
+        "Current recovery tasks using the active task-status filter.",
+      rows: filteredFallow,
+      columns: ["week", "action", "owner", "timing", "status"],
+    }),
+    intercrop: createReport({
+      id: "seasons-intercropping",
+      title: "Intercropping plans",
+      filename: "growmo-intercropping-plans",
+      description: "Current intercropping plans using the active search.",
+      rows: filteredIntercrops,
+      columns: [
+        "main",
+        "intercrop",
+        "spacing",
+        "benefit",
+        "compatibility",
+        "plot",
+      ],
+    }),
+    climate: createReport({
+      id: "seasons-climate-plan",
+      title: "Climate adaptation plan",
+      filename: "growmo-climate-adaptation-plan",
+      description: "Current long-range climate scenarios and farm responses.",
+      rows: CLIMATE_SCENARIOS,
+      columns: ["event", "seasons", "impact", "avoid", "favor", "advisory"],
+    }),
+  };
+  const activeReport = seasonReports[view];
+
   return (
     <div>
       <SeasonsHero
@@ -384,6 +473,7 @@ function SeasonsPage() {
           },
         ]}
       />
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "calendar" ? (
         <CalendarContent
@@ -487,6 +577,10 @@ function SeasonsPage() {
         projection={selectedProjection}
         onClose={() => setModal(null)}
         onSaved={savedWorkflow}
+      />
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
       />
     </div>
   );

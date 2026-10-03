@@ -20,6 +20,61 @@ export type ReportDefinition = {
   rows: ReportRow[];
 };
 
+function reportColumnLabel(key: string) {
+  return key
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function toReportValue(value: unknown): ReportValue {
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
+    return value;
+  }
+  if (Array.isArray(value)) return value.join(" · ");
+  return String(value);
+}
+
+/**
+ * Build a report from the same live rows rendered by a dashboard section.
+ * Callers can opt into the precise columns appropriate to their active tab.
+ */
+export function createReport<T extends object>({
+  id,
+  title,
+  filename,
+  description,
+  rows,
+  columns,
+}: {
+  id: string;
+  title: string;
+  filename: string;
+  description: string;
+  rows: readonly T[];
+  columns: readonly (keyof T & string)[];
+}): ReportDefinition {
+  return {
+    id,
+    title,
+    filename,
+    description,
+    columns: columns.map((key) => ({ key, label: reportColumnLabel(key) })),
+    rows: rows.map(
+      (row) =>
+        Object.fromEntries(
+          columns.map((key) => [key, toReportValue(row[key])]),
+        ) as ReportRow,
+    ),
+  };
+}
+
 function reportValue(value: ReportValue) {
   if (value === null || value === undefined || value === "") return "—";
   if (typeof value === "boolean") return value ? "Yes" : "No";

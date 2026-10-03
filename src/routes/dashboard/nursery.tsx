@@ -43,6 +43,13 @@ import {
 } from "../../components/dashboard/pages/NurseryWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
 import { ScoreRing } from "../../components/auth/controls";
+
+import {
+  createReport,
+  ReportActionBar,
+  type ReportDefinition,
+  ReportPreviewDrawer,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal, Stars } from "../../components/ui/primitives";
 import {
   CABBAGE_NURSERY_SETUP,
@@ -115,6 +122,9 @@ function NurseryPage() {
     useState<SeedlingPurchase | null>(SEEDLING_PURCHASES[0]);
   const [context, setContext] = useState("");
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [seedSearch, setSeedSearch] = useState("");
   const [seedFilter, setSeedFilter] = useState<"All" | SeedStock["status"]>(
     "All",
@@ -335,6 +345,167 @@ function NurseryPage() {
     toast.notify(message, "success");
   };
 
+  const seedReport =
+    seedSubtab === "propagation"
+      ? createReport({
+          id: "nursery-seed-propagation",
+          title: "Seed propagation log",
+          filename: "growmo-seed-propagation-log",
+          description:
+            "Live germination and propagation observations for the nursery.",
+          rows: filteredGermination,
+          columns: [
+            "day",
+            "date",
+            "activity",
+            "observation",
+            "action",
+            "status",
+          ],
+        })
+      : createReport({
+          id: "nursery-seed-inventory",
+          title:
+            seedSubtab === "storage"
+              ? "Seed storage register"
+              : "Seed inventory register",
+          filename: "growmo-seed-inventory",
+          description:
+            "Current seed lots using the active seed-store search and status filters.",
+          rows: filteredSeeds,
+          columns: [
+            "seed",
+            "variety",
+            "company",
+            "lot",
+            "quantity",
+            "germination",
+            "expiry",
+            "storage",
+            "status",
+            "value",
+          ],
+        });
+  const healthReport =
+    healthSubtab === "readiness"
+      ? createReport({
+          id: "nursery-transplant-readiness",
+          title: "Transplant readiness check",
+          filename: "growmo-transplant-readiness",
+          description:
+            "Current transplant-readiness criteria for the nursery batch.",
+          rows: TRANSPLANT_READINESS,
+          columns: ["criteria", "required", "actual", "pass"],
+        })
+      : createReport({
+          id: "nursery-seedling-health",
+          title: "Seedling health monitor",
+          filename: "growmo-seedling-health-monitor",
+          description:
+            "Current health-monitor results using the active issue and level filters.",
+          rows: filteredHealth,
+          columns: [
+            "issue",
+            "symptoms",
+            "cause",
+            "treatment",
+            "prevention",
+            "level",
+          ],
+        });
+  const sourceReport =
+    sourceSubtab === "direct"
+      ? createReport({
+          id: "nursery-direct-planting",
+          title: "Direct planting plan",
+          filename: "growmo-direct-planting-plan",
+          description: "Current field-direct planting specification.",
+          rows: [DIRECT_PLANTING],
+          columns: [
+            "crop",
+            "plot",
+            "method",
+            "seedRate",
+            "depth",
+            "spacing",
+            "target",
+            "fertilizer",
+            "date",
+            "expected",
+          ],
+        })
+      : createReport({
+          id: "nursery-seedling-purchases",
+          title: "Seedling purchase register",
+          filename: "growmo-seedling-purchase-register",
+          description:
+            "Current purchases using the active supplier, crop and status filters.",
+          rows: filteredPurchases,
+          columns: [
+            "date",
+            "nursery",
+            "crop",
+            "quantity",
+            "unitPrice",
+            "total",
+            "verified",
+            "quality",
+            "status",
+          ],
+        });
+  const nurseryReports: Record<View, ReportDefinition> = {
+    seeds: seedReport,
+    nursery: createReport({
+      id: "nursery-batch-register",
+      title: "Nursery batch register",
+      filename: "growmo-nursery-batch-register",
+      description:
+        "Current nursery batches using the active crop, site and status filters.",
+      rows: filteredNurseries,
+      columns: [
+        "crop",
+        "variety",
+        "seedLot",
+        "sown",
+        "target",
+        "ready",
+        "sowingDate",
+        "transplantDate",
+        "location",
+        "status",
+        "assigned",
+      ],
+    }),
+    germination: createReport({
+      id: "nursery-germination-log",
+      title: "Germination log",
+      filename: "growmo-germination-log",
+      description:
+        "Current germination results using the active activity search.",
+      rows: filteredGermination,
+      columns: ["day", "date", "activity", "observation", "action", "status"],
+    }),
+    health: healthReport,
+    sources: sourceReport,
+    performance: createReport({
+      id: "nursery-seed-performance",
+      title: "Seed performance record",
+      filename: "growmo-seed-performance-record",
+      description: "Current seed performance results using the active search.",
+      rows: filteredPerformance,
+      columns: [
+        "seed",
+        "variety",
+        "season",
+        "germination",
+        "emergence",
+        "yield",
+        "rating",
+      ],
+    }),
+  };
+  const activeReport = nurseryReports[view];
+
   const tableSearch = (
     value: string,
     onChange: (value: string) => void,
@@ -465,6 +636,7 @@ function NurseryPage() {
           ))}
         </div>
       </Reveal>
+      <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
       {view === "seeds" ? (
         <Reveal delay={80}>
@@ -1934,6 +2106,10 @@ function NurseryPage() {
         context={context}
         onClose={() => setModal(null)}
         onSaved={savedWorkflow}
+      />
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
       />
     </main>
   );

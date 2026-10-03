@@ -70,6 +70,12 @@ import {
   WalletHero,
   WalletKv,
 } from "../../components/dashboard/pages/WalletWidgets";
+import {
+  createReport,
+  ReportActionBar,
+  ReportPreviewDrawer,
+  type ReportDefinition,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination } from "../../components/ui/primitives";
 import type { PayoutLine, Recipient, Txn, WalletBudget } from "../../data/app/wallet";
 import {
@@ -141,6 +147,9 @@ function WalletPage() {
   const [security, setSecurity] = useState(SECURITY_CONTROLS);
   const [frozen, setFrozen] = useState(false);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [faqOpen, setFaqOpen] = useState<number | null>(0);
 
   const [depositOpen, setDepositOpen] = useState(false);
@@ -177,6 +186,72 @@ function WalletPage() {
   const perPage = 8;
   const pageCount = Math.max(1, Math.ceil(filtered.length / perPage));
   const visible = filtered.slice(page * perPage, page * perPage + perPage);
+
+  const walletReports: Record<WalletView, ReportDefinition> = {
+    overview: createReport({
+      id: "wallet-latest-movements",
+      title: "Wallet latest movements",
+      filename: "growmo-wallet-latest-movements",
+      description: "Most recent live money movements in the farm wallet.",
+      rows: txns.slice(0, 8),
+      columns: [
+        "date", "type", "description", "amount", "balanceAfter", "method", "status",
+      ],
+    }),
+    deposit: createReport({
+      id: "wallet-deposit-methods",
+      title: "Wallet deposit methods",
+      filename: "growmo-wallet-deposit-methods",
+      description: "Available deposit rails, limits, fees and settlement speed.",
+      rows: DEPOSIT_METHODS,
+      columns: ["name", "swahili", "min", "max", "fee", "speed"],
+    }),
+    send: createReport({
+      id: "wallet-saved-recipients",
+      title: "Wallet saved recipients",
+      filename: "growmo-wallet-saved-recipients",
+      description: "Current saved recipients for payments and farm payouts.",
+      rows: recipients,
+      columns: ["name", "phone", "role", "recent", "bank"],
+    }),
+    autopay: createReport({
+      id: "wallet-auto-pay-rules",
+      title: "Wallet auto-pay rules",
+      filename: "growmo-wallet-auto-pay-rules",
+      description: "Live wallet automation rules, caps and next runs.",
+      rows: rules,
+      columns: [
+        "label", "trigger", "recipients", "amount", "amountCap", "status", "nextRun",
+      ],
+    }),
+    history: createReport({
+      id: "wallet-transaction-history",
+      title: "Wallet transaction history",
+      filename: "growmo-wallet-transaction-history",
+      description: "Current history results using the active transaction filters.",
+      rows: filtered,
+      columns: [
+        "date", "type", "description", "category", "amount", "balanceAfter", "method", "refNo", "status",
+      ],
+    }),
+    budgets: createReport({
+      id: "wallet-budget-envelopes",
+      title: "Wallet budget envelopes",
+      filename: "growmo-wallet-budget-envelopes",
+      description: "Current ring-fenced crop and farm budget envelopes.",
+      rows: budgets,
+      columns: ["name", "crop", "allocated", "spent"],
+    }),
+    security: createReport({
+      id: "wallet-security-controls",
+      title: "Wallet security controls",
+      filename: "growmo-wallet-security-controls",
+      description: "Current wallet controls and enabled protection settings.",
+      rows: security,
+      columns: ["k", "v", "enabled", "lockable"],
+    }),
+  };
+  const activeReport = walletReports[view];
 
   const spendThisMonth = txns
     .filter((t) => t.type === "Out" && t.iso.startsWith("2026-10"))
@@ -377,6 +452,7 @@ function WalletPage() {
             ]}
           />
         </div>
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         {/* ---------------- 14.1 wallet dashboard ---------------- */}
         {view === "overview" ? (
@@ -878,6 +954,10 @@ function WalletPage() {
         confirmLabel={confirm?.label ?? "Confirm"}
         onClose={() => setConfirm(null)}
         onConfirm={() => confirm?.run()}
+      />
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
       />
     </main>
   );

@@ -82,6 +82,12 @@ import {
 } from "../../components/dashboard/pages/FinanceWidgets";
 import { BarChart } from "../../components/dashboard/pages/InventoryWidgets";
 import { PlannerSubtabs } from "../../components/dashboard/pages/PlannerWidgets";
+import {
+  createReport,
+  ReportActionBar,
+  type ReportDefinition,
+  ReportPreviewDrawer,
+} from "../../components/dashboard/pages/ReportActions";
 import { Pagination, Reveal } from "../../components/ui/primitives";
 import {
   AUTO_PAY_RULES,
@@ -189,6 +195,9 @@ function FinanceManagementPage() {
   const [settings, setSettings] =
     useState<FinancialSettings>(FINANCIAL_SETTINGS);
   const [menu, setMenu] = useState(false);
+  const [reportPreview, setReportPreview] = useState<ReportDefinition | null>(
+    null,
+  );
   const [modal, setModal] = useState<ModalId>(null);
   const [moneyModal, setMoneyModal] = useState<MoneyModal>("deposit");
   const [pendingExpenseId, setPendingExpenseId] = useState<string | null>(null);
@@ -671,6 +680,103 @@ function FinanceManagementPage() {
     },
   ];
 
+  const financeReports: Record<FinancialView, ReportDefinition> = {
+    wallet: createReport({
+      id: "finance-wallet-activity",
+      title: "Finance wallet activity",
+      filename: "growmo-finance-wallet-activity",
+      description: "Live wallet movements and their balances after each entry.",
+      rows: walletActivity,
+      columns: [
+        "time",
+        "description",
+        "kind",
+        "category",
+        "amount",
+        "balanceAfter",
+        "status",
+      ],
+    }),
+    budgets: createReport({
+      id: "finance-budgets",
+      title: "Finance budget register",
+      filename: "growmo-finance-budget-register",
+      description:
+        "Live crop and season budgets, spend, dates and delivery status.",
+      rows: budgets,
+      columns: ["name", "crop", "plot", "season", "total", "spent", "status"],
+    }),
+    expenses: createReport({
+      id: "finance-expenses",
+      title: "Finance expense register",
+      filename: "growmo-finance-expense-register",
+      description: "Live expense entries recorded for the current farm ledger.",
+      rows: expenses,
+      columns: [
+        "date",
+        "description",
+        "category",
+        "crop",
+        "amount",
+        "method",
+        "status",
+      ],
+    }),
+    income: createReport({
+      id: "finance-income",
+      title: "Finance income register",
+      filename: "growmo-finance-income-register",
+      description: "Live income, buyer and settlement records.",
+      rows: income,
+      columns: ["date", "source", "crop", "buyer", "total", "method", "status"],
+    }),
+    cashflow: createReport({
+      id: "finance-cash-flow",
+      title: "Finance cash-flow forecast",
+      filename: "growmo-finance-cash-flow",
+      description:
+        "Live cash-flow forecast using the current finance assumptions.",
+      rows: cashFlow,
+      columns: ["month", "inflows", "outflows", "net", "cumulative", "note"],
+    }),
+    pnl: createReport({
+      id: "finance-profit-loss",
+      title: "Cabbage profit and loss statement",
+      filename: "growmo-cabbage-profit-and-loss",
+      description:
+        "Budgeted versus actual P and L lines for the active cabbage season.",
+      rows: PNL_CABBAGE,
+      columns: ["group", "label", "budgeted", "actual", "variance", "note"],
+    }),
+    autopay: createReport({
+      id: "finance-auto-pay-rules",
+      title: "Finance auto-pay rules",
+      filename: "growmo-finance-auto-pay-rules",
+      description:
+        "Current payment automation rules and their latest activity.",
+      rows: rules,
+      columns: ["name", "trigger", "action", "amount", "status", "lastRun"],
+    }),
+    portfolio: createReport({
+      id: "finance-crop-portfolio",
+      title: "Crop finance portfolio",
+      filename: "growmo-crop-finance-portfolio",
+      description: "Crop-level budget, spend, revenue, profit and ROI outlook.",
+      rows: CROP_FINANCIALS,
+      columns: [
+        "crop",
+        "acreage",
+        "budget",
+        "spent",
+        "revenue",
+        "profit",
+        "roi",
+        "status",
+      ],
+    }),
+  };
+  const activeReport = financeReports[view];
+
   return (
     <main className="gm-app-page gm-finance-page">
       <div className="gm-container py-4">
@@ -763,6 +869,7 @@ function FinanceManagementPage() {
             label="Financial management sections"
           />
         </div>
+        <ReportActionBar report={activeReport} onPreview={setReportPreview} />
 
         <Reveal className="mt-4">
           {view === "wallet" ? (
@@ -1133,6 +1240,10 @@ function FinanceManagementPage() {
         open={modal === "portfolio"}
         crop={selectedCrop}
         onClose={closeModal}
+      />
+      <ReportPreviewDrawer
+        report={reportPreview}
+        onClose={() => setReportPreview(null)}
       />
     </main>
   );
